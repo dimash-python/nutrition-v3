@@ -8,11 +8,11 @@
 <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;700;900&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet"/>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-html,body{height:100%;background:#07070e;overflow:hidden}
+html,body{height:100%;background:#07070e;overflow:hidden;position:fixed;width:100%;top:0;left:0}#app{overflow:hidden}
 :root{--c:#ff9432;--cb:rgba(255,148,50,0.14)}
 body{font-family:'Plus Jakarta Sans',-apple-system,sans-serif;color:#f0f0f8;display:flex;justify-content:center}
-#app{width:100%;max-width:390px;height:100vh;position:relative;background:#07070e;overflow:hidden}
-.screen{position:absolute;inset:0;overflow-y:auto;padding-bottom:90px;scrollbar-width:none;-webkit-overflow-scrolling:touch;transition:opacity .3s,transform .3s}
+#app{width:100%;max-width:390px;height:100%;position:relative;background:#07070e;overflow:hidden}
+.screen{position:absolute;inset:0;overflow-y:scroll;padding-bottom:90px;scrollbar-width:none;-webkit-overflow-scrolling:touch;transition:opacity .3s,transform .3s;touch-action:pan-y;overscroll-behavior:contain}
 .screen::-webkit-scrollbar{display:none}
 .screen.hidden{opacity:0;pointer-events:none;transform:translateY(16px)}
 .fade-in{animation:fadeIn .35s cubic-bezier(.25,.46,.45,.94)}
