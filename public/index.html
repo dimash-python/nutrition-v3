@@ -28,7 +28,9 @@ body{font-family:'Plus Jakarta Sans',-apple-system,sans-serif;color:#f0f0f8;disp
 .btn-primary{background:var(--c);color:#000}
 .btn-ghost{background:rgba(255,255,255,.05);color:rgba(255,255,255,.55);border:none}
 .btn-sm{padding:8px 14px;border-radius:10px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.06);color:#f0f0f8}
-.inp{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:10px;padding:12px 14px;color:#f0f0f8;font-size:15px;width:100%;outline:none;font-family:inherit}
+.inp{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:10px;padding:12px 14px;color:#f0f0f8;font-size:15px;width:100%;outline:none;font-family:inherit;transition:border-color .2s}
+.inp:focus{border-color:rgba(255,255,255,.3)}
+.inp.error{border-color:#ff5733}
 .inp::placeholder{color:rgba(255,255,255,.28)}
 select.inp option{background:#111120}
 textarea.inp{resize:none;line-height:1.6}
@@ -488,17 +490,60 @@ function updatePreview(){
     </div>`:""}`;
 }
 function startMain(){
-  const name=document.getElementById("ud-name").value||"Атлет";
-  const w=+document.getElementById("ud-weight").value||70;
-  const h=+document.getElementById("ud-height").value||170;
-  const a=+document.getElementById("ud-age").value||25;
-  const tw=+document.getElementById("ud-target").value||(w-5);
-  const act=+document.getElementById("ud-activity").value||3;
+  // Validate required fields
+  var name=document.getElementById("ud-name").value.trim();
+  var w=+document.getElementById("ud-weight").value;
+  var h=+document.getElementById("ud-height").value;
+  var a=+document.getElementById("ud-age").value;
+  var tw=+document.getElementById("ud-target").value;
+  var act=+document.getElementById("ud-activity").value||3;
+
+  // Check gender
+  if(!S.gender){
+    showFieldError("Выбери пол — мужской или женский");return;
+  }
+  if(!name){
+    showFieldError("Введи своё имя");
+    document.getElementById("ud-name").focus();return;
+  }
+  if(!w||w<30||w>300){
+    showFieldError("Введи корректный вес (30–300 кг)");
+    document.getElementById("ud-weight").focus();return;
+  }
+  if(!h||h<100||h>250){
+    showFieldError("Введи корректный рост (100–250 см)");
+    document.getElementById("ud-height").focus();return;
+  }
+  if(!a||a<10||a>100){
+    showFieldError("Введи корректный возраст (10–100 лет)");
+    document.getElementById("ud-age").focus();return;
+  }
+  if(!tw||tw<30||tw>300){
+    showFieldError("Введи желаемый вес (30–300 кг)");
+    document.getElementById("ud-target").focus();return;
+  }
+
+  // All good — save and proceed
   S.name=name;S.weight=w;S.height=h;S.age=a;S.targetWeight=tw;
   S.dg=calcGoals(w,h,a,S.gender,act,S.gl);
   showScreen("main");
   renderDashboard();
 }
+
+function showFieldError(msg){
+  var el=document.getElementById("field-error");
+  if(!el){
+    el=document.createElement("div");
+    el.id="field-error";
+    el.style.cssText="background:rgba(255,87,51,.12);border:1px solid rgba(255,87,51,.3);border-radius:10px;padding:10px 14px;font-size:13px;color:#ff7755;margin-bottom:12px;text-align:center";
+    var btn=document.querySelector("#scr-data .btn-primary");
+    if(btn) btn.parentNode.insertBefore(el,btn);
+  }
+  el.textContent="⚠️ "+msg;
+  el.style.display="block";
+  setTimeout(function(){if(el)el.style.display="none";},3000);
+}
+
 
 // ── DASHBOARD ─────────────────────────────────────────────────────────────────
 function renderDashboard(){
@@ -1032,97 +1077,109 @@ async function showWeeklyPlan(){
 
 // ── BODY SCREEN ───────────────────────────────────────────────────────────────
 function renderBodyScreen(){
-  const g=GOALS.find(x=>x.id===S.gl);
-  const bc=document.getElementById("body-content");
-  const cw=S.weight||70;
-  const optMap={loss:-380,cutting:-500,bulking:280,maint:0,sport:-180,healthy:-120};
-  const optChg=((optMap[S.gl]||-350)*30)/7700;
-  const tw=S.targetWeight||(cw-(S.gl==="bulking"?-5:5));
-  const daysLeft=Math.round(Math.abs(cw-tw)*7700/Math.max(Math.abs(optMap[S.gl]||350),50));
-  const kgPerMonth=Math.abs((optMap[S.gl]||350)*30/7700).toFixed(1);
-  // Scenario A: maintenance (TDEE without plan) — no weight change
-  const mults=[1.2,1.375,1.55,1.725,1.9];
-  const bmr=S.gender==="female"?10*cw+6.25*(S.height||170)-5*(S.age||25)-161:10*cw+6.25*(S.height||170)-5*(S.age||25)+5;
-  const tdee=Math.round(bmr*(mults[2]||1.55));
+  var g=GOALS.find(function(x){return x.id===S.gl;});
+  var bc=document.getElementById("body-content");
+  var cw=S.weight||70;
+  var optMap={loss:-380,cutting:-500,bulking:280,maint:0,sport:-180,healthy:-120};
+  var optChg=((optMap[S.gl]||-350)*30)/7700;
+  var tw=S.targetWeight||(S.gl==="bulking"?cw+5:cw-5);
+  var daysLeft=Math.round(Math.abs(cw-tw)*7700/Math.max(Math.abs(optMap[S.gl]||350),50));
+  var months=Math.round(daysLeft/30*10)/10;
+  var kgPerMonth=Math.abs((optMap[S.gl]||350)*30/7700).toFixed(1);
+  var mults=[1.2,1.375,1.55,1.725,1.9];
+  var bmr=S.gender==="female"?10*cw+6.25*(S.height||170)-5*(S.age||25)-161:10*cw+6.25*(S.height||170)-5*(S.age||25)+5;
+  var tdee=Math.round(bmr*(mults[2]||1.55));
 
-  bc.innerHTML=`
-    <div class="text-head" style="margin-bottom:10px">Два сценария — 30 дней</div>
-    <div style="display:flex;gap:10px;margin-bottom:10px">
-      <div class="card" style="flex:1;background:rgba(255,87,51,.07);border:1px solid rgba(255,87,51,.25)">
-        <div class="tag" style="background:rgba(255,87,51,.15);color:#ff5733;font-size:10px;margin-bottom:8px">БЕЗ ПЛАНА</div>
-        <div style="font-size:24px;font-weight:900;color:#f0f0f8">${cw.toFixed(1)}<span style="font-size:12px;color:rgba(255,255,255,.4)"> кг</span></div>
-        <div style="font-size:12px;color:rgba(255,255,255,.4);margin-top:4px">без изменений</div>
-        <div style="font-size:11px;color:rgba(255,255,255,.3);margin-top:3px">${tdee} ккал/день</div>
-      </div>
-      <div class="card" style="flex:1;background:${g.color}0a;border:1px solid ${g.color}28">
-        <div class="tag" style="background:${g.color}20;color:${g.color};font-size:10px;margin-bottom:8px">ПО ПЛАНУ</div>
-        <div style="font-size:24px;font-weight:900;color:${g.color}">${(cw+optChg).toFixed(1)}<span style="font-size:12px;color:rgba(255,255,255,.4)"> кг</span></div>
-        <div style="font-size:12px;color:${g.color};font-weight:600;margin-top:4px">${optChg>0?"+":""}${optChg.toFixed(1)} кг</div>
-        <div style="font-size:11px;color:rgba(255,255,255,.3);margin-top:3px">${S.dg.calories} ккал/день</div>
-      </div>
-    </div>
-    <div class="card" style="background:rgba(0,232,122,.05);border:1px solid rgba(0,232,122,.18);margin-bottom:14px">
-      <div style="display:flex;gap:12px;align-items:center">
-        <span style="font-size:26px">🎯</span>
-        <div>
-          <div class="text-muted" style="font-size:11px;margin-bottom:2px">Цель: ${tw}кг · при соблюдении плана</div>
-          <div style="font-weight:700;font-size:15px">через ~${daysLeft} дней (${Math.round(daysLeft/30*10)/10} мес)</div>
-          <div style="font-size:11px;color:rgba(255,255,255,.3);margin-top:2px">${kgPerMonth} кг/месяц при дефиците ${Math.abs(optMap[S.gl]||350)} ккал/день</div>
-        </div>
-      </div>
-    </div>
+  var html="";
 
-    <div class="text-head" style="margin-bottom:10px">Body Twin — Анализ тела</div>
-    ${S.bodyLoading?`
-    <div class="card" style="text-align:center;padding:24px;margin-bottom:12px">
-      <div style="font-size:36px;margin-bottom:8px" class="pulse">🔍</div>
-      <div style="font-weight:600;font-size:13px">AI анализирует тело...</div>
-    </div>`:
-    S.bodyPics.length===0?`
-    <div class="dz" style="margin-bottom:14px" onclick="document.getElementById('body-file').click()">
-      <div style="font-size:40px">🪞</div>
-      <div style="font-weight:700;font-size:15px">Загрузи фото тела</div>
-      <div class="text-muted" style="font-size:12px;line-height:1.6;text-align:center">AI оценит % жира, мышцы,<br/>тип телосложения и даст совет</div>
-      <div style="padding:10px 24px;background:var(--c);color:#000;border-radius:10px;font-size:14px;font-weight:700">Выбрать фото</div>
-    </div>`:`
-    <div style="overflow-x:auto;padding-bottom:8px;margin-bottom:10px">
-      <div style="display:flex;gap:10px;width:max-content">
-        ${S.bodyPics.map((p,i)=>`
-        <div style="width:148px;flex-shrink:0">
-          <div style="position:relative">
-            <img src="${p.url}" style="width:148px;height:196px;object-fit:cover;border-radius:12px;display:block" alt="body"/>
-            ${i===S.bodyPics.length-1?`<div class="tag" style="position:absolute;top:7px;right:7px;background:rgba(0,232,122,.9);color:#000;font-size:9px">СЕЙЧАС</div>`:""}
-          </div>
-          <div style="margin-top:8px">
-            <div style="font-size:12px;font-weight:600;color:${g.color}">${p.date}</div>
-            ${p.an?`
-              <div class="text-muted" style="font-size:11px;margin-top:3px">Жир: ~${p.an.fatPercent}% · Мышцы: ${p.an.muscleLevel}/100</div>
-              <div class="text-muted" style="font-size:11px;margin-top:2px">${p.an.bodyType||""}</div>
-              <div style="font-size:11px;color:rgba(240,240,248,.75);margin-top:4px;line-height:1.5">${p.an.note}</div>
-              <div class="tag" style="background:${g.color}15;color:${g.color};font-size:10px;margin-top:5px;white-space:normal;line-height:1.4">→ ${(p.an.nextStep||"").slice(0,55)}</div>
-            `:""}
-          </div>
-        </div>`).join("")}
-        <div style="width:148px;height:196px;border:2px dashed rgba(255,255,255,.12);border-radius:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;gap:6px" onclick="document.getElementById('body-file').click()">
-          <div style="font-size:26px">+</div>
-          <div class="text-muted" style="font-size:11px;text-align:center">Добавить<br/>фото</div>
-        </div>
-      </div>
-    </div>
-    ${S.bodyPics.length>=2&&S.bodyPics[0].an&&S.bodyPics[S.bodyPics.length-1].an?`
-    <div class="card" style="background:rgba(0,232,122,.06);border:1px solid rgba(0,232,122,.2);margin-bottom:10px">
-      <div style="font-size:12px;color:#00e87a;font-weight:700;margin-bottom:4px">📈 ПРОГРЕСС</div>
-      <div style="font-size:13px;color:rgba(240,240,248,.8)">Жир: ${S.bodyPics[0].an.fatPercent}% → ${S.bodyPics[S.bodyPics.length-1].an.fatPercent}% · ${S.bodyPics.length} фото</div>
-    </div>`:""}
-    `}
+  // Scenarios
+  html+="<div class='text-head' style='margin-bottom:10px'>ДВА СЦЕНАРИЯ — 30 ДНЕЙ</div>";
+  html+="<div style='display:flex;gap:10px;margin-bottom:10px'>";
+  html+="<div class='card' style='flex:1;background:rgba(255,87,51,.07);border:1px solid rgba(255,87,51,.25)'>";
+  html+="<div class='tag' style='background:rgba(255,87,51,.15);color:#ff5733;font-size:10px;margin-bottom:8px'>БЕЗ ПЛАНА</div>";
+  html+="<div style='font-size:24px;font-weight:900;color:#f0f0f8'>"+cw.toFixed(1)+"<span style='font-size:12px;color:rgba(255,255,255,.4)'> кг</span></div>";
+  html+="<div style='font-size:12px;color:rgba(255,255,255,.4);margin-top:4px'>без изменений</div>";
+  html+="<div style='font-size:11px;color:rgba(255,255,255,.3);margin-top:3px'>"+tdee+" ккал/день</div>";
+  html+="</div>";
+  html+="<div class='card' style='flex:1;background:"+g.color+"0a;border:1px solid "+g.color+"28'>";
+  html+="<div class='tag' style='background:"+g.color+"20;color:"+g.color+";font-size:10px;margin-bottom:8px'>ПО ПЛАНУ</div>";
+  html+="<div style='font-size:24px;font-weight:900;color:"+g.color+"'>"+(cw+optChg).toFixed(1)+"<span style='font-size:12px;color:rgba(255,255,255,.4)'> кг</span></div>";
+  html+="<div style='font-size:12px;color:"+g.color+";font-weight:600;margin-top:4px'>"+(optChg>0?"+":"")+optChg.toFixed(1)+" кг</div>";
+  html+="<div style='font-size:11px;color:rgba(255,255,255,.3);margin-top:3px'>"+S.dg.calories+" ккал/день</div>";
+  html+="</div></div>";
 
-    <div class="card" style="margin-bottom:20px">
-      <div class="tag" style="background:rgba(255,87,51,.15);color:#ff5733;margin-bottom:10px">🔥 ПОДЕЛИТЬСЯ</div>
-      <div style="font-weight:700;font-size:15px;margin-bottom:6px">Карточка прогресса</div>
-      <div class="text-muted" style="font-size:13px;margin-bottom:14px">Скачай PNG и отправь друзьям как вызов</div>
-      <button class="btn btn-primary" onclick="downloadCard()">⬇ Скачать PNG</button>
-    </div>`;
+  // Goal timeline
+  html+="<div class='card' style='background:rgba(0,232,122,.05);border:1px solid rgba(0,232,122,.18);margin-bottom:14px'>";
+  html+="<div style='display:flex;gap:12px;align-items:center'><span style='font-size:26px'>🎯</span>";
+  html+="<div><div style='font-size:11px;color:rgba(255,255,255,.4);margin-bottom:2px'>Цель: "+tw+"кг · при соблюдении плана</div>";
+  html+="<div style='font-weight:700;font-size:15px'>через ~"+daysLeft+" дней ("+months+" мес)</div>";
+  html+="<div style='font-size:11px;color:rgba(255,255,255,.3);margin-top:2px'>"+kgPerMonth+" кг/месяц</div>";
+  html+="</div></div></div>";
+
+  // Body Twin header
+  html+="<div class='text-head' style='margin-bottom:12px'>BODY TWIN — АНАЛИЗ ТЕЛА</div>";
+
+  if(S.bodyLoading){
+    html+="<div class='card' style='text-align:center;padding:28px;margin-bottom:12px'>";
+    html+="<div style='font-size:36px;margin-bottom:10px' class='pulse'>🔍</div>";
+    html+="<div style='font-weight:600;font-size:13px'>AI анализирует тело...</div>";
+    html+="<div style='color:rgba(255,255,255,.35);font-size:12px;margin-top:6px'>Это займёт 10–20 секунд</div>";
+    html+="</div>";
+  } else if(S.bodyPics.length===0){
+    html+="<div style='border:2px dashed rgba(255,255,255,.14);border-radius:18px;padding:32px 20px;display:flex;flex-direction:column;align-items:center;gap:12px;cursor:pointer;text-align:center;margin-bottom:14px' onclick='document.getElementById(\"body-file\").click()'>";
+    html+="<div style='font-size:44px'>🪞</div>";
+    html+="<div style='font-weight:700;font-size:15px'>Загрузи фото тела</div>";
+    html+="<div style='color:rgba(240,240,248,.42);font-size:13px;line-height:1.6'>AI определит % жира, уровень мышц,<br/>тип телосложения и даст план</div>";
+    html+="<div style='padding:10px 24px;background:var(--c);color:#000;border-radius:10px;font-size:14px;font-weight:700'>Выбрать фото</div>";
+    html+="</div>";
+  } else {
+    html+="<div style='overflow-x:auto;padding-bottom:8px;margin-bottom:10px'>";
+    html+="<div style='display:flex;gap:10px;width:max-content'>";
+    S.bodyPics.forEach(function(p,i){
+      html+="<div style='width:148px;flex-shrink:0'>";
+      html+="<div style='position:relative'>";
+      html+="<img src='"+p.url+"' style='width:148px;height:196px;object-fit:cover;border-radius:12px;display:block'/>";
+      if(i===S.bodyPics.length-1){
+        html+="<div class='tag' style='position:absolute;top:7px;right:7px;background:rgba(0,232,122,.9);color:#000;font-size:9px'>СЕЙЧАС</div>";
+      }
+      html+="</div><div style='margin-top:8px'>";
+      html+="<div style='font-size:12px;font-weight:600;color:"+g.color+"'>"+p.date+"</div>";
+      if(p.an){
+        html+="<div style='color:rgba(240,240,248,.42);font-size:11px;margin-top:3px'>Жир: ~"+p.an.fatPercent+"% · Мышцы: "+p.an.muscleLevel+"/100</div>";
+        if(p.an.bodyType) html+="<div style='color:rgba(240,240,248,.42);font-size:11px;margin-top:2px'>"+p.an.bodyType+"</div>";
+        html+="<div style='font-size:11px;color:rgba(240,240,248,.75);margin-top:4px;line-height:1.5'>"+p.an.note+"</div>";
+        if(p.an.nextStep){
+          html+="<div class='tag' style='background:"+g.color+"15;color:"+g.color+";font-size:10px;margin-top:6px;white-space:normal;line-height:1.4'>→ "+(p.an.nextStep||"").slice(0,60)+"</div>";
+        }
+      }
+      html+="</div></div>";
+    });
+    html+="<div style='width:148px;height:196px;border:2px dashed rgba(255,255,255,.12);border-radius:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;gap:6px' onclick='document.getElementById(\"body-file\").click()'>";
+    html+="<div style='font-size:26px'>+</div><div style='color:rgba(240,240,248,.42);font-size:11px;text-align:center'>Добавить<br/>фото</div></div>";
+    html+="</div></div>";
+
+    if(S.bodyPics.length>=2){
+      var first=S.bodyPics[0].an, last=S.bodyPics[S.bodyPics.length-1].an;
+      if(first&&last){
+        var fatDiff=(last.fatPercent-first.fatPercent).toFixed(1);
+        html+="<div class='card' style='background:rgba(0,232,122,.06);border:1px solid rgba(0,232,122,.2);margin-bottom:10px'>";
+        html+="<div style='font-size:12px;color:#00e87a;font-weight:700;margin-bottom:4px'>📈 ПРОГРЕСС</div>";
+        html+="<div style='font-size:13px;color:rgba(240,240,248,.8)'>Жир: "+first.fatPercent+"% → "+last.fatPercent+"% ("+(fatDiff>0?"↑":"↓")+Math.abs(fatDiff)+"%) · "+S.bodyPics.length+" фото</div>";
+        html+="</div>";
+      }
+    }
+  }
+
+  // Share card
+  html+="<div class='card' style='margin-bottom:20px'>";
+  html+="<div class='tag' style='background:rgba(255,87,51,.15);color:#ff5733;margin-bottom:10px'>🔥 ПОДЕЛИТЬСЯ</div>";
+  html+="<div style='font-weight:700;font-size:15px;margin-bottom:6px'>Карточка прогресса</div>";
+  html+="<div style='color:rgba(240,240,248,.42);font-size:13px;margin-bottom:14px'>Скачай PNG и отправь друзьям как вызов</div>";
+  html+="<button class='btn btn-primary' onclick='downloadCard()'>⬇ Скачать PNG</button></div>";
+
+  bc.innerHTML=html;
 }
+
 
 // ── SHARE CARD ────────────────────────────────────────────────────────────────
 function downloadCard(){
