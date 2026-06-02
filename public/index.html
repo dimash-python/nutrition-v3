@@ -959,45 +959,75 @@ function resetFood(){
 
 // ── WEEKLY PLAN ───────────────────────────────────────────────────────────────
 async function showWeeklyPlan(){
-  const g=GOALS.find(x=>x.id===S.gl);
-  const sheet=document.getElementById("plan-sheet");
-  sheet.innerHTML=`
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
-      <div style="font-family:'Unbounded',sans-serif;font-size:16px;font-weight:700">План питания на неделю</div>
-      <button onclick="closeModal('plan-modal')" style="background:none;border:none;color:rgba(255,255,255,.4);cursor:pointer;font-size:22px">×</button>
-    </div>
-    <div style="text-align:center;padding:32px 0">
-      <div style="font-size:48px;margin-bottom:14px" class="pulse">🤖</div>
-      <div style="font-weight:700;font-size:15px;margin-bottom:6px">AI составляет твой план...</div>
-      <div class="text-muted" style="font-size:12px">Это займёт 10–15 секунд</div>
-    </div>`;
+  var g=GOALS.find(function(x){return x.id===S.gl;});
+  var sheet=document.getElementById("plan-sheet");
+  var days=["Понедельник","Вторник","Среда","Четверг","Пятница","Суббота","Воскресенье"];
+
+  // Show loading
+  var loadHTML="<div style='display:flex;justify-content:space-between;align-items:center;margin-bottom:20px'>";
+  loadHTML+="<div style='font-family:Unbounded,sans-serif;font-size:16px;font-weight:700'>План на 7 дней</div>";
+  loadHTML+="<button onclick=\"closeModal(\'plan-modal\')\" style='background:none;border:none;color:rgba(255,255,255,.4);cursor:pointer;font-size:22px'>x</button></div>";
+  loadHTML+="<div style='text-align:center;padding:32px 0'>";
+  loadHTML+="<div style='font-size:48px;margin-bottom:14px' class='pulse'>🤖</div>";
+  loadHTML+="<div style='font-weight:700;font-size:15px;margin-bottom:6px'>AI составляет твой план...</div>";
+  loadHTML+="<div style='color:rgba(240,240,248,.42);font-size:12px'>10-15 секунд</div></div>";
+  sheet.innerHTML=loadHTML;
   document.getElementById("plan-modal").style.display="flex";
-  try{
-    const plan=await callClaude([{role:"user",content:`Составь ПЕРСОНАЛЬНЫЙ план питания на 7 дней.\nПол: ${S.gender==="female"?"женщина":"мужчина"}. Вес: ${S.weight}кг → ${S.targetWeight||"?"}кг. Цель: ${GP[S.gl]}.\nНорма: ${S.dg.calories} ккал/день, белок ${S.dg.protein}г, жиры ${S.dg.fat}г, углеводы ${S.dg.carbs}г.\nРеальные блюда с точными граммами. Разные блюда каждый день. Учитывай пол и вес.\nJSON: {"days":[{"day":"Понедельник","breakfast":"блюдо с граммами","lunch":"блюдо с граммами","dinner":"блюдо с граммами","snack":"перекус","cal":1700}]}`}],
-      "Ты диетолог. Составляй вкусные и реалистичные планы питания. Верни ТОЛЬКО JSON без markdown.");
-    sheet.innerHTML=`
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
-        <div style="font-family:'Unbounded',sans-serif;font-size:16px;font-weight:700">План на 7 дней</div>
-        <button onclick="closeModal('plan-modal')" style="background:none;border:none;color:rgba(255,255,255,.4);cursor:pointer;font-size:22px">×</button>
-      </div>
-      ${plan.days.map(d=>`
-        <div class="card" style="margin-bottom:10px">
-          <div style="font-weight:700;font-size:14px;color:${g.color};margin-bottom:10px">${d.day} · ${d.total_calories} ккал</div>
-          ${d.meals.map(m=>`
-            <div style="display:flex;justify-content:space-between;align-items:flex-start;padding:7px 0;border-bottom:1px solid rgba(255,255,255,.05)">
-              <div>
-                <div style="font-size:12px;color:rgba(255,255,255,.4);font-weight:600">${m.name}</div>
-                <div style="font-size:13px;margin-top:2px">${m.food}</div>
-              </div>
-              <div style="text-align:right;flex-shrink:0;margin-left:10px">
-                <div style="font-size:13px;font-weight:700;color:${g.color}">${m.calories}</div>
-                <div class="text-muted" style="font-size:11px">Б${m.protein}г</div>
-              </div>
-            </div>`).join("")}
-        </div>`).join("")}`;
-  }catch(e){
-    sheet.innerHTML=`<div style="text-align:center;padding:32px"><div style="font-size:36px;margin-bottom:12px">❌</div><div style="font-weight:700;margin-bottom:8px">Ошибка генерации</div><button class="btn btn-primary" onclick="closeModal('plan-modal')">Закрыть</button></div>`;
-  }
+
+  fetch("/api/claude",{
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({
+      model:"claude-haiku-4-5",
+      max_tokens:3000,
+      system:"Ты диетолог. Верни ТОЛЬКО валидный JSON без markdown, комментариев и пояснений. Только JSON.",
+      messages:[{role:"user",content:
+        "Составь персональный план питания на 7 дней для: "+
+        "Пол: "+(S.gender==="female"?"женщина":"мужчина")+
+        ", вес: "+S.weight+"кг, желаемый вес: "+(S.targetWeight||S.weight-5)+"кг"+
+        ", цель: "+GP[S.gl]+
+        ", норма: "+S.dg.calories+" ккал/день, белок "+S.dg.protein+"г, жиры "+S.dg.fat+"г, углеводы "+S.dg.carbs+"г. "+
+        "Реальные блюда с точными граммами. Разные блюда каждый день. "+
+        'JSON: {"days":[{"day":"Понедельник","breakfast":"блюдо 200г","lunch":"блюдо 300г","dinner":"блюдо 250г","snack":"перекус 150г","cal":1800}]}'
+      }]
+    })
+  })
+  .then(function(r){return r.json();})
+  .then(function(d){
+    if(d.error) throw new Error(d.error.message||"API error");
+    var txt=d.content[0].text.replace(/```json|```/g,"").trim();
+    // Find JSON in response
+    var jsonStart=txt.indexOf("{");
+    var jsonEnd=txt.lastIndexOf("}")+1;
+    if(jsonStart>=0&&jsonEnd>jsonStart) txt=txt.slice(jsonStart,jsonEnd);
+    var plan=JSON.parse(txt);
+
+    var html="<div style='display:flex;justify-content:space-between;align-items:center;margin-bottom:20px'>";
+    html+="<div style='font-family:Unbounded,sans-serif;font-size:16px;font-weight:700'>План на 7 дней</div>";
+    html+="<button onclick=\"closeModal(\'plan-modal\')\" style='background:none;border:none;color:rgba(255,255,255,.4);cursor:pointer;font-size:22px'>x</button></div>";
+    html+="<div style='font-size:12px;color:rgba(255,255,255,.35);margin-bottom:14px'>";
+    html+=(S.gender==="female"?"Женщина":"Мужчина")+" · "+S.weight+"кг → "+(S.targetWeight||"?")+"кг · "+S.dg.calories+" ккал/день</div>";
+
+    plan.days.forEach(function(day){
+      html+="<div class='card' style='margin-bottom:10px'>";
+      html+="<div style='font-weight:700;font-size:14px;color:"+g.color+";margin-bottom:10px'>"+day.day+" · "+day.cal+" ккал</div>";
+      [["🌅 Завтрак",day.breakfast||"-"],["🍽 Обед",day.lunch||"-"],["🌙 Ужин",day.dinner||"-"],["🍎 Перекус",day.snack||"-"]].forEach(function(item){
+        html+="<div style='padding:7px 0;border-bottom:1px solid rgba(255,255,255,.05)'>";
+        html+="<div style='font-size:11px;color:rgba(255,255,255,.4);font-weight:600;margin-bottom:2px'>"+item[0]+"</div>";
+        html+="<div style='font-size:13px;color:rgba(240,240,248,.85)'>"+item[1]+"</div></div>";
+      });
+      html+="</div>";
+    });
+    sheet.innerHTML=html;
+  })
+  .catch(function(e){
+    var errHTML="<div style='text-align:center;padding:32px'>";
+    errHTML+="<div style='font-size:36px;margin-bottom:12px'>❌</div>";
+    errHTML+="<div style='font-weight:700;margin-bottom:6px'>Ошибка генерации</div>";
+    errHTML+="<div style='color:rgba(255,255,255,.4);font-size:12px;margin-bottom:16px'>"+e.message+"</div>";
+    errHTML+="<button class='btn btn-primary' onclick='showWeeklyPlan()'>Попробовать снова</button></div>";
+    sheet.innerHTML=errHTML;
+  });
 }
 
 // ── BODY SCREEN ───────────────────────────────────────────────────────────────
