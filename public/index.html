@@ -6,10 +6,10 @@
 <title>AI Nutrition Coach</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;700;900&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet"/>
-<script src="https://unpkg.com/@zxing/library@0.19.1/umd/index.min.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-html,body{height:100%;background:#07070e;overflow:hidden;position:fixed;width:100%;top:0;left:0}
+html,body{height:100%;background:#07070e;overflow:hidden;position:fixed;width:100%;top:0;left:0}#app{overflow:hidden}
+:root{--c:#ff9432;--cb:rgba(255,148,50,0.14)}
 body{font-family:'Plus Jakarta Sans',-apple-system,sans-serif;color:#f0f0f8;display:flex;justify-content:center}
 #app{width:100%;max-width:390px;height:100%;position:relative;background:#07070e;overflow:hidden}
 .screen{position:absolute;inset:0;overflow-y:scroll;padding-bottom:90px;scrollbar-width:none;-webkit-overflow-scrolling:touch;transition:opacity .3s,transform .3s;touch-action:pan-y;overscroll-behavior:contain}
@@ -20,23 +20,29 @@ body{font-family:'Plus Jakarta Sans',-apple-system,sans-serif;color:#f0f0f8;disp
 .pulse{animation:pulse 1.8s ease-in-out infinite}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
 .tip-slide{animation:tipSlide .25s ease}
-@keyframes tipSlide{from{opacity:0;max-height:0}to{opacity:1;max-height:200px}}
+@keyframes tipSlide{from{opacity:0;max-height:0;transform:translateY(-8px)}to{opacity:1;max-height:200px;transform:translateY(0)}}
+/* Cards */
 .card{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:16px;padding:16px}
 .card-goal{border-width:1.5px;cursor:pointer;padding:14px 16px;transition:all .2s;border-color:transparent;background:rgba(255,255,255,.03)}
 .card-goal.selected{border-color:var(--c);background:var(--cb)}
+/* Buttons */
 .btn{width:100%;padding:14px;border-radius:12px;border:none;font-weight:700;font-size:15px;cursor:pointer;font-family:inherit;transition:all .2s}
 .btn-primary{background:var(--c);color:#000}
 .btn-ghost{background:rgba(255,255,255,.05);color:rgba(255,255,255,.55);border:none}
 .btn-sm{padding:8px 14px;border-radius:10px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.06);color:#f0f0f8}
+/* Inputs */
 .inp{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:10px;padding:12px 14px;color:#f0f0f8;font-size:15px;width:100%;outline:none;font-family:inherit}
 .inp::placeholder{color:rgba(255,255,255,.28)}
 select.inp option{background:#111120}
 textarea.inp{resize:none;line-height:1.6}
+/* Tags */
 .tag{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700}
+/* Progress bars */
 .pbar{height:5px;border-radius:3px;background:rgba(255,255,255,.08);overflow:hidden;margin-top:3px}
 .pbar-fill{height:100%;border-radius:3px;transition:width 1s cubic-bezier(.22,1,.36,1)}
 .xpbar{height:3px;background:rgba(255,255,255,.07);border-radius:2px;overflow:hidden}
 .xpbar-fill{height:100%;background:linear-gradient(90deg,#00e87a,#4a9eff);border-radius:2px;transition:width .8s}
+/* Nav */
 .bnav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:390px;background:rgba(7,7,14,.97);backdrop-filter:blur(20px);border-top:1px solid rgba(255,255,255,.07);display:flex;z-index:100}
 .nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:10px 0 16px;background:none;border:none;cursor:pointer;color:rgba(255,255,255,.28);font-size:11px;transition:color .2s;font-family:inherit}
 .nav-btn.active{color:var(--c)}
@@ -44,47 +50,35 @@ textarea.inp{resize:none;line-height:1.6}
 .nav-center{flex:1;display:flex;flex-direction:column;align-items:center;padding:0 0 14px}
 .nav-plus{margin-top:-22px;width:52px;height:52px;border-radius:50%;background:var(--c);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:26px;font-weight:900;color:#000;box-shadow:0 0 20px rgba(255,148,50,.44);font-family:inherit;transition:transform .15s}
 .nav-plus:hover{transform:scale(1.08)}
+/* Modal overlay */
 .overlay{position:fixed;inset:0;background:rgba(0,0,0,.82);backdrop-filter:blur(10px);display:flex;align-items:flex-end;justify-content:center;z-index:200;animation:fadeIn .2s}
 .sheet{background:#111120;border-radius:20px 20px 0 0;width:100%;max-width:390px;padding:28px 20px 40px;animation:sheetUp .32s cubic-bezier(.25,.46,.45,.94);max-height:90vh;overflow-y:auto}
 @keyframes sheetUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+/* Misc */
 .meal-row{display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid rgba(255,255,255,.05)}
 .meal-row:last-child{border-bottom:none}
 .text-muted{color:rgba(240,240,248,.42);font-size:13px}
-.text-head{font-family:Unbounded,sans-serif;font-weight:700;text-transform:uppercase;font-size:12px;letter-spacing:.04em}
-.h1{font-family:Unbounded,sans-serif;font-size:28px;font-weight:900;line-height:1.2}
-.h2{font-family:Unbounded,sans-serif;font-size:20px;font-weight:800}
+.text-head{font-family:'Unbounded',sans-serif;font-weight:700;text-transform:uppercase;font-size:12px;letter-spacing:.04em}
+.h1{font-family:'Unbounded',sans-serif;font-size:28px;font-weight:900;line-height:1.2}
+.h2{font-family:'Unbounded',sans-serif;font-size:20px;font-weight:800}
 .gender-btn{flex:1;padding:12px;border-radius:10px;font-weight:600;font-size:14px;cursor:pointer;transition:all .2s;font-family:inherit;border:1.5px solid rgba(255,255,255,.1);background:rgba(255,255,255,.04);color:rgba(240,240,248,.6)}
 .gender-btn.sel{border-color:var(--c);background:var(--cb);color:var(--c)}
 .dz{border:2px dashed rgba(255,255,255,.12);border-radius:20px;padding:40px 20px;display:flex;flex-direction:column;align-items:center;gap:12px;cursor:pointer;background:rgba(255,255,255,.02);text-align:center}
 .mode-btn{flex:1;padding:11px;border-radius:10px;font-weight:600;font-size:14px;cursor:pointer;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.04);color:rgba(240,240,248,.6);font-family:inherit;transition:all .2s}
 .mode-btn.sel{border-color:rgba(255,148,50,.6);background:rgba(255,148,50,.15);color:var(--c)}
-/* Onboarding */
-.ob-slide{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 28px;text-align:center;transition:opacity .4s,transform .4s}
-.ob-slide.hidden{opacity:0;pointer-events:none;transform:translateX(40px)}
-.ob-icon{font-size:80px;margin-bottom:24px;line-height:1}
-.ob-dots{display:flex;gap:8px;margin-top:32px}
-.ob-dot{width:8px;height:8px;border-radius:4px;background:rgba(255,255,255,.2);transition:all .3s}
-.ob-dot.active{width:24px;background:var(--c)}
-/* Barcode */
-#barcode-video{width:100%;border-radius:12px;display:block}
-:root{--c:#ff9432;--cb:rgba(255,148,50,0.14)}
+.body-thumb{width:148px;flex-shrink:0}
+.body-img{width:148px;height:196px;object-fit:cover;border-radius:12px;display:block}
+.body-add{width:148px;height:196px;border:2px dashed rgba(255,255,255,.12);border-radius:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;gap:6px}
+/* Key setup screen */
 </style>
 </head>
 <body>
+
+<!-- MAIN APP -->
 <div id="app">
 
-  <!-- ONBOARDING -->
-  <div id="scr-onboard" class="screen fade-in" style="padding:0;overflow:hidden">
-    <div style="height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 28px;text-align:center">
-      <div id="ob-content"></div>
-      <div id="ob-dots" style="display:flex;gap:8px;margin-top:32px"></div>
-      <button id="ob-btn" class="btn btn-primary" style="margin-top:24px;width:100%;max-width:300px" onclick="nextSlide()">Начать →</button>
-      <button onclick="showScreen('goal')" style="margin-top:12px;background:none;border:none;color:rgba(255,255,255,.25);font-size:13px;cursor:pointer;font-family:inherit">Пропустить</button>
-    </div>
-  </div>
-
-<!-- GOAL -->
-  <div id="scr-goal" class="screen hidden" style="padding:48px 20px 32px">
+  <!-- SCREEN: GOAL -->
+  <div id="scr-goal" class="screen fade-in" style="padding:48px 20px 32px">
     <div class="tag" style="background:rgba(0,232,122,.1);color:#00e87a;margin-bottom:24px">✦ AI Nutrition Coach</div>
     <div class="h1" style="margin-bottom:8px">Выбери<br/>свою цель</div>
     <p class="text-muted" style="margin-bottom:24px">AI подберёт план под твой пол, тело и режим</p>
@@ -92,7 +86,7 @@ textarea.inp{resize:none;line-height:1.6}
     <button class="btn" id="goal-next-btn" style="margin-top:20px;background:rgba(255,255,255,.06);color:rgba(255,255,255,.2)" onclick="goToData()">Продолжить →</button>
   </div>
 
-  <!-- DATA -->
+  <!-- SCREEN: DATA -->
   <div id="scr-data" class="screen hidden" style="padding:40px 20px 32px">
     <div style="display:flex;align-items:center;gap:14px;margin-bottom:24px">
       <button onclick="showScreen('goal')" style="background:none;border:none;color:rgba(255,255,255,.4);cursor:pointer;font-size:20px;padding:0">←</button>
@@ -103,15 +97,15 @@ textarea.inp{resize:none;line-height:1.6}
       <div>
         <div style="font-size:12px;color:rgba(255,255,255,.38);margin-bottom:8px">Пол</div>
         <div style="display:flex;gap:10px">
-          <button class="gender-btn" id="gbtn-male" onclick="setGender('male')">Мужской</button>
+          <button class="gender-btn" id="gbtn-male"   onclick="setGender('male')"  >Мужской</button>
           <button class="gender-btn" id="gbtn-female" onclick="setGender('female')">Женский</button>
         </div>
         <div id="bmr-hint" style="font-size:11px;color:rgba(255,255,255,.3);margin-top:5px"></div>
       </div>
-      <div><div style="font-size:12px;color:rgba(255,255,255,.38);margin-bottom:6px">Имя</div><input id="ud-name" class="inp" type="text" placeholder="Алекс"/></div>
+      <div><div style="font-size:12px;color:rgba(255,255,255,.38);margin-bottom:6px">Имя</div><input id="ud-name"   class="inp" type="text"   placeholder="Алекс"/></div>
       <div><div style="font-size:12px;color:rgba(255,255,255,.38);margin-bottom:6px">Вес (кг)</div><input id="ud-weight" class="inp" type="number" placeholder="70" oninput="updatePreview()"/></div>
       <div><div style="font-size:12px;color:rgba(255,255,255,.38);margin-bottom:6px">Рост (см)</div><input id="ud-height" class="inp" type="number" placeholder="170" oninput="updatePreview()"/></div>
-      <div><div style="font-size:12px;color:rgba(255,255,255,.38);margin-bottom:6px">Возраст</div><input id="ud-age" class="inp" type="number" placeholder="25" oninput="updatePreview()"/></div>
+      <div><div style="font-size:12px;color:rgba(255,255,255,.38);margin-bottom:6px">Возраст</div><input id="ud-age"    class="inp" type="number" placeholder="25"  oninput="updatePreview()"/></div>
       <div><div style="font-size:12px;color:rgba(255,255,255,.38);margin-bottom:6px">Желаемый вес (кг)</div><input id="ud-target" class="inp" type="number" placeholder="65"/></div>
       <div>
         <div style="font-size:12px;color:rgba(255,255,255,.38);margin-bottom:6px">Уровень активности</div>
@@ -124,19 +118,21 @@ textarea.inp{resize:none;line-height:1.6}
         </select>
       </div>
     </div>
-    <div id="plan-preview" style="display:none;margin-top:16px" class="card"></div>
+    <div id="plan-preview" style="display:none;margin-top:16px" class="card" style="background:rgba(0,232,122,.05);border:1px solid rgba(0,232,122,.2)"></div>
     <button class="btn btn-primary" style="margin-top:16px" onclick="startMain()">Создать мой план →</button>
   </div>
 
-  <!-- MAIN -->
+  <!-- SCREEN: MAIN (DASHBOARD) -->
   <div id="scr-main" class="screen hidden" style="padding:44px 20px 0">
+    <!-- Header -->
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
       <div>
         <div class="text-muted" style="font-size:12px;margin-bottom:2px" id="greeting">Привет!</div>
-        <div style="font-family:Unbounded,sans-serif;font-size:17px;font-weight:700" id="level-label">Level 1</div>
+        <div style="font-family:'Unbounded',sans-serif;font-size:17px;font-weight:700" id="level-label">Level 1</div>
       </div>
       <div class="tag" style="background:rgba(255,87,51,.15);color:#ff5733" id="streak-tag">Streak: 0 д.</div>
     </div>
+    <!-- XP -->
     <div style="margin-bottom:14px">
       <div style="display:flex;justify-content:space-between;margin-bottom:4px">
         <span class="text-muted" style="font-size:11px" id="xp-label">XP: 0 / 5000</span>
@@ -144,18 +140,22 @@ textarea.inp{resize:none;line-height:1.6}
       </div>
       <div class="xpbar"><div class="xpbar-fill" id="xp-bar" style="width:0%"></div></div>
     </div>
+    <!-- Body state -->
     <div style="margin-bottom:14px">
       <div id="body-state-pill" style="display:inline-flex;align-items:center;gap:8px;padding:8px 16px;border-radius:30px"></div>
     </div>
+    <!-- Calorie ring + macros -->
     <div class="card" style="margin-bottom:12px">
       <div style="display:flex;align-items:center;gap:14px">
         <div style="position:relative;flex-shrink:0">
-          <svg width="114" height="114" viewBox="0 0 114 114">
+          <svg width="114" height="114" viewBox="0 0 114 114" id="cal-ring-svg">
             <circle cx="57" cy="57" r="52" fill="none" stroke="rgba(255,255,255,.07)" stroke-width="9"/>
-            <circle cx="57" cy="57" r="52" fill="none" id="cal-ring" stroke="#4a9eff" stroke-width="9" stroke-dasharray="326.7" stroke-dashoffset="326.7" stroke-linecap="round" transform="rotate(-90 57 57)" style="transition:stroke-dashoffset .9s"/>
+            <circle cx="57" cy="57" r="52" fill="none" id="cal-ring" stroke="#4a9eff" stroke-width="9"
+              stroke-dasharray="326.7" stroke-dashoffset="326.7" stroke-linecap="round"
+              transform="rotate(-90 57 57)" style="transition:stroke-dashoffset .9s cubic-bezier(.22,1,.36,1)"/>
           </svg>
           <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center">
-            <div style="font-family:Unbounded,sans-serif;font-size:18px;font-weight:900" id="cal-ring-val">0</div>
+            <div style="font-family:'Unbounded',sans-serif;font-size:18px;font-weight:900" id="cal-ring-val">0</div>
             <div class="text-muted" style="font-size:9px;margin-top:1px">ккал</div>
           </div>
         </div>
@@ -165,8 +165,11 @@ textarea.inp{resize:none;line-height:1.6}
         </div>
       </div>
     </div>
+    <!-- Water -->
     <div class="card" style="margin-bottom:12px" id="water-card"></div>
+    <!-- Mission -->
     <div class="card" id="mission-card" style="margin-bottom:12px;background:rgba(0,232,122,.05);border:1px solid rgba(0,232,122,.18)"></div>
+    <!-- Meals -->
     <div style="margin-bottom:12px">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
         <div class="text-head">Сегодня</div>
@@ -174,21 +177,22 @@ textarea.inp{resize:none;line-height:1.6}
       </div>
       <div class="card" id="meals-list"><div class="text-muted" style="text-align:center;padding:20px 0;font-size:13px">Нажми + чтобы добавить первый приём</div></div>
     </div>
+    <!-- Notifications -->
     <div class="card" style="margin-bottom:20px" id="notif-card"></div>
   </div>
 
-  <!-- FOOD -->
+  <!-- SCREEN: FOOD -->
   <div id="scr-food" class="screen hidden" style="padding:44px 20px 0">
     <div class="h2" style="margin-bottom:4px">Анализ питания</div>
-    <div class="text-muted" style="margin-bottom:16px">Фото, штрихкод или текст</div>
+    <div class="text-muted" style="margin-bottom:16px">Фото или описание текстом</div>
     <div id="food-content"></div>
   </div>
 
-  <!-- HISTORY -->
-  <div id="scr-history" class="screen hidden" style="padding:44px 20px 0">
-    <div class="h2" style="margin-bottom:4px">История</div>
-    <div class="text-muted" style="margin-bottom:20px">Питание за неделю</div>
-    <div id="history-content"></div>
+  <!-- SCREEN: BODY -->
+  <div id="scr-body" class="screen hidden" style="padding:44px 20px 0">
+    <div class="h2" style="margin-bottom:4px">Тело</div>
+    <div class="text-muted" style="margin-bottom:20px">Прогресс, сценарии и Body Twin</div>
+    <div id="body-content"></div>
   </div>
 
   <!-- BOTTOM NAV -->
@@ -196,159 +200,148 @@ textarea.inp{resize:none;line-height:1.6}
     <button class="nav-btn active" id="nav-main" onclick="switchTab('main')">
       <span class="nav-icon">🏠</span>Главная
     </button>
-    <button class="nav-btn" id="nav-history" onclick="switchTab('history')">
-      <span class="nav-icon">📊</span>История
-    </button>
     <div class="nav-center">
       <button class="nav-plus" onclick="openFood()">+</button>
       <span style="font-size:11px;color:rgba(255,255,255,.28);margin-top:3px" id="nav-food-label">Еда</span>
     </div>
-    <button class="nav-btn" id="nav-plan" onclick="showWeeklyPlan()">
-      <span class="nav-icon">📅</span>План
-    </button>
     <button class="nav-btn" id="nav-body" onclick="switchTab('body')">
       <span class="nav-icon">💪</span>Тело
     </button>
   </nav>
 
-  <!-- BODY -->
-  <div id="scr-body" class="screen hidden" style="padding:44px 20px 0">
-    <div class="h2" style="margin-bottom:4px">Тело</div>
-    <div class="text-muted" style="margin-bottom:20px">Прогресс и сценарии</div>
-    <div id="body-content"></div>
-  </div>
-
-  <input type="file" id="food-file" accept="image/*" style="display:none" onchange="onFoodFile(event)"/>
-  <input type="file" id="body-file" accept="image/*" style="display:none" onchange="onBodyFile(event)"/>
+  <!-- Hidden file inputs -->
+  <input type="file" id="food-file"  accept="image/*" style="display:none" onchange="onFoodFile(event)"/>
+  <input type="file" id="body-file"  accept="image/*" style="display:none" onchange="onBodyFile(event)"/>
 </div>
 
 <!-- MODALS -->
-<div id="hunger-modal" style="display:none" class="overlay" onclick="closeModal('hunger-modal',event)"><div class="sheet" id="hunger-sheet"></div></div>
-<div id="share-modal" style="display:none" class="overlay" onclick="closeModal('share-modal',event)"><div class="sheet" id="share-sheet"></div></div>
-<div id="plan-modal" style="display:none" class="overlay" onclick="closeModal('plan-modal',event)"><div class="sheet" id="plan-sheet" style="max-height:85vh;overflow-y:auto"></div></div>
-<div id="barcode-modal" style="display:none" class="overlay" onclick="closeModal('barcode-modal',event)">
-  <div class="sheet">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
-      <div style="font-family:Unbounded,sans-serif;font-size:16px;font-weight:700">Сканирование штрихкода</div>
-      <button onclick="stopBarcode()" style="background:none;border:none;color:rgba(255,255,255,.4);cursor:pointer;font-size:22px">×</button>
-    </div>
-    <video id="barcode-video" autoplay playsinline></video>
-    <div id="barcode-status" class="text-muted" style="text-align:center;margin-top:12px;font-size:13px">Наведи камеру на штрихкод</div>
-  </div>
-</div>
+<div id="hunger-modal"  style="display:none" class="overlay" onclick="closeModal('hunger-modal',event)"><div class="sheet" id="hunger-sheet"></div></div>
+<div id="share-modal"   style="display:none" class="overlay" onclick="closeModal('share-modal',event)"><div class="sheet" id="share-sheet"></div></div>
 
 <script>
-// ── GOALS ─────────────────────────────────────────────────────────────────────
-const GOALS=[
-  {id:"loss",icon:"🏃",title:"Похудение",sub:"Мягкое снижение веса",desc:"Плавно снижаем вес без стресса",color:"#ff9432",bg:"rgba(255,148,50,0.14)",tip:"Дефицит 300–400 ккал/день — стабильный −1–1.5 кг/месяц без потери мышц."},
-  {id:"cutting",icon:"🔥",title:"Сушка",sub:"Рельеф и жиросжигание",desc:"Спортивная сушка с сохранением мышц",color:"#ff5733",bg:"rgba(255,87,51,0.14)",tip:"Дефицит 400–600 ккал + 2.2г белка/кг. Циклируй углеводы."},
-  {id:"bulking",icon:"💪",title:"Масса",sub:"Набор мышц",desc:"Строим мышцы, растём в силе",color:"#00e87a",bg:"rgba(0,232,122,0.13)",tip:"Профицит 200–300 ккал + 2г белка/кг. Темп: 0.5–1 кг/месяц."},
-  {id:"maint",icon:"⚖️",title:"Поддержание",sub:"Удержание формы",desc:"Держим результат без откатов",color:"#4a9eff",bg:"rgba(74,158,255,0.13)",tip:"Точное TDEE без дефицита. 80% цельные продукты."},
-  {id:"sport",icon:"⚡",title:"Спорт",sub:"Выносливость и скорость",desc:"Максимум энергии и производительности",color:"#fbbf24",bg:"rgba(251,191,36,0.13)",tip:"Углеводы за 2–3 ч до тренировки. Белок сразу после."},
-  {id:"healthy",icon:"🌿",title:"Здоровье",sub:"Правильное питание",desc:"Натуральное и сбалансированное",color:"#a855f7",bg:"rgba(168,85,247,0.13)",tip:"Правило тарелки: ½ овощи, ¼ белок, ¼ углеводы."},
+// ═══════════════════════════════════════════════════
+// CONFIG & STATE
+// ═══════════════════════════════════════════════════
+const XP_MAX = 5000;
+
+const GOALS = [
+  {id:"loss",    icon:"🏃",title:"Похудение",  sub:"Мягкое снижение веса",    desc:"Плавно снижаем вес без стресса",       color:"#ff9432",bg:"rgba(255,148,50,0.14)",
+   tip:"Дефицит 300–400 ккал/день — достаточно для стабильного −1–1.5 кг/месяц без потери мышц. Акцент на белок и клетчатку: насыщают надолго. Правило 80/20 работает лучше любой диеты."},
+  {id:"cutting", icon:"🔥",title:"Сушка",      sub:"Рельеф и жиросжигание",   desc:"Спортивная сушка с сохранением мышц",  color:"#ff5733",bg:"rgba(255,87,51,0.14)",
+   tip:"Дефицит 400–600 ккал + 2.2г белка/кг. Идеально если уже тренируешься. Циклируй углеводы: больше в дни тренировок, меньше в дни отдыха. Кардио натощак ускорит процесс."},
+  {id:"bulking", icon:"💪",title:"Масса",      sub:"Набор мышц",              desc:"Строим мышцы, растём в силе",          color:"#00e87a",bg:"rgba(0,232,122,0.13)",
+   tip:"Профицит 200–300 ккал + 2г белка/кг — золотой стандарт. Углеводы до и после тренировки. Оптимальный темп: 0.5–1 кг/месяц. Меньше — теряешь потенциал, больше — набираешь жир."},
+  {id:"maint",   icon:"⚖️",title:"Поддержание",sub:"Удержание формы",         desc:"Держим результат без откатов",         color:"#4a9eff",bg:"rgba(74,158,255,0.13)",
+   tip:"Точное TDEE без дефицита и профицита. После похудения перезагружает метаболизм за 8–12 недель. Качество важнее количества: 80% цельные продукты."},
+  {id:"sport",   icon:"⚡",title:"Спорт",      sub:"Выносливость и скорость", desc:"Максимум энергии и производительности",color:"#fbbf24",bg:"rgba(251,191,36,0.13)",
+   tip:"Углеводы — главное топливо: ешь за 2–3 ч до тренировки. Белок сразу после. При нагрузках >60 мин — быстрые углеводы каждые 45 мин. Электролиты при интенсивных тренировках."},
+  {id:"healthy", icon:"🌿",title:"Здоровье",   sub:"Правильное питание",      desc:"Натуральное и сбалансированное",       color:"#a855f7",bg:"rgba(168,85,247,0.13)",
+   tip:"Правило тарелки: ½ овощи, ¼ белок, ¼ углеводы. Минимум обработанного. Правило 80/20 — гибкость без чувства вины — ключ к долгосрочной привычке."},
 ];
-const BSTATES={
-  burning:{icon:"🔥",label:"Жир горит",color:"#ff5733"},
-  building:{icon:"💪",label:"Мышцы растут",color:"#00e87a"},
-  dark:{icon:"📉",label:"Недобор калорий",color:"#4a9eff"},
-  sugar:{icon:"⚠️",label:"Перебор сахара",color:"#fbbf24"},
-  perfect:{icon:"⭐",label:"Идеальный день",color:"#a855f7"},
+const BSTATES = {
+  burning: {icon:"🔥",label:"Жир горит",       color:"#ff5733"},
+  building:{icon:"💪",label:"Мышцы растут",    color:"#00e87a"},
+  dark:    {icon:"📉",label:"Недобор калорий", color:"#4a9eff"},
+  sugar:   {icon:"⚠️", label:"Перебор сахара",  color:"#fbbf24"},
+  perfect: {icon:"⭐",label:"Идеальный день",  color:"#a855f7"},
 };
-const GP={
-  loss:"ПОХУДЕНИЕ: дефицит 300-400 ккал, белок 1.6-1.8г/кг, без жёстких ограничений",
-  cutting:"СУШКА: дефицит 400-600 ккал, белок 2.2г/кг, минимум быстрых углеводов",
-  bulking:"МАССА: профицит 200-300 ккал, белок 2г/кг, много сложных углеводов",
-  maint:"ПОДДЕРЖАНИЕ: норма TDEE, баланс всех макронутриентов",
-  sport:"СПОРТ: углеводы для энергии, белок для восстановления",
-  healthy:"ЗДОРОВЬЕ: цельные продукты, правило тарелки, умеренность",
+const GP = {
+  loss:   "ПОХУДЕНИЕ: мягкий дефицит 300-400 ккал, умеренный белок 1.6-1.8г/кг",
+  cutting:"СУШКА: дефицит 400-600 ккал, высокий белок 2.2г/кг, мало быстрых углеводов",
+  bulking:"МАССА: профицит 200-300 ккал, много белка 2г/кг и сложных углеводов",
+  maint:  "ПОДДЕРЖАНИЕ: норма TDEE, баланс всех макронутриентов",
+  sport:  "СПОРТ: углеводы для энергии, белок для восстановления, электролиты",
+  healthy:"ЗДОРОВОЕ ПИТАНИЕ: цельные продукты, правило тарелки, умеренность",
 };
 
-// Разные вопросы о голоде
-const HUNGER_Q=[
-  {q:"Ты правда голоден?",sub:"Настоящий голод или просто скука?"},
-  {q:"Подожди 5 минут",sub:"Иногда жажда маскируется под голод. Выпей воды?"},
-  {q:"Когда ты последний раз ел?",sub:"Если прошло меньше 2 часов — возможно это привычка"},
-  {q:"Что ты чувствуешь?",sub:"Голод в желудке или желание \"что-нибудь пожевать\"?"},
-  {q:"Это эмоциональный голод?",sub:"Стресс, скука и усталость часто имитируют голод"},
-];
-
-// ── STATE ─────────────────────────────────────────────────────────────────────
-const XP_MAX=5000;
-const S={
-  gl:null,gender:null,name:"",weight:0,height:0,age:0,targetWeight:0,
+// App state
+const S = {
+  gl:null, gender:null,
+  name:"", weight:0, height:0, age:0, targetWeight:0,
   dg:{calories:2000,protein:150,fat:65,carbs:200},
   st:{calories:0,protein:0,fat:0,carbs:0},
-  meals:[],lv:1,xp:0,str:0,water:0,bs:"burning",missionDone:false,
-  bodyPics:[],notifOn:false,notifTimer:null,
-  foodImg:null,foodB64:null,foodMime:null,foodAna:null,foodAdv:null,
-  loadingFood:false,manualMode:false,currentTab:"main",
-  weekHistory:(function(){try{return JSON.parse(localStorage.getItem("nc_week")||"{}");}catch(e){return {};}})(),
-  obSlide:0,barcodeReader:null,bodyLoading:false,barcodeMode:false,
+  meals:[], lv:1, xp:0, str:0, water:0,
+  bs:"burning", missionDone:false,
+  bodyPics:[], notifOn:false, notifTimer:null,
+  // food flow
+  foodImg:null, foodB64:null, foodMime:null,
+  foodAna:null, foodAdv:null,
+  currentTab:"main"
 };
 
-// ── ONBOARDING ────────────────────────────────────────────────────────────────
-var obSlide=0;
-var OB_SLIDES=[
-  {icon:"🤖",title:"AI Nutrition Coach",sub:"Фотографируй еду — AI мгновенно считает калории и говорит что съесть дальше",btn:"Начать →"},
-  {icon:"📸",title:"Фото еды → КБЖУ за 5 сек",sub:"AI видит все продукты и считает каждый грамм отдельно. Точнее любого приложения",btn:"Дальше →"},
-  {icon:"🧠",title:"Умный совет после еды",sub:"Говорит что съесть дальше под цель: похудение, масса или рельеф",btn:"Дальше →"},
-  {icon:"🎯",title:"Твой личный нутрициолог",sub:"План питания, история недели, анализ тела и сравнение прогресса",btn:"Выбрать цель →"},
-];
-function renderObSlide(){
-  var s=OB_SLIDES[obSlide];
-  document.getElementById("ob-content").innerHTML=
-    "<div style='font-size:80px;margin-bottom:24px;line-height:1'>"+s.icon+"</div>"+
-    "<div style='font-family:Unbounded,sans-serif;font-size:26px;font-weight:900;line-height:1.2;margin-bottom:16px'>"+s.title+"</div>"+
-    "<div style='color:rgba(240,240,248,.42);font-size:15px;line-height:1.7'>"+s.sub+"</div>";
-  document.getElementById("ob-btn").textContent=s.btn;
-  var dots=document.getElementById("ob-dots");
-  dots.innerHTML="";
-  OB_SLIDES.forEach(function(_, i){
-    var d=document.createElement("div");
-    d.style.cssText="height:8px;border-radius:4px;background:"+(i===obSlide?"var(--c)":"rgba(255,255,255,.2)")+";width:"+(i===obSlide?"24px":"8px")+";transition:all .3s";
-    dots.appendChild(d);
-  });
-}
-function nextSlide(){
-  obSlide++;
-  if(obSlide>=OB_SLIDES.length){showScreen("goal");return;}
-  renderObSlide();
-}
+// ═══════════════════════════════════════════════════
+// STARTUP
+// ═══════════════════════════════════════════════════
+// auto-init on load
+window.addEventListener('DOMContentLoaded', () => { renderGoals(); showScreen('goal'); });
 
-// ── SCREEN ROUTING ────────────────────────────────────────────────────────────
+// ═══════════════════════════════════════════════════
+// SCREEN ROUTING
+// ═══════════════════════════════════════════════════
 function showScreen(name){
-  ["onboard","goal","data","main","food","history","body"].forEach(s=>{
+  ["goal","data","main","food","body"].forEach(s=>{
     const el=document.getElementById("scr-"+s);
-    if(el) el.classList.toggle("hidden",s!==name);
-    if(s===name&&el) el.classList.add("fade-in");
+    if(el) el.classList.toggle("hidden", s!==name);
+    else return;
+    if(s===name) el.classList.add("fade-in");
   });
-  const mainScreens=["main","food","history","body"];
+  const mainScreens=["main","food","body"];
   const nav=document.getElementById("main-nav");
   if(mainScreens.includes(name)){
     nav.style.display="flex";
     S.currentTab=name;
     updateNavActive();
-    if(name==="history") renderHistoryScreen();
-    if(name==="body") renderBodyScreen();
   } else {
     nav.style.display="none";
   }
 }
+
 function switchTab(tab){
   S.currentTab=tab;
   showScreen(tab);
+  if(tab==="food") renderFoodScreen();
+  if(tab==="body") renderBodyScreen();
   updateNavActive();
 }
+
 function updateNavActive(){
-  ["main","history","body"].forEach(t=>{
+  ["main","body"].forEach(t=>{
     const b=document.getElementById("nav-"+t);
-    if(b) b.classList.toggle("active",S.currentTab===t);
+    if(b) b.classList.toggle("active", S.currentTab===t);
   });
   const fl=document.getElementById("nav-food-label");
-  if(fl) fl.style.color=S.currentTab==="food"?"var(--c)":"rgba(255,255,255,.28)";
+  if(fl) fl.style.color = S.currentTab==="food" ? "var(--c)" : "rgba(255,255,255,.28)";
 }
 
-// ── GOAL SELECTION ────────────────────────────────────────────────────────────
+function goToData(){
+  if(!S.gl) return;
+  const g=GOALS.find(x=>x.id===S.gl);
+  setCSSVars(g);
+  document.getElementById("goal-reminder").innerHTML=`
+    <div style="display:flex;align-items:center;gap:10px">
+      <span style="font-size:22px">${g.icon}</span>
+      <div><div style="font-size:11px;color:rgba(255,255,255,.42)">Выбранная цель</div>
+      <div style="font-weight:700;color:${g.color}">${g.title} — ${g.sub}</div></div>
+    </div>`;
+  showScreen("data");
+}
+
+function startMain(){
+  const name=document.getElementById("ud-name").value||"Атлет";
+  const w=+document.getElementById("ud-weight").value||70;
+  const h=+document.getElementById("ud-height").value||170;
+  const a=+document.getElementById("ud-age").value||25;
+  const tw=+document.getElementById("ud-target").value||(w-5);
+  const act=+document.getElementById("ud-activity").value||3;
+  S.name=name; S.weight=w; S.height=h; S.age=a; S.targetWeight=tw;
+  S.dg = calcGoals(w,h,a,S.gender,act,S.gl);
+  showScreen("main");
+  renderDashboard();
+}
+
+// ═══════════════════════════════════════════════════
+// GOAL SELECTION
+// ═══════════════════════════════════════════════════
 function renderGoals(){
   const list=document.getElementById("goals-list");
   list.innerHTML="";
@@ -371,12 +364,13 @@ function renderGoals(){
         </div>
       </div>
       <div id="gc-tip-${g.id}" class="tip-slide" style="display:none;margin-top:4px;background:${g.color}0d;border:1px solid ${g.color}28;border-radius:12px;padding:12px 14px">
-        <div style="font-size:11px;color:${g.color};font-weight:700;margin-bottom:5px">СОВЕТ</div>
+        <div style="font-size:11px;color:${g.color};font-weight:700;margin-bottom:5px">СОВЕТ НУТРИЦИОЛОГА</div>
         <div style="font-size:12px;color:rgba(240,240,248,.78);line-height:1.65">${g.tip}</div>
       </div>`;
     list.appendChild(wrap);
   });
 }
+
 function selectGoal(id){
   GOALS.forEach(g=>{
     const card=document.getElementById("gc-"+g.id);
@@ -384,105 +378,93 @@ function selectGoal(id){
     const tip=document.getElementById("gc-tip-"+g.id);
     const title=document.getElementById("gt-"+g.id);
     const active=g.id===id;
-    if(card){card.classList.toggle("selected",active);card.style.borderColor=active?g.color:"transparent";card.style.background=active?g.bg:"rgba(255,255,255,.03)";}
-    if(check) check.style.display=active?"flex":"none";
-    if(tip) tip.style.display=active?"block":"none";
-    if(title) title.style.color=active?g.color:"#f0f0f8";
+    card.classList.toggle("selected",active);
+    card.style.borderColor=active?g.color:"transparent";
+    card.style.background=active?g.bg:"rgba(255,255,255,.03)";
+    if(check){ check.style.display=active?"flex":"none"; }
+    if(tip)  { tip.style.display=active?"block":"none"; if(active) tip.classList.add("tip-slide"); }
+    if(title){ title.style.color=active?g.color:"#f0f0f8"; }
   });
   S.gl=id;
-  const g=GOALS.find(x=>x.id===id);
-  setCSSVars(g);
   const nb=document.getElementById("goal-next-btn");
+  const g=GOALS.find(x=>x.id===id);
   nb.style.background=g.color; nb.style.color="#000";
 }
-function goToData(){
-  if(!S.gl) return;
-  const g=GOALS.find(x=>x.id===S.gl);
-  setCSSVars(g);
-  document.getElementById("goal-reminder").innerHTML=`
-    <div style="display:flex;align-items:center;gap:10px">
-      <span style="font-size:22px">${g.icon}</span>
-      <div><div style="font-size:11px;color:rgba(255,255,255,.42)">Выбранная цель</div>
-      <div style="font-weight:700;color:${g.color}">${g.title} — ${g.sub}</div></div>
-    </div>`;
-  showScreen("data");
-}
-function setCSSVars(g){
-  document.documentElement.style.setProperty("--c",g.color);
-  document.documentElement.style.setProperty("--cb",g.bg);
-}
 
-// ── GENDER ────────────────────────────────────────────────────────────────────
+// ═══════════════════════════════════════════════════
+// GENDER
+// ═══════════════════════════════════════════════════
 function setGender(v){
   S.gender=v;
   document.getElementById("gbtn-male").classList.toggle("sel",v==="male");
   document.getElementById("gbtn-female").classList.toggle("sel",v==="female");
-  document.getElementById("bmr-hint").textContent=v==="female"?"Формула Миффлина для женщин":"Формула Миффлина для мужчин";
+  document.getElementById("bmr-hint").textContent=
+    v==="female"?"Формула Миффлина для женщин: BMR = 10W + 6.25H − 5A − 161"
+                :"Формула Миффлина для мужчин: BMR = 10W + 6.25H − 5A + 5";
   updatePreview();
 }
+
+function updatePreview(){
+  const w=+document.getElementById("ud-weight").value;
+  const h=+document.getElementById("ud-height").value;
+  const a=+document.getElementById("ud-age").value;
+  const act=+document.getElementById("ud-activity").value||3;
+  const pp=document.getElementById("plan-preview");
+  if(!w||!h||!a||!S.gender){ pp.style.display="none"; return; }
+  const p=calcGoals(w,h,a,S.gender,act,S.gl);
+  pp.style.display="block";
+  pp.style.background="rgba(0,232,122,.05)";
+  pp.style.border="1px solid rgba(0,232,122,.2)";
+  pp.innerHTML=`
+    <div style="font-size:11px;color:#00e87a;font-weight:700;margin-bottom:8px">ТВОЙ ПЕРСОНАЛЬНЫЙ ПЛАН</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+      ${[[p.calories+" ккал","Калорий"],[p.protein+"г","Белок"],[p.fat+"г","Жиры"],[p.carbs+"г","Углеводы"]].map(([v,l])=>`
+        <div style="background:rgba(0,232,122,.08);border-radius:8px;padding:8px 10px">
+          <div style="font-weight:700;font-size:15px;color:#00e87a">${v}</div>
+          <div style="font-size:11px;color:rgba(255,255,255,.4)">${l}</div>
+        </div>`).join("")}
+    </div>`;
+}
+
+// ═══════════════════════════════════════════════════
+// MATH: BMR / TDEE / MACROS
+// ═══════════════════════════════════════════════════
 function calcGoals(w,h,a,gender,activity,goal){
   const mults=[1.2,1.375,1.55,1.725,1.9];
-  const bmr=gender==="female"?10*w+6.25*h-5*a-161:10*w+6.25*h-5*a+5;
-  const tdee=bmr*(mults[Math.min(activity-1,4)]||1.55);
+  const bmr = gender==="female" ? 10*w+6.25*h-5*a-161 : 10*w+6.25*h-5*a+5;
+  const tdee = bmr*(mults[Math.min(activity-1,4)]||1.55);
   const calMap={loss:tdee*.83,cutting:tdee*.8,bulking:tdee*1.15,maint:tdee,sport:tdee*1.08,healthy:tdee};
   const cal=Math.round(calMap[goal]||tdee);
   const ppkg={loss:gender==="female"?1.6:1.8,cutting:gender==="female"?1.8:2.2,bulking:gender==="female"?1.6:2.0,maint:gender==="female"?1.3:1.6,sport:gender==="female"?1.5:1.8,healthy:gender==="female"?1.2:1.5};
   const prot=Math.round(w*(ppkg[goal]||1.5));
   const fat=Math.max(Math.round(cal*.27/9),35);
   const carbs=Math.max(Math.round((cal-prot*4-fat*9)/4),40);
-  return{calories:cal,protein:prot,fat,carbs};
-}
-function updatePreview(){
-  const w=+document.getElementById("ud-weight").value;
-  const h=+document.getElementById("ud-height").value;
-  const a=+document.getElementById("ud-age").value;
-  const tw=+document.getElementById("ud-target").value;
-  const act=+document.getElementById("ud-activity").value||3;
-  const pp=document.getElementById("plan-preview");
-  if(!w||!h||!a||!S.gender){pp.style.display="none";return;}
-  const p=calcGoals(w,h,a,S.gender,act,S.gl);
-  const optMap={loss:-380,cutting:-500,bulking:280,maint:0,sport:-180,healthy:-120};
-  const dailyDiff=Math.abs(optMap[S.gl]||350);
-  const daysToGoal=tw?Math.round(Math.abs(w-tw)*7700/dailyDiff):null;
-  const months=daysToGoal?Math.round(daysToGoal/30):null;
-  const g=GOALS.find(x=>x.id===S.gl);
-  pp.style.display="block";
-  pp.style.background="rgba(0,232,122,.05)";
-  pp.style.border="1px solid rgba(0,232,122,.2)";
-  pp.innerHTML=
-    "<div style='font-size:11px;color:#00e87a;font-weight:700;margin-bottom:8px'>ТВОЙ ПЕРСОНАЛЬНЫЙ ПЛАН</div>"+
-    "<div style='display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px'>"+
-    "<div style='background:rgba(0,232,122,.08);border-radius:8px;padding:8px 10px'><div style='font-weight:700;font-size:15px;color:#00e87a'>"+p.calories+" ккал</div><div style='font-size:11px;color:rgba(255,255,255,.4)'>Калорий</div></div>"+
-    "<div style='background:rgba(0,232,122,.08);border-radius:8px;padding:8px 10px'><div style='font-weight:700;font-size:15px;color:#00e87a'>"+p.protein+"г</div><div style='font-size:11px;color:rgba(255,255,255,.4)'>Белок</div></div>"+
-    "<div style='background:rgba(0,232,122,.08);border-radius:8px;padding:8px 10px'><div style='font-weight:700;font-size:15px;color:#00e87a'>"+p.fat+"г</div><div style='font-size:11px;color:rgba(255,255,255,.4)'>Жиры</div></div>"+
-    "<div style='background:rgba(0,232,122,.08);border-radius:8px;padding:8px 10px'><div style='font-weight:700;font-size:15px;color:#00e87a'>"+p.carbs+"г</div><div style='font-size:11px;color:rgba(255,255,255,.4)'>Углеводы</div></div>"+
-    "</div>"+
-    (daysToGoal&&tw?
-      "<div style='background:"+g.color+"15;border-radius:8px;padding:10px 12px;display:flex;justify-content:space-between;align-items:center'>"+
-      "<div style='font-size:12px;color:rgba(255,255,255,.6)'>"+w+" кг → "+tw+" кг</div>"+
-      "<div style='font-weight:700;font-size:13px;color:"+g.color+"'>~"+months+" мес ("+daysToGoal+" дней)</div>"+
-      "</div>":"");
-}
-function startMain(){
-  const name=document.getElementById("ud-name").value||"Атлет";
-  const w=+document.getElementById("ud-weight").value||70;
-  const h=+document.getElementById("ud-height").value||170;
-  const a=+document.getElementById("ud-age").value||25;
-  const tw=+document.getElementById("ud-target").value||(w-5);
-  const act=+document.getElementById("ud-activity").value||3;
-  S.name=name;S.weight=w;S.height=h;S.age=a;S.targetWeight=tw;
-  S.dg=calcGoals(w,h,a,S.gender,act,S.gl);
-  showScreen("main");
-  renderDashboard();
+  return {calories:cal,protein:prot,fat,carbs};
 }
 
-// ── DASHBOARD ─────────────────────────────────────────────────────────────────
+function setCSSVars(g){
+  document.documentElement.style.setProperty("--c",g.color);
+  document.documentElement.style.setProperty("--cb",g.bg);
+}
+
+// ═══════════════════════════════════════════════════
+// DASHBOARD
+// ═══════════════════════════════════════════════════
 function renderDashboard(){
   const g=GOALS.find(x=>x.id===S.gl);
   setCSSVars(g);
+  // Greeting
   document.getElementById("greeting").textContent=`Привет, ${S.name} ${S.gender==="female"?"👩":"👨"}`;
-  renderXP();renderBodyState();renderCalRing();renderMacroBars();renderWater();renderMission();renderMeals();renderNotif();
+  renderXP();
+  renderBodyState();
+  renderCalRing();
+  renderMacroBars();
+  renderWater();
+  renderMission();
+  renderMeals();
+  renderNotif();
 }
+
 function renderXP(){
   const cur=S.xp%XP_MAX;
   document.getElementById("level-label").textContent="Level "+S.lv;
@@ -491,6 +473,7 @@ function renderXP(){
   document.getElementById("xp-bar").style.width=(cur/XP_MAX*100)+"%";
   document.getElementById("streak-tag").textContent=`Streak: ${S.str} д.`;
 }
+
 function renderBodyState(){
   const bs=BSTATES[S.bs]||BSTATES.burning;
   const pill=document.getElementById("body-state-pill");
@@ -498,6 +481,7 @@ function renderBodyState(){
   pill.style.border=`1px solid ${bs.color}32`;
   pill.innerHTML=`<span style="font-size:18px">${bs.icon}</span><span style="font-weight:700;color:${bs.color};font-size:14px">${bs.label}</span>`;
 }
+
 function renderCalRing(){
   const g=GOALS.find(x=>x.id===S.gl);
   const p=Math.min(Math.round(S.st.calories/Math.max(S.dg.calories,1)*100),100);
@@ -505,11 +489,13 @@ function renderCalRing(){
   const offset=C-(p/100)*C;
   const clr=p>95?"#ff5733":p>70?g.color:"#4a9eff";
   const ring=document.getElementById("cal-ring");
-  ring.style.strokeDashoffset=offset;ring.style.stroke=clr;
+  ring.style.strokeDashoffset=offset;
+  ring.style.stroke=clr;
   document.getElementById("cal-ring-val").style.color=clr;
   document.getElementById("cal-ring-val").textContent=S.st.calories;
   document.getElementById("cal-sub").textContent=`Цель: ${S.dg.calories} · Остаток: ${Math.max(0,S.dg.calories-S.st.calories)}`;
 }
+
 function renderMacroBars(){
   const macros=[["Белок",S.st.protein,S.dg.protein,"#4a9eff"],["Жиры",S.st.fat,S.dg.fat,"#fbbf24"],["Углеводы",S.st.carbs,S.dg.carbs,"#a855f7"]];
   document.getElementById("macro-bars").innerHTML=macros.map(([l,v,m,c])=>`
@@ -521,6 +507,7 @@ function renderMacroBars(){
       <div class="pbar"><div class="pbar-fill" style="width:${Math.min(100,Math.round(v/Math.max(m,1)*100))}%;background:${c}"></div></div>
     </div>`).join("");
 }
+
 function renderWater(){
   const pct=Math.min(100,Math.round(S.water/2500*100));
   const msg=S.water>=2500?"✅ Норма выполнена!":S.water>=1500?"Хорошо, добавь ещё":"Пей больше воды";
@@ -538,52 +525,38 @@ function renderWater(){
     <div class="pbar" style="height:6px"><div class="pbar-fill" style="width:${pct}%;background:linear-gradient(90deg,#4a9eff,#00e87a)"></div></div>
     <div class="text-muted" style="font-size:11px;margin-top:5px">${msg}</div>`;
 }
-function changeWater(d){S.water=Math.max(0,Math.min(4000,S.water+d));renderWater();}
-function renderMission(){
-  const g=GOALS.find(x=>x.id===S.gl);
-  const pc=S.st.protein;
-  const cc=S.st.calories;
-  const needProt=S.dg.protein-pc;
-  const needCal=S.dg.calories-cc;
-  
-  // Generate smart mission based on current intake
-  var missionText, missionXp;
-  if(needProt>40&&S.meals.length>0){
-    missionText="Добавь белок: съешь "+Math.round(needProt)+"г ещё — яйца, творог или курица";
-    missionXp=60;
-  } else if(cc<S.dg.calories*0.5&&new Date().getHours()>14){
-    missionText="Ты мало ел сегодня — добавь приём пищи чтобы не замедлить метаболизм";
-    missionXp=50;
-  } else if(S.water<1500){
-    missionText="Выпей ещё воды — сейчас "+S.water+" мл из 2500 мл нормы";
-    missionXp=40;
-  } else if(S.gl==="loss"||S.gl==="cutting"){
-    missionText="Заменить вечерний перекус на 150г творога или кефир";
-    missionXp=50;
-  } else if(S.gl==="bulking"||S.gl==="sport"){
-    missionText="Добавь к следующему приёму 30г белка — протеин или творог";
-    missionXp=60;
-  } else {
-    missionText="Прогулка 20 минут после ужина для лучшего усвоения питательных веществ";
-    missionXp=50;
-  }
 
-  document.getElementById("mission-card").innerHTML=
-    "<div style='display:flex;justify-content:space-between;align-items:center'>"+
-    "<div style='flex:1'>"+
-    "<div class='tag' style='background:rgba(0,232,122,.15);color:#00e87a;font-size:10px;margin-bottom:8px'>⚡ МИССИЯ ДНЯ</div>"+
-    "<div style='font-weight:700;font-size:14px;margin-bottom:3px'>"+missionText+"</div>"+
-    "<div style='color:rgba(240,240,248,.42);font-size:11px'>+"+missionXp+" XP за выполнение</div>"+
-    "</div>"+
-    "<button onclick='completeMission()' style='padding:9px 14px;font-size:12px;font-weight:700;border-radius:10px;margin-left:12px;white-space:nowrap;cursor:pointer;border:none;font-family:inherit;background:"+(S.missionDone?"rgba(0,232,122,.1)":"#00e87a")+";color:"+(S.missionDone?"#00e87a":"#000")+"'>"+
-    (S.missionDone?"✓ Готово":"Выполнил")+"</button></div>";
+function changeWater(d){
+  S.water=Math.max(0,Math.min(4000,S.water+d));
+  renderWater();
 }
-function completeMission(){if(S.missionDone)return;S.missionDone=true;S.str++;addXP(50);renderMission();renderXP();}
+
+function renderMission(){
+  document.getElementById("mission-card").innerHTML=`
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <div style="flex:1">
+        <div class="tag" style="background:rgba(0,232,122,.15);color:#00e87a;font-size:10px;margin-bottom:8px">⚡ МИССИЯ ДНЯ</div>
+        <div style="font-weight:700;font-size:14px;margin-bottom:3px">+500 шагов к обычному</div>
+        <div class="text-muted" style="font-size:11px">+50 XP за выполнение</div>
+      </div>
+      <button onclick="completeMission()" style="padding:9px 14px;font-size:12px;font-weight:700;border-radius:10px;margin-left:12px;white-space:nowrap;cursor:pointer;border:none;font-family:inherit;background:${S.missionDone?"rgba(0,232,122,.1)":"#00e87a"};color:${S.missionDone?"#00e87a":"#000"}">${S.missionDone?"✓ Готово":"Выполнил"}</button>
+    </div>`;
+}
+
+function completeMission(){
+  if(S.missionDone) return;
+  S.missionDone=true; S.str++; addXP(50);
+  renderMission(); renderXP();
+}
+
 function renderMeals(){
-  const g=GOALS.find(x=>x.id===S.gl);
   const list=document.getElementById("meals-list");
+  const g=GOALS.find(x=>x.id===S.gl);
   document.getElementById("meals-count").textContent=S.meals.length+" приёмов";
-  if(!S.meals.length){list.innerHTML=`<div class="text-muted" style="text-align:center;padding:20px 0;font-size:13px">Нажми + чтобы добавить первый приём</div>`;return;}
+  if(!S.meals.length){
+    list.innerHTML=`<div class="text-muted" style="text-align:center;padding:20px 0;font-size:13px">Нажми + чтобы добавить первый приём</div>`;
+    return;
+  }
   list.innerHTML=S.meals.map(m=>`
     <div class="meal-row">
       <div style="width:36px;height:36px;border-radius:10px;background:${g.bg};display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:16px">🍽</div>
@@ -594,156 +567,88 @@ function renderMeals(){
       <div style="font-weight:800;font-size:14px;color:${g.color};flex-shrink:0">${m.calories}</div>
     </div>`).join("");
 }
+
 function renderNotif(){
   document.getElementById("notif-card").innerHTML=`
     <div style="display:flex;justify-content:space-between;align-items:center">
       <div>
         <div class="tag" style="background:rgba(168,85,247,.15);color:#a855f7;font-size:10px;margin-bottom:6px">🔔 НАПОМИНАНИЯ</div>
-        <div style="font-weight:600;font-size:14px;margin-bottom:2px">${S.notifOn?"Каждые 3–4 часа":"Напоминать о еде?"}</div>
+        <div style="font-weight:600;font-size:14px;margin-bottom:2px">${S.notifOn?"Включены · каждые 3 часа":"Напоминать о еде?"}</div>
         <div class="text-muted" style="font-size:11px">${S.notifOn?"Уведомлю о следующем приёме":"Уведомление в браузере"}</div>
       </div>
       <button onclick="toggleNotif()" style="padding:9px 16px;font-size:12px;font-weight:700;border-radius:10px;margin-left:12px;white-space:nowrap;cursor:pointer;font-family:inherit;background:${S.notifOn?"rgba(168,85,247,.15)":"#a855f7"};color:${S.notifOn?"#a855f7":"#000"};border:${S.notifOn?"1px solid rgba(168,85,247,.4)":"none"}">${S.notifOn?"Выкл":"Включить"}</button>
     </div>`;
 }
+
 async function toggleNotif(){
-  if(S.notifOn){clearInterval(S.notifTimer);S.notifOn=false;renderNotif();return;}
-  if(!("Notification" in window)){alert("Уведомления не поддерживаются");return;}
+  if(S.notifOn){
+    clearInterval(S.notifTimer);
+    S.notifOn=false; renderNotif(); return;
+  }
+  if(!("Notification" in window)){ alert("Уведомления не поддерживаются в этом браузере"); return; }
   const perm=await Notification.requestPermission();
   if(perm==="granted"){
-    S.notifOn=true;renderNotif();
-    setTimeout(()=>new Notification("AI Nutrition Coach",{body:"Напоминания включены!"}),800);
-    S.notifTimer=setInterval(()=>new Notification("AI Nutrition Coach",{body:"Пора записать приём пищи!"}),3.5*60*60*1000);
-  } else alert("Разреши уведомления в настройках браузера");
-}
-function addXP(n){S.xp+=n;if(S.xp>=XP_MAX*S.lv)S.lv++;renderXP();}
-
-// ── HISTORY SCREEN ────────────────────────────────────────────────────────────
-function saveToHistory(meal){
-  const today=new Date().toISOString().slice(0,10);
-  if(!S.weekHistory[today]) S.weekHistory[today]={calories:0,protein:0,fat:0,carbs:0,meals:[]};
-  S.weekHistory[today].calories+=meal.calories;
-  S.weekHistory[today].protein+=meal.protein;
-  S.weekHistory[today].fat+=meal.fat;
-  S.weekHistory[today].carbs+=meal.carbs;
-  S.weekHistory[today].meals.push(meal);
-  localStorage.setItem("nc_week",JSON.stringify(S.weekHistory));
-}
-function renderHistoryScreen(){
-  const g=GOALS.find(x=>x.id===S.gl);
-  const hc=document.getElementById("history-content");
-  const today=new Date().toISOString().slice(0,10);
-  const days=[];
-  for(let i=6;i>=0;i--){
-    const d=new Date();d.setDate(d.getDate()-i);
-    const key=d.toISOString().slice(0,10);
-    const dayName=d.toLocaleDateString("ru",{weekday:"short"});
-    days.push({key,dayName,data:S.weekHistory[key]||null,isToday:key===today});
+    S.notifOn=true; renderNotif();
+    setTimeout(()=>new Notification("AI Nutrition Coach",{body:"Напоминания включены! Слежу за питанием каждые 3 часа"}),800);
+    S.notifTimer=setInterval(()=>new Notification("AI Nutrition Coach",{body:"Пора записать приём пищи! Открой приложение"}),3*60*60*1000);
+  } else {
+    alert("Разреши уведомления в настройках браузера");
   }
-  // Сравнение недель
-  const thisWeekCal=days.slice(0,7).reduce((a,d)=>a+((d.data&&d.data.calories)||0),0);
-  const lastWeekCal=Object.keys(S.weekHistory).filter(k=>{
-    const d=new Date(k);const now=new Date();
-    const diff=(now-d)/(1000*60*60*24);
-    return diff>=7&&diff<14;
-  }).reduce((a,k)=>a+((S.weekHistory[k]&&S.weekHistory[k].calories)||0),0);
-  const maxCal=Math.max(...days.map(d=>(d.data&&d.data.calories)||0),1);
-
-  hc.innerHTML=`
-    <div class="text-head" style="margin-bottom:12px">Калории за 7 дней</div>
-    <div class="card" style="margin-bottom:14px;padding:16px">
-      <div style="display:flex;align-items:flex-end;gap:6px;height:80px;margin-bottom:8px">
-        ${days.map(d=>{
-          const h=d.data?Math.max(8,Math.round((d.data.calories/maxCal)*80)):4;
-          const isOver=d.data&&d.data.calories>S.dg.calories;
-          const clr=d.isToday?g.color:isOver?"#ff5733":"rgba(255,255,255,.25)";
-          return`<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px">
-            <div style="width:100%;height:${h}px;border-radius:4px 4px 0 0;background:${clr};transition:height .5s"></div>
-            <div class="text-muted" style="font-size:10px">${d.dayName}</div>
-          </div>`;
-        }).join("")}
-      </div>
-      <div style="display:flex;justify-content:space-between">
-        <div class="text-muted" style="font-size:11px">Эта неделя: ${thisWeekCal} ккал</div>
-        <div class="text-muted" style="font-size:11px">Норма: ${S.dg.calories*7} ккал</div>
-      </div>
-    </div>
-    ${lastWeekCal>0?`
-    <div class="text-head" style="margin-bottom:10px">Сравнение недель</div>
-    <div class="card" style="margin-bottom:14px">
-      <div style="display:flex;gap:12px">
-        <div style="flex:1;background:rgba(255,255,255,.04);border-radius:10px;padding:12px;text-align:center">
-          <div class="text-muted" style="font-size:11px;margin-bottom:4px">Эта неделя</div>
-          <div style="font-family:Unbounded,sans-serif;font-size:20px;font-weight:900;color:${g.color}">${Math.round(thisWeekCal/7)}</div>
-          <div class="text-muted" style="font-size:10px">ккал/день</div>
-        </div>
-        <div style="flex:1;background:rgba(255,255,255,.04);border-radius:10px;padding:12px;text-align:center">
-          <div class="text-muted" style="font-size:11px;margin-bottom:4px">Прошлая</div>
-          <div style="font-family:Unbounded,sans-serif;font-size:20px;font-weight:900;color:rgba(255,255,255,.5)">${Math.round(lastWeekCal/7)}</div>
-          <div class="text-muted" style="font-size:10px">ккал/день</div>
-        </div>
-        <div style="flex:1;background:rgba(255,255,255,.04);border-radius:10px;padding:12px;text-align:center">
-          <div class="text-muted" style="font-size:11px;margin-bottom:4px">Разница</div>
-          <div style="font-family:Unbounded,sans-serif;font-size:20px;font-weight:900;color:${thisWeekCal<lastWeekCal?"#00e87a":"#ff5733"}">${thisWeekCal<lastWeekCal?"↓":"↑"}${Math.abs(Math.round((thisWeekCal-lastWeekCal)/7))}</div>
-          <div class="text-muted" style="font-size:10px">ккал/день</div>
-        </div>
-      </div>
-    </div>`:""}
-    <div class="text-head" style="margin-bottom:10px">По дням</div>
-    ${days.reverse().map(d=>`
-    <div class="card" style="margin-bottom:8px;padding:12px 16px">
-      <div style="display:flex;justify-content:space-between;align-items:center">
-        <div>
-          <div style="font-weight:600;font-size:14px">${d.isToday?"Сегодня":d.dayName}</div>
-          ${d.data?`<div class="text-muted" style="font-size:11px;margin-top:2px">Б${d.data.protein}г · Ж${d.data.fat}г · У${d.data.carbs}г</div>`:`<div class="text-muted" style="font-size:11px;margin-top:2px">Нет данных</div>`}
-        </div>
-        ${d.data?`<div style="font-family:Unbounded,sans-serif;font-size:18px;font-weight:900;color:${d.data.calories>S.dg.calories?"#ff5733":g.color}">${d.data.calories}</div>`:""}
-      </div>
-    </div>`).join("")}`;
 }
 
-// ── FOOD SCREEN ───────────────────────────────────────────────────────────────
+function addXP(n){
+  S.xp+=n;
+  if(S.xp>=XP_MAX*S.lv){ S.lv++; }
+  renderXP();
+}
+
+// ═══════════════════════════════════════════════════
+// FOOD SCREEN
+// ═══════════════════════════════════════════════════
 function openFood(){
-  S.foodAna=null;S.foodAdv=null;S.foodImg=null;S.foodB64=null;S.loadingFood=false;
+  S.foodAna=null; S.foodAdv=null; S.foodImg=null; S.foodB64=null;
   switchTab("food");
   renderFoodScreen();
   setTimeout(()=>document.getElementById("food-file").click(),150);
 }
+
 function renderFoodScreen(){
   const g=GOALS.find(x=>x.id===S.gl);
   const fc=document.getElementById("food-content");
-  if(S.foodAna){renderFoodResults(fc,g);return;}
+  if(S.foodAna){
+    renderFoodResults(fc,g); return;
+  }
   fc.innerHTML=`
     <div style="display:flex;gap:8px;margin-bottom:16px">
-      <button class="mode-btn ${!S.manualMode&&!S.barcodeMode?"sel":""}" onclick="setFoodMode('photo')">📸 Фото</button>
-      <button class="mode-btn ${S.barcodeMode?"sel":""}" onclick="setFoodMode('barcode')">🔲 Штрихкод</button>
-      <button class="mode-btn ${S.manualMode?"sel":""}" onclick="setFoodMode('text')">✏️ Текст</button>
+      <button class="mode-btn ${!S.manualMode?"sel":""}" onclick="setFoodMode(false)">📸 Фото</button>
+      <button class="mode-btn ${S.manualMode?"sel":""}"  onclick="setFoodMode(true)">✏️ Текст</button>
     </div>
     <div id="food-input-area"></div>`;
   renderFoodInput();
 }
-function setFoodMode(mode){
-  S.manualMode=mode==="text";
-  S.barcodeMode=mode==="barcode";
+
+function setFoodMode(manual){
+  S.manualMode=manual;
   renderFoodScreen();
-  if(mode==="barcode") startBarcode();
 }
+
 function renderFoodInput(){
   const g=GOALS.find(x=>x.id===S.gl);
   const area=document.getElementById("food-input-area");
   if(!area) return;
   if(S.loadingFood){
     area.innerHTML=`
-      <div class="card" style="text-align:center;padding:36px 20px">
+      <div class="card" style="text-align:center;padding:36px 20px;margin-bottom:16px">
         <div style="font-size:48px;margin-bottom:14px" class="pulse">🤖</div>
         <div style="font-weight:700;font-size:15px;margin-bottom:6px" id="load-msg">Анализирую...</div>
         <div class="text-muted" style="font-size:12px">Несколько секунд...</div>
-      </div>`;return;
+      </div>`; return;
   }
   if(S.manualMode){
     area.innerHTML=`
       <textarea id="txt-meal" class="inp" style="height:100px" placeholder="Что вы ели? Например: куриная грудка 200г, рис 150г, огурец"></textarea>
       <button class="btn btn-primary" style="margin-top:10px" onclick="analyzeText()">Проанализировать</button>`;
-  } else if(!S.barcodeMode){
+  } else {
     area.innerHTML=`
       ${S.foodImg?`<div class="card" style="padding:0;overflow:hidden;border-radius:16px;margin-bottom:14px"><img src="${S.foodImg}" style="width:100%;max-height:220px;object-fit:cover;display:block"/></div>`:""}
       <div class="dz" onclick="document.getElementById('food-file').click()">
@@ -755,61 +660,17 @@ function renderFoodInput(){
   }
 }
 
-// ── BARCODE ───────────────────────────────────────────────────────────────────
-function startBarcode(){
-  document.getElementById("barcode-modal").style.display="flex";
-  try{
-    if(window.ZXing){
-      const hints=new Map();
-      const formats=[window.ZXing.BarcodeFormat.EAN_13,window.ZXing.BarcodeFormat.EAN_8,window.ZXing.BarcodeFormat.UPC_A];
-      hints.set(window.ZXing.DecodeHintType.POSSIBLE_FORMATS,formats);
-      S.barcodeReader=new window.ZXing.BrowserBarcodeReader(hints);
-      S.barcodeReader.decodeFromVideoDevice(null,"barcode-video",async(result,err)=>{
-        if(result){
-          const barcode=result.getText();
-          stopBarcode();
-          await lookupBarcode(barcode);
-        }
-      });
-    }
-  }catch(e){
-    document.getElementById("barcode-status").textContent="Ошибка камеры: "+e.message;
-  }
-}
-function stopBarcode(){
-  if(S.barcodeReader){try{S.barcodeReader.reset();}catch(e){}}
-  document.getElementById("barcode-modal").style.display="none";
-  S.barcodeMode=false;
-  renderFoodScreen();
-}
-async function lookupBarcode(barcode){
-  S.loadingFood=true;renderFoodInput();
-  try{
-    setLoadMsg("🔍 Ищу продукт по штрихкоду...");
-    const a1=await callClaude([{role:"user",content:`Штрихкод продукта: ${barcode}. Определи продукт и его КБЖУ на 100г. JSON: {"dishes":[{"name":"название продукта","weight":100,"calories":200,"protein":10,"fat":8,"carbs":25}],"total":{"calories":200,"protein":10,"fat":8,"carbs":25,"weight":100}} Если не знаешь — укажи примерные значения типичного продукта.`}],
-      "Ты AI нутрициолог. Верни ТОЛЬКО JSON без markdown.");
-    await finishAnalysis(a1);
-  }catch(e){
-    S.loadingFood=false;
-    S.foodAna={error:true,dishes:[],total:{calories:0,protein:0,fat:0,carbs:0}};
-    renderFoodResults(document.getElementById("food-content"),GOALS.find(x=>x.id===S.gl));
-  }
-}
-
-// ── FOOD ANALYSIS ─────────────────────────────────────────────────────────────
 function onFoodFile(e){
-  const f=e.target.files[0];if(!f)return;
-  S.foodImg=URL.createObjectURL(f);S.foodMime=f.type;S.foodAna=null;S.foodAdv=null;
+  const f=e.target.files[0]; if(!f) return;
+  S.foodImg=URL.createObjectURL(f); S.foodMime=f.type;
   const r=new FileReader();
-  r.onload=ev=>{S.foodB64=ev.target.result.split(",")[1];};
+  r.onload=ev=>{ S.foodB64=ev.target.result.split(",")[1]; };
   r.readAsDataURL(f);
-  // Случайный вопрос о голоде
-  const q=HUNGER_Q[Math.floor(Math.random()*HUNGER_Q.length)];
   document.getElementById("hunger-sheet").innerHTML=`
     <div style="text-align:center;margin-bottom:24px">
       <div style="font-size:54px;margin-bottom:12px">🤔</div>
-      <div style="font-family:Unbounded,sans-serif;font-size:20px;font-weight:800;margin-bottom:10px">${q.q}</div>
-      <div class="text-muted" style="font-size:14px;line-height:1.75">${q.sub}</div>
+      <div style="font-family:'Unbounded',sans-serif;font-size:20px;font-weight:800;margin-bottom:10px">Ты правда голоден?</div>
+      <div class="text-muted" style="font-size:14px;line-height:1.75">Настоящий голод или привычка / скука?</div>
     </div>
     <div style="display:flex;flex-direction:column;gap:10px">
       <button class="btn btn-primary" onclick="closeModal('hunger-modal');analyzePhoto()">🍽 Да, голоден — анализируй</button>
@@ -819,98 +680,71 @@ function onFoodFile(e){
   document.getElementById("hunger-modal").style.display="flex";
   e.target.value="";
 }
-function cancelFood(){S.foodImg=null;S.foodB64=null;renderFoodInput();}
+
+function cancelFood(){
+  S.foodImg=null; S.foodB64=null;
+  renderFoodInput();
+}
 
 async function analyzePhoto(){
-  if(!S.foodB64)return;
-  S.loadingFood=true;renderFoodInput();
+  if(!S.foodB64){ return; }
+  S.loadingFood=true; renderFoodInput();
   try{
     setLoadMsg("🔍 Распознаю продукты...");
-    const prompt=`Ты профессиональный нутрициолог с 15-летним опытом. Анализируй фото еды с максимальной точностью.
-
-ПРАВИЛА:
-- Определи ВСЕ продукты включая соусы, масло, гарниры
-- Оцени вес каждого визуально (по размеру тарелки)
-- Учитывай способ приготовления: жареное +30% к калориям
-- Маленькая тарелка = 200-250г, большая = 350-400г
-- Если видишь соус или масло — добавляй отдельной строкой
-
-Цель пользователя: ${GP[S.gl]}
-Уже съедено сегодня: ${S.st.calories} ккал из ${S.dg.calories} ккал
-Белок съедено: ${S.st.protein}г из ${S.dg.protein}г
-
-Верни ТОЛЬКО JSON без markdown:
-{"dishes":[{"name":"точное название","weight":200,"calories":350,"protein":25,"fat":12,"carbs":40,"cooking_method":"способ","confidence":"высокая"}],"total":{"calories":350,"protein":25,"fat":12,"carbs":40,"weight":200},"notes":"важные замечания если есть"}`;
-
     const a1=await callClaude([{role:"user",content:[
       {type:"image",source:{type:"base64",media_type:S.foodMime||"image/jpeg",data:S.foodB64}},
-      {type:"text",text:prompt}
-    ]}],"Ты профессиональный нутрициолог. Верни ТОЛЬКО JSON без markdown.");
+      {type:"text",text:`Анализируй еду на фото. JSON: {"dishes":[{"name":"название","weight":200,"calories":350,"protein":25,"fat":12,"carbs":40}],"total":{"calories":350,"protein":25,"fat":12,"carbs":40,"weight":200}} Цель: ${GP[S.gl]}. Съедено: ${S.st.calories} ккал. Лимит: ${S.dg.calories} ккал.`}
+    ]}],"Ты AI нутрициолог. Верни ТОЛЬКО JSON без markdown.");
     await finishAnalysis(a1);
   }catch(e){
     S.foodAna={error:true,dishes:[],total:{calories:0,protein:0,fat:0,carbs:0}};
-    S.foodAdv={mainAdvice:"Ошибка анализа. Попробуй снова."};
+    S.foodAdv={mainAdvice:"Ошибка анализа. Попробуй другое фото или опиши текстом."};
     S.loadingFood=false;
     renderFoodResults(document.getElementById("food-content"),GOALS.find(x=>x.id===S.gl));
   }
 }
+
 async function analyzeText(){
-  const txt=(document.getElementById("txt-meal")||{value:""}).value.trim();
-  if(!txt)return;
-  S.loadingFood=true;renderFoodInput();
+  const txt=document.getElementById("txt-meal")?.value?.trim();
+  if(!txt) return;
+  S.loadingFood=true; renderFoodInput();
   try{
     setLoadMsg("🔍 Анализирую...");
-    const a1=await callClaude([{role:"user",content:`Проанализируй еду: "${txt}". Учитывай способ приготовления и типичные размеры порций. JSON: {"dishes":[{"name":"название","weight":200,"calories":350,"protein":25,"fat":12,"carbs":40}],"total":{"calories":350,"protein":25,"fat":12,"carbs":40,"weight":200}} Цель: ${GP[S.gl]}. Съедено: ${S.st.calories}/${S.dg.calories} ккал.`}],
+    const a1=await callClaude([{role:"user",content:`Проанализируй еду: "${txt}". JSON: {"dishes":[{"name":"название","weight":200,"calories":350,"protein":25,"fat":12,"carbs":40}],"total":{"calories":350,"protein":25,"fat":12,"carbs":40,"weight":200}} Цель: ${GP[S.gl]}. Съедено: ${S.st.calories} ккал. Лимит: ${S.dg.calories} ккал.`}],
       "Ты AI нутрициолог. Верни ТОЛЬКО JSON без markdown.");
     await finishAnalysis(a1);
   }catch(e){
     S.foodAna={error:true,dishes:[],total:{calories:0,protein:0,fat:0,carbs:0}};
-    S.foodAdv={mainAdvice:"Ошибка. Попробуй снова."};
+    S.foodAdv={mainAdvice:"Ошибка анализа. Попробуй ещё раз."};
     S.loadingFood=false;
     renderFoodResults(document.getElementById("food-content"),GOALS.find(x=>x.id===S.gl));
   }
 }
+
 async function finishAnalysis(a1){
   S.foodAna=a1;
   setLoadMsg("🧠 Составляю рекомендацию...");
   const nc=S.st.calories+a1.total.calories, np=S.st.protein+a1.total.protein;
-  const nf=S.st.fat+a1.total.fat, ncarbs=S.st.carbs+a1.total.carbs;
-  const mealsList=S.meals.map(function(m){return m.name;}).join(", ")||"ничего";
-  
-  const advice=await callClaude([{role:"user",content:
-    "Дай умный совет после приёма пищи. Будь конкретным и РАЗНООБРАЗНЫМ — не повторяй стандартные рекомендации."+
-    " Учитывай ЧТО УЖЕ СЪЕДЕНО сегодня чтобы следующий приём дополнял рацион, а не дублировал."+
-    " JSON: {mainAdvice:string,nextMeal:string,warning:string|null,replacement:string|null,bodyState:string}"+
-    " bodyState: burning|building|dark|sugar|perfect"+
-    " Цель: "+GP[S.gl]+". Пол: "+(S.gender==="female"?"женский":"мужской")+". Вес: "+S.weight+"кг."+
-    " Только что съел: "+a1.dishes.map(function(d){return d.name;}).join(", ")+"."+
-    " За сегодня уже ел: "+mealsList+"."+
-    " Итого за день: "+nc+"/"+S.dg.calories+" ккал. Белок: "+np+"/"+S.dg.protein+"г. Жиры: "+nf+"/"+S.dg.fat+"г. Углеводы: "+ncarbs+"/"+S.dg.carbs+"г."+
-    " Для nextMeal: предложи КОНКРЕТНОЕ блюдо которое восполнит именно то что не хватает сегодня. Укажи время через сколько часов и точные продукты с граммовкой."
-  }],
-  "Ты строгий нутрициолог. Давай разнообразные персонализированные советы. Никогда не повторяй одни и те же рекомендации. Верни ТОЛЬКО JSON без markdown.");
-  
-  S.foodAdv=advice;
-  if(advice.bodyState&&BSTATES[advice.bodyState]) S.bs=advice.bodyState;
+  const a2=await callClaude([{role:"user",content:`Умный совет. JSON: {"mainAdvice":"совет","nextMeal":"через X ч что съесть","warning":null,"replacement":null,"bodyState":"burning"} bodyState: burning|building|dark|sugar|perfect. Цель: ${GP[S.gl]}. Блюда: ${a1.dishes.map(d=>d.name).join(", ")}. Итого: ${nc}/${S.dg.calories} ккал. Белок: ${np}/${S.dg.protein}г.`}],
+    "Ты строгий AI нутрициолог. Верни ТОЛЬКО JSON без markdown.");
+  S.foodAdv=a2;
+  if(a2.bodyState&&BSTATES[a2.bodyState]){ S.bs=a2.bodyState; renderBodyState(); }
   S.st.calories+=a1.total.calories; S.st.protein+=a1.total.protein;
   S.st.fat+=a1.total.fat; S.st.carbs+=a1.total.carbs;
-  const meal={
-    id:Date.now(),
-    name:a1.dishes.map(function(d){return d.name;}).join(" + "),
-    time:new Date().toLocaleTimeString("ru",{hour:"2-digit",minute:"2-digit"}),
-    calories:a1.total.calories, protein:a1.total.protein,
-    fat:a1.total.fat, carbs:a1.total.carbs
-  };
-  S.meals.push(meal);
-  saveToHistory(meal);
   addXP(100+Math.floor(Math.random()*60));
-  renderCalRing(); renderMacroBars(); renderMeals(); renderBodyState(); renderMission();
+  S.meals.push({id:Date.now(),name:a1.dishes.map(d=>d.name).join(" + "),time:new Date().toLocaleTimeString("ru",{hour:"2-digit",minute:"2-digit"}),calories:a1.total.calories,protein:a1.total.protein,fat:a1.total.fat,carbs:a1.total.carbs});
+  renderCalRing(); renderMacroBars(); renderMeals();
   S.loadingFood=false;
-  renderFoodResults(document.getElementById("food-content"), GOALS.find(function(x){return x.id===S.gl;}));
+  renderFoodResults(document.getElementById("food-content"),GOALS.find(x=>x.id===S.gl));
 }
-function setLoadMsg(m){const el=document.getElementById("load-msg");if(el)el.textContent=m;}
+
+function setLoadMsg(m){
+  const el=document.getElementById("load-msg");
+  if(el) el.textContent=m;
+}
+
 function renderFoodResults(fc,g){
-  const a1=S.foodAna,a2=S.foodAdv;
+  const a1=S.foodAna, a2=S.foodAdv;
   if(a1.error){
     fc.innerHTML=`
       <div class="card" style="text-align:center;padding:24px;margin-bottom:14px">
@@ -919,30 +753,20 @@ function renderFoodResults(fc,g){
         <div class="text-muted" style="font-size:12px">Попробуй другое фото или опиши текстом</div>
       </div>
       ${a2?`<div class="card" style="margin-bottom:10px"><div style="font-size:14px;line-height:1.6">${a2.mainAdvice}</div></div>`:""}
-      <button class="btn btn-primary" onclick="resetFood()">↩ Попробовать снова</button>`;return;
+      <button class="btn btn-primary" onclick="resetFood()">↩ Попробовать снова</button>`; return;
   }
   fc.innerHTML=`
     <div class="text-head" style="margin-bottom:10px">Обнаружено</div>
     <div class="card" style="margin-bottom:12px">
       ${a1.dishes.map((d,i)=>`
         <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;${i<a1.dishes.length-1?"border-bottom:1px solid rgba(255,255,255,.05)":""}">
-          <div>
-            <div style="font-weight:600;font-size:14px">${d.name}</div>
-            <div class="text-muted" style="font-size:11px;margin-top:2px">≈${d.weight}г${d.cooking_method?" · "+d.cooking_method:""}${d.confidence?" · "+d.confidence:""}</div>
-          </div>
-          <div style="text-align:right">
-            <div style="font-weight:800;font-size:15px;color:${g.color}">${d.calories} ккал</div>
-            <div class="text-muted" style="font-size:11px">Б${d.protein} Ж${d.fat} У${d.carbs}</div>
-          </div>
+          <div><div style="font-weight:600;font-size:14px">${d.name}</div><div class="text-muted" style="font-size:11px;margin-top:2px">≈${d.weight}г</div></div>
+          <div style="text-align:right"><div style="font-weight:800;font-size:15px;color:${g.color}">${d.calories} ккал</div><div class="text-muted" style="font-size:11px">Б${d.protein} Ж${d.fat} У${d.carbs}</div></div>
         </div>`).join("")}
       <div style="padding:10px 0 0;border-top:1px solid rgba(255,255,255,.08);display:flex;justify-content:space-between;align-items:center">
         <span style="font-weight:700">Итого</span>
-        <div style="text-align:right">
-          <div style="font-weight:900;font-size:18px;color:${g.color}">${a1.total.calories} ккал</div>
-          <div class="text-muted" style="font-size:11px">Б${a1.total.protein} Ж${a1.total.fat} У${a1.total.carbs}</div>
-        </div>
+        <div style="text-align:right"><div style="font-weight:900;font-size:18px;color:${g.color}">${a1.total.calories} ккал</div><div class="text-muted" style="font-size:11px">Б${a1.total.protein} Ж${a1.total.fat} У${a1.total.carbs}</div></div>
       </div>
-      ${a1.notes?`<div class="text-muted" style="font-size:11px;margin-top:8px;padding-top:8px;border-top:1px solid rgba(255,255,255,.05)">💡 ${a1.notes}</div>`:""}
     </div>
     ${a2?`
       <div class="text-head" style="margin-bottom:10px">Умный совет AI</div>
@@ -951,243 +775,267 @@ function renderFoodResults(fc,g){
       </div>
       ${a2.warning?`<div class="card" style="background:rgba(255,87,51,.07);border:1px solid rgba(255,87,51,.2);margin-bottom:10px"><div style="display:flex;gap:10px"><span style="font-size:18px;flex-shrink:0">⚠️</span><div style="font-size:13px;color:#ff7755;font-weight:500;line-height:1.55">${a2.warning}</div></div></div>`:""}
       ${a2.replacement?`<div class="card" style="background:rgba(74,158,255,.07);border:1px solid rgba(74,158,255,.2);margin-bottom:10px"><div style="display:flex;gap:10px"><span style="font-size:18px;flex-shrink:0">💡</span><div><div style="font-size:11px;color:#4a9eff;font-weight:700;margin-bottom:3px">ЗАМЕНА ДЛЯ УЛУЧШЕНИЯ</div><div style="font-size:13px;color:rgba(240,240,248,.82);line-height:1.55">${a2.replacement}</div></div></div></div>`:""}
-      <div class="card" style="background:rgba(0,232,122,.06);border:1px solid rgba(0,232,122,.2);margin-bottom:14px">
-        <div style="display:flex;gap:10px"><span style="font-size:18px;flex-shrink:0">⏰</span><div><div style="font-size:11px;color:#00e87a;font-weight:700;margin-bottom:3px">СЛЕДУЮЩИЙ ПРИЁМ</div><div style="font-size:13px;color:rgba(240,240,248,.82);line-height:1.55">${a2.nextMeal||""}</div></div></div>
-      </div>
+      <div class="card" style="background:rgba(0,232,122,.06);border:1px solid rgba(0,232,122,.2);margin-bottom:14px"><div style="display:flex;gap:10px"><span style="font-size:18px;flex-shrink:0">⏰</span><div><div style="font-size:11px;color:#00e87a;font-weight:700;margin-bottom:3px">СЛЕДУЮЩИЙ ПРИЁМ</div><div style="font-size:13px;color:rgba(240,240,248,.82);line-height:1.55">${a2.nextMeal||""}</div></div></div></div>
     `:""}
     <button class="btn btn-primary" onclick="resetFood()">↩ Новый приём пищи</button>`;
 }
+
 function resetFood(){
-  S.foodAna=null;S.foodAdv=null;S.foodImg=null;S.foodB64=null;S.loadingFood=false;S.manualMode=false;S.barcodeMode=false;
+  S.foodAna=null; S.foodAdv=null; S.foodImg=null; S.foodB64=null; S.loadingFood=false; S.manualMode=false;
   renderFoodScreen();
 }
 
-// ── WEEKLY PLAN ───────────────────────────────────────────────────────────────
-async function showWeeklyPlan(){
-  var g=GOALS.find(function(x){return x.id===S.gl;});
-  var sheet=document.getElementById("plan-sheet");
-  var loadHTML="<div style='display:flex;justify-content:space-between;align-items:center;margin-bottom:16px'>";
-  loadHTML+="<div style='font-size:16px;font-weight:700'>План на неделю</div>";
-  loadHTML+="<button onclick="closeModal('plan-modal')" style='background:none;border:none;color:rgba(255,255,255,.4);cursor:pointer;font-size:22px'>x</button></div>";
-  loadHTML+="<div style='text-align:center;padding:32px 0'><div style='font-size:48px;margin-bottom:14px' class='pulse'>🤖</div>";
-  loadHTML+="<div style='font-weight:700;font-size:15px;margin-bottom:6px'>AI составляет план...</div>";
-  loadHTML+="<div style='color:rgba(240,240,248,.42);font-size:12px'>10-15 секунд</div></div>";
-  sheet.innerHTML=loadHTML;
-  document.getElementById("plan-modal").style.display="flex";
-  try{
-    var res=await fetch("/api/claude",{method:"POST",headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({model:"claude-haiku-4-5-20251001",max_tokens:3000,
-        system:"Ты диетолог. Верни ТОЛЬКО валидный JSON без markdown.",
-        messages:[{role:"user",content:"Составь ПЕРСОНАЛЬНЫЙ план питания на 7 дней.\n"+"Пол: "+(S.gender===\"female\"?\"женщина\":\"мужчина\")+". Вес: "+S.weight+"кг. Желаемый вес: "+S.targetWeight+"кг.\n"+"Цель: "+GP[S.gl]+".\n"+"Норма: "+S.dg.calories+" ккал/день, белок "+S.dg.protein+"г, жиры "+S.dg.fat+"г, углеводы "+S.dg.carbs+"г.\n"+"Уже ел сегодня: "+(S.meals.length?S.meals.map(function(m){return m.name;}).join(", "):"нет данных")+".\n"+"Требования: реальные блюда которые легко приготовить. Порции точные в граммах. Учитывай пол и вес.\n"+"JSON: {days:[{day:string,breakfast:string,lunch:string,dinner:string,snack:string,cal:number}]}"}]})});
-    var d=await res.json();
-    if(d.error) throw new Error(d.error.message||"API error");
-    var txt=d.content[0].text.replace(/```json|```/g,"").trim();
-    var plan=JSON.parse(txt);
-    var html="<div style='display:flex;justify-content:space-between;align-items:center;margin-bottom:20px'>";
-    html+="<div style='font-size:16px;font-weight:700'>Plan 7 days</div>";
-    html+="<button onclick="closeModal('plan-modal')" style='background:none;border:none;color:rgba(255,255,255,.4);cursor:pointer;font-size:22px'>x</button></div>";
-    plan.days.forEach(function(day){
-      html+="<div class='card' style='margin-bottom:10px'>";
-      html+="<div style='font-weight:700;font-size:14px;color:"+g.color+";margin-bottom:10px'>"+day.day+" - "+day.cal+" kkal</div>";
-      var items=[["Завтрак",day.breakfast],["Обед",day.lunch],["Ужин",day.dinner],["Перекус",day.snack]];
-      items.forEach(function(item){
-        html+="<div style='padding:7px 0;border-bottom:1px solid rgba(255,255,255,.05)'>";
-        html+="<div style='font-size:11px;color:rgba(255,255,255,.4);font-weight:600'>"+item[0]+"</div>";
-        html+="<div style='font-size:13px;margin-top:2px'>"+(item[1]||"")+"</div></div>";
-      });
-      html+="</div>";
-    });
-    sheet.innerHTML=html;
-  }catch(e){
-    var errHTML="<div style='text-align:center;padding:32px'>";
-    errHTML+="<div style='font-size:36px;margin-bottom:12px'>x</div>";
-    errHTML+="<div style='font-weight:700;margin-bottom:8px'>Ошибка: "+e.message+"</div>";
-    errHTML+="<button class='btn btn-primary' style='margin-top:12px' onclick='showWeeklyPlan()'>Попробовать снова</button></div>";
-    sheet.innerHTML=errHTML;
-  }
-}
-
-// ── BODY SCREEN ───────────────────────────────────────────────────────────────
+// ═══════════════════════════════════════════════════
+// BODY SCREEN
+// ═══════════════════════════════════════════════════
 function renderBodyScreen(){
   const g=GOALS.find(x=>x.id===S.gl);
   const bc=document.getElementById("body-content");
   const cw=S.weight||70;
-  const tw=S.targetWeight||(cw-(S.gl==="bulking"?-5:5));
-  // Scenario A: user continues at TDEE (no plan)
-  const mults=[1.2,1.375,1.55,1.725,1.9];
-  const bmr=S.gender==="female"?10*cw+6.25*(S.height||170)-5*(S.age||25)-161:10*cw+6.25*(S.height||170)-5*(S.age||25)+5;
-  const tdee=bmr*(mults[Math.min((+(document.getElementById("ud-activity")||{}).value||3)-1,4)]||1.55);
-  const scenAcal=Math.round(tdee); // maintenance
-  const scenAchg=0; // no change at maintenance
-  // Scenario B: following the plan
+  const curDiff=S.st.calories-S.dg.calories;
+  const curChg=(curDiff*30)/7700;
   const optMap={loss:-380,cutting:-500,bulking:280,maint:0,sport:-180,healthy:-120};
-  const optDiff=optMap[S.gl]||-350;
-  const optChg=(optDiff*30)/7700;
-  const daysLeft=Math.round(Math.abs(cw-tw)*7700/Math.max(Math.abs(optDiff),50));
-  const months=Math.round(daysLeft/30*10)/10;
+  const optChg=((optMap[S.gl]||-350)*30)/7700;
+  const tw=S.targetWeight||(cw-5);
+  const daysLeft=Math.round(Math.abs(cw-tw)*7700/Math.max(Math.abs(optMap[S.gl]||350),50));
 
-  let html="";
+  bc.innerHTML=`
+    <div class="text-head" style="margin-bottom:10px">Два сценария — 30 дней</div>
+    <div style="display:flex;gap:10px;margin-bottom:10px">
+      <div class="card" style="flex:1;background:rgba(255,87,51,.07);border:1px solid rgba(255,87,51,.25)">
+        <div class="tag" style="background:rgba(255,87,51,.15);color:#ff5733;font-size:10px;margin-bottom:8px">ТАК КАК ЕСТЬ</div>
+        <div style="font-family:'Unbounded',sans-serif;font-size:26px;font-weight:900;color:${curChg>0.3?"#ff5733":"#f0f0f8"}">${(cw+curChg).toFixed(1)}<span style="font-size:12px"> кг</span></div>
+        <div style="font-size:12px;color:${curChg>0.2?"#ff7755":"#00e87a"};font-weight:600;margin-top:2px">${curChg>0?"+":""}${curChg.toFixed(1)} кг</div>
+        <div class="text-muted" style="font-size:11px;margin-top:6px">${S.st.calories||S.dg.calories} ккал/день</div>
+      </div>
+      <div class="card" style="flex:1;background:${g.color}0a;border:1px solid ${g.color}28">
+        <div class="tag" style="background:${g.color}20;color:${g.color};font-size:10px;margin-bottom:8px">ПО ПЛАНУ</div>
+        <div style="font-family:'Unbounded',sans-serif;font-size:26px;font-weight:900;color:${g.color}">${(cw+optChg).toFixed(1)}<span style="font-size:12px"> кг</span></div>
+        <div style="font-size:12px;color:${g.color};font-weight:600;margin-top:2px">${optChg>0?"+":""}${optChg.toFixed(1)} кг</div>
+        <div class="text-muted" style="font-size:11px;margin-top:6px">${S.dg.calories} ккал/день</div>
+      </div>
+    </div>
+    <div class="card" style="background:rgba(0,232,122,.05);border:1px solid rgba(0,232,122,.18);margin-bottom:14px">
+      <div style="display:flex;gap:12px;align-items:center">
+        <span style="font-size:26px">🎯</span>
+        <div>
+          <div class="text-muted" style="font-size:11px;margin-bottom:2px">Цель: ${tw}кг · при соблюдении плана</div>
+          <div style="font-weight:700;font-size:15px">через ~${daysLeft} дней</div>
+        </div>
+      </div>
+    </div>
 
-  // Two scenarios
-  html+="<div class='text-head' style='margin-bottom:10px'>Два сценария — 30 дней</div>";
-  html+="<div style='display:flex;gap:10px;margin-bottom:10px'>";
-  html+="<div class='card' style='flex:1;background:rgba(255,87,51,.07);border:1px solid rgba(255,87,51,.25)'>";
-  html+="<div class='tag' style='background:rgba(255,87,51,.15);color:#ff5733;font-size:10px;margin-bottom:8px'>БЕЗ ПЛАНА</div>";
-  html+="<div style='font-size:24px;font-weight:900;color:#f0f0f8'>"+cw.toFixed(1)+"<span style='font-size:12px;color:rgba(255,255,255,.4)'> кг</span></div>";
-  html+="<div style='font-size:12px;color:rgba(255,255,255,.4);margin-top:4px'>без изменений</div>";
-  html+="<div style='font-size:11px;color:rgba(255,255,255,.3);margin-top:4px'>"+scenAcal+" ккал/день</div>";
-  html+="</div>";
-  html+="<div class='card' style='flex:1;background:"+g.color+"0a;border:1px solid "+g.color+"28'>";
-  html+="<div class='tag' style='background:"+g.color+"20;color:"+g.color+";font-size:10px;margin-bottom:8px'>ПО ПЛАНУ</div>";
-  html+="<div style='font-size:24px;font-weight:900;color:"+g.color+"'>"+(cw+optChg).toFixed(1)+"<span style='font-size:12px;color:rgba(255,255,255,.4)'> кг</span></div>";
-  html+="<div style='font-size:12px;color:"+g.color+";font-weight:600;margin-top:4px'>"+(optChg>0?"+":"")+optChg.toFixed(1)+" кг</div>";
-  html+="<div style='font-size:11px;color:rgba(255,255,255,.3);margin-top:4px'>"+S.dg.calories+" ккал/день</div>";
-  html+="</div></div>";
-
-  // Goal timeline
-  html+="<div class='card' style='background:rgba(0,232,122,.05);border:1px solid rgba(0,232,122,.18);margin-bottom:14px'>";
-  html+="<div style='display:flex;gap:12px;align-items:center'><span style='font-size:26px'>🎯</span>";
-  html+="<div><div style='font-size:11px;color:rgba(255,255,255,.4);margin-bottom:2px'>Цель: "+tw+" кг · при соблюдении плана</div>";
-  html+="<div style='font-weight:700;font-size:15px'>через ~"+daysLeft+" дней ("+months+" мес)</div>";
-  html+="<div style='font-size:11px;color:rgba(255,255,255,.35);margin-top:2px'>Дефицит "+Math.abs(optDiff)+" ккал/день = "+Math.abs((optDiff*30/7700)).toFixed(1)+" кг/мес</div>";
-  html+="</div></div></div>";
-
-  // Body photo timeline
-  html+="<div class='text-head' style='margin-bottom:10px'>Body Twin — Анализ тела</div>";
-  if(S.bodyLoading){
-    html+="<div class='card' style='text-align:center;padding:24px;margin-bottom:12px'>";
-    html+="<div style='font-size:36px;margin-bottom:8px' class='pulse'>🔍</div>";
-    html+="<div style='font-weight:600;font-size:13px'>AI анализирует тело...</div></div>";
-  }
-  if(S.bodyPics.length===0&&!S.bodyLoading){
-    html+="<div class='dz' style='margin-bottom:14px' onclick='document.getElementById("body-file").click()'>";
-    html+="<div style='font-size:40px'>🪞</div>";
-    html+="<div style='font-weight:700;font-size:15px'>Загрузи фото тела</div>";
-    html+="<div style='color:rgba(240,240,248,.42);font-size:12px;line-height:1.6;text-align:center'>AI оценит % жира, мышцы,<br/>даст конкретный совет</div>";
-    html+="<div style='padding:10px 24px;background:var(--c);color:#000;border-radius:10px;font-size:14px;font-weight:700'>Выбрать фото</div></div>";
-  }
-  if(S.bodyPics.length>0){
-    html+="<div style='overflow-x:auto;padding-bottom:8px;margin-bottom:10px'>";
-    html+="<div style='display:flex;gap:10px;width:max-content'>";
-    S.bodyPics.forEach(function(p,i){
-      html+="<div style='width:148px;flex-shrink:0'>";
-      html+="<div style='position:relative'>";
-      html+="<img src='"+p.url+"' style='width:148px;height:196px;object-fit:cover;border-radius:12px;display:block' alt='body'/>";
-      if(i===S.bodyPics.length-1) html+="<div class='tag' style='position:absolute;top:7px;right:7px;background:rgba(0,232,122,.9);color:#000;font-size:9px'>СЕЙЧАС</div>";
-      html+="</div><div style='margin-top:8px'>";
-      html+="<div style='font-size:12px;font-weight:600;color:"+g.color+"'>"+p.date+"</div>";
-      if(p.an){
-        html+="<div style='color:rgba(240,240,248,.42);font-size:11px;margin-top:3px'>Жир: ~"+p.an.fatPercent+"% · Мышцы: "+p.an.muscleLevel+"/100</div>";
-        html+="<div style='font-size:11px;color:rgba(240,240,248,.42);margin-top:2px'>"+p.an.bodyType+"</div>";
-        html+="<div style='font-size:11px;color:rgba(240,240,248,.7);margin-top:4px;line-height:1.5'>"+p.an.note+"</div>";
-        html+="<div class='tag' style='background:"+g.color+"15;color:"+g.color+";font-size:10px;margin-top:5px;white-space:normal;line-height:1.4'>→ "+p.an.nextStep.slice(0,60)+"</div>";
-      }
-      html+="</div></div>";
-    });
-    html+="<div style='width:148px;height:196px;border:2px dashed rgba(255,255,255,.12);border-radius:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;gap:6px' onclick='document.getElementById("body-file").click()'>";
-    html+="<div style='font-size:26px'>+</div><div style='color:rgba(240,240,248,.42);font-size:11px;text-align:center'>Добавить<br/>фото</div></div>";
-    html+="</div></div>";
-    if(S.bodyPics.length>=2&&S.bodyPics[0].an&&S.bodyPics[S.bodyPics.length-1].an){
-      const first=S.bodyPics[0].an;
-      const last=S.bodyPics[S.bodyPics.length-1].an;
-      const fatDiff=last.fatPercent-first.fatPercent;
-      html+="<div class='card' style='background:rgba(0,232,122,.06);border:1px solid rgba(0,232,122,.2);margin-bottom:10px'>";
-      html+="<div style='font-size:12px;color:#00e87a;font-weight:700;margin-bottom:4px'>📈 ПРОГРЕСС</div>";
-      html+="<div style='font-size:13px;color:rgba(240,240,248,.8)'>Жир: "+first.fatPercent+"% → "+last.fatPercent+"% ("+( fatDiff<0?"↓":"↑")+Math.abs(fatDiff).toFixed(1)+"%) · "+S.bodyPics.length+" фото</div>";
-      html+="</div>";
+    <div class="text-head" style="margin-bottom:10px">Body Twin Timeline</div>
+    ${S.bodyLoading?`<div class="card" style="text-align:center;padding:20px;margin-bottom:12px"><div style="font-size:32px;margin-bottom:8px" class="pulse">🔍</div><div style="font-weight:600;font-size:13px">AI анализирует тело...</div></div>`:""}
+    ${S.bodyPics.length===0&&!S.bodyLoading?`
+      <div class="dz" onclick="document.getElementById('body-file').click()" style="margin-bottom:14px">
+        <div style="font-size:40px">🪞</div>
+        <div style="font-weight:700;font-size:15px">Загрузи первое фото тела</div>
+        <div class="text-muted" style="font-size:12px;line-height:1.6;text-align:center">AI оценит % жира, мышцы<br/>и даст конкретный совет</div>
+        <div style="padding:10px 24px;background:var(--c);color:#000;border-radius:10px;font-size:14px;font-weight:700">Выбрать фото</div>
+      </div>`:
+      S.bodyPics.length>0?`
+      <div style="overflow-x:auto;padding-bottom:8px;margin-bottom:10px">
+        <div style="display:flex;gap:10px;width:max-content">
+          ${S.bodyPics.map((p,i)=>`
+            <div class="body-thumb">
+              <div style="position:relative">
+                <img src="${p.url}" class="body-img" alt="body"/>
+                ${i===S.bodyPics.length-1?`<div class="tag" style="position:absolute;top:7px;right:7px;background:rgba(0,232,122,.9);color:#000;font-size:9px">СЕЙЧАС</div>`:""}
+              </div>
+              <div style="margin-top:8px">
+                <div style="font-size:12px;font-weight:600;color:${g.color}">${p.date}</div>
+                ${p.an?`
+                  <div class="text-muted" style="font-size:11px;margin-top:3px">Жир: ~${p.an.fatPercent}% · М: ${p.an.muscleLevel}</div>
+                  <div style="font-size:11px;color:rgba(240,240,248,.7);margin-top:3px;line-height:1.5">${p.an.note}</div>
+                  <div class="tag" style="background:${g.color}15;color:${g.color};font-size:10px;margin-top:5px;white-space:normal;line-height:1.4">${(p.an.nextStep||"").slice(0,50)}</div>`:""}
+              </div>
+            </div>`).join("")}
+          <div class="body-add" onclick="document.getElementById('body-file').click()">
+            <div style="font-size:26px">+</div>
+            <div class="text-muted" style="font-size:11px;text-align:center">Добавить<br/>фото</div>
+          </div>
+        </div>
+      </div>
+      ${S.bodyPics.length>=2?`<div class="card" style="background:rgba(0,232,122,.06);border:1px solid rgba(0,232,122,.2);margin-bottom:10px">
+        <div style="font-size:12px;color:#00e87a;font-weight:700;margin-bottom:4px">ПРОГРЕСС</div>
+        <div style="font-size:13px;color:rgba(240,240,248,.8)">${S.bodyPics[0].an&&S.bodyPics[S.bodyPics.length-1].an?`Жир: ${S.bodyPics[0].an.fatPercent}% → ${S.bodyPics[S.bodyPics.length-1].an.fatPercent}% · ${S.bodyPics.length} фото`:`${S.bodyPics.length} фото. Загружай раз в неделю.`}</div>
+      </div>`:""}`:""
     }
-  }
 
-  // Share card
-  html+="<div class='card' style='margin-bottom:20px'>";
-  html+="<div class='tag' style='background:rgba(255,87,51,.15);color:#ff5733;margin-bottom:10px'>🔥 ПОДЕЛИТЬСЯ</div>";
-  html+="<div style='font-weight:700;font-size:15px;margin-bottom:6px'>Карточка прогресса</div>";
-  html+="<div style='color:rgba(240,240,248,.42);font-size:13px;margin-bottom:14px'>Скачай PNG и отправь друзьям как вызов</div>";
-  html+="<button class='btn btn-primary' onclick='downloadCard()'>⬇ Скачать PNG</button></div>";
-
-  bc.innerHTML=html;
+    <div class="text-head" style="margin-bottom:10px">Поделиться прогрессом</div>
+    <div class="card" style="margin-bottom:20px">
+      <div class="tag" style="background:rgba(255,87,51,.15);color:#ff5733;margin-bottom:10px">🔥 ВИРУСНАЯ ФИЧА</div>
+      <div style="font-weight:700;font-size:15px;margin-bottom:6px">Карточка прогресса</div>
+      <div class="text-muted" style="font-size:13px;margin-bottom:14px;line-height:1.65">PNG со статистикой — скачай и отправь друзьям как вызов</div>
+      <div id="card-err" style="color:#ff7755;font-size:12px;margin-bottom:8px;display:none"></div>
+      <div style="display:flex;gap:8px">
+        <button class="btn btn-primary" style="flex:1;font-size:14px" onclick="downloadCard()">⬇ Скачать PNG</button>
+        <button class="btn" style="flex:1;background:rgba(255,255,255,.06);color:rgba(240,240,248,.7);border:1px solid rgba(255,255,255,.1);font-size:14px" onclick="showSharePreview()">👁 Превью</button>
+      </div>
+    </div>`;
 }
-
-// ── SHARE CARD ────────────────────────────────────────────────────────────────
-function downloadCard(){
-  try{
-    const g=GOALS.find(x=>x.id===S.gl);
-    const bs=BSTATES[S.bs]||BSTATES.burning;
-    const W=390,H=600,F="-apple-system,Helvetica,Arial,sans-serif";
-    const canvas=document.createElement("canvas");
-    canvas.width=W*2;canvas.height=H*2;
-    const ctx=canvas.getContext("2d");ctx.scale(2,2);
-    ctx.fillStyle="#07070e";ctx.fillRect(0,0,W,H);
-    ctx.fillStyle=g.color;ctx.fillRect(0,0,W,5);
-    ctx.fillStyle="rgba(255,255,255,0.3)";ctx.font=`500 11px ${F}`;ctx.fillText("AI NUTRITION COACH",28,34);
-    ctx.fillStyle=g.color;ctx.font=`700 22px ${F}`;ctx.fillText(g.icon+" "+g.title,28,72);
-    ctx.strokeStyle="rgba(255,255,255,0.09)";ctx.beginPath();ctx.moveTo(28,90);ctx.lineTo(362,90);ctx.stroke();
-    ctx.fillStyle="rgba(255,255,255,0.32)";ctx.font=`500 11px ${F}`;ctx.fillText("STREAK",28,114);
-    ctx.fillStyle=g.color;ctx.font=`900 72px ${F}`;ctx.fillText(String(S.str)+" дней",24,196);
-    ctx.beginPath();ctx.moveTo(28,216);ctx.lineTo(362,216);ctx.stroke();
-    ctx.fillStyle="rgba(255,255,255,0.28)";ctx.font=`500 11px ${F}`;ctx.fillText("CALORIES",28,248);ctx.fillText("PROTEIN",214,248);
-    ctx.fillStyle=g.color;ctx.font=`700 24px ${F}`;ctx.fillText(S.st.calories+" kkal",28,280);
-    ctx.fillStyle="#4a9eff";ctx.fillText(S.st.protein+"g",214,280);
-    ctx.beginPath();ctx.moveTo(28,300);ctx.lineTo(362,300);ctx.stroke();
-    ctx.fillStyle="rgba(255,255,255,0.28)";ctx.font=`500 11px ${F}`;ctx.fillText("LEVEL",28,330);ctx.fillText("BODY STATE",214,330);
-    ctx.fillStyle="#f0f0f8";ctx.font=`700 18px ${F}`;ctx.fillText("Level "+S.lv,28,356);
-    ctx.fillStyle=bs.color;ctx.fillText(bs.label,214,356);
-    ctx.fillStyle="rgba(255,255,255,0.13)";ctx.font=`400 11px ${F}`;ctx.fillText("AI Nutrition Coach",28,H-16);
-    const url=canvas.toDataURL("image/png");
-    const a=document.createElement("a");a.href=url;a.download="progress.png";
-    document.body.appendChild(a);a.click();document.body.removeChild(a);
-  }catch(e){alert("Ошибка: "+e.message);}
-}
-function roundRect(ctx,x,y,w,h,r){
-  ctx.beginPath();ctx.moveTo(x+r,y);ctx.lineTo(x+w-r,y);ctx.arcTo(x+w,y,x+w,y+r,r);
-  ctx.lineTo(x+w,y+h-r);ctx.arcTo(x+w,y+h,x+w-r,y+h,r);ctx.lineTo(x+r,y+h);
-  ctx.arcTo(x,y+h,x,y+h-r,r);ctx.lineTo(x,y+r);ctx.arcTo(x,y,x+r,y,r);ctx.closePath();
-}
-
-// ── CLAUDE API ────────────────────────────────────────────────────────────────
 
 function onBodyFile(e){
   const f=e.target.files[0]; if(!f) return;
   const url=URL.createObjectURL(f);
   S.bodyLoading=true; renderBodyScreen();
   const r=new FileReader();
-  r.onload=async function(ev){
+  r.onload=async ev=>{
     const b=ev.target.result.split(",")[1];
     try{
       const an=await callClaude([{role:"user",content:[
         {type:"image",source:{type:"base64",media_type:f.type,data:b}},
-        {type:"text",text:"Ты опытный фитнес-тренер. Проанализируй фото тела.\nЦель: "+GP[S.gl]+". Вес: "+S.weight+"кг → "+S.targetWeight+"кг.\nОПРЕДЕЛИ точно: 1) % жира тела (по виду складок и рельефа) 2) уровень мышц 1-100 3) тип телосложения 4) проблемные зоны 5) сильные стороны.\nJSON: {fatPercent:22,muscleLevel:45,bodyType:string,problemZones:[string],strengths:[string],note:string,nextStep:string,weeklyGoal:string}"}
-      ]}],
-      "Ты AI фитнес-тренер. Давай точные реалистичные оценки по фото. Верни ТОЛЬКО JSON без markdown.");
-      S.bodyPics.push({id:Date.now(),date:new Date().toLocaleDateString("ru",{day:"numeric",month:"long"}),url:url,an:an});
-    }catch(err){
-      S.bodyPics.push({id:Date.now(),date:new Date().toLocaleDateString("ru",{day:"numeric",month:"long"}),url:url,an:null});
-    }
-    S.bodyLoading=false;
-    renderBodyScreen();
+        {type:"text",text:'Оцени телосложение. JSON: {"fatPercent":22,"muscleLevel":42,"note":"краткое наблюдение 1-2 предложения","nextStep":"конкретный практический совет"}'}
+      ]}],"Ты AI фитнес-тренер. Верни ТОЛЬКО JSON без markdown.");
+      S.bodyPics.push({id:Date.now(),date:new Date().toLocaleDateString("ru",{day:"numeric",month:"long"}),url,an});
+    }catch{
+      S.bodyPics.push({id:Date.now(),date:new Date().toLocaleDateString("ru",{day:"numeric",month:"long"}),url,an:null});
+    }finally{ S.bodyLoading=false; renderBodyScreen(); }
   };
   r.readAsDataURL(f);
   e.target.value="";
 }
+
+// ═══════════════════════════════════════════════════
+// SHARE CARD
+// ═══════════════════════════════════════════════════
+function downloadCard(){
+  try{
+    const g=GOALS.find(x=>x.id===S.gl);
+    const bs=BSTATES[S.bs]||BSTATES.burning;
+    const W=390,H=700,F="-apple-system,Helvetica,Arial,sans-serif";
+    const canvas=document.createElement("canvas");
+    canvas.width=W*2; canvas.height=H*2;
+    const ctx=canvas.getContext("2d"); ctx.scale(2,2);
+
+    // BG
+    ctx.fillStyle="#07070e"; ctx.fillRect(0,0,W,H);
+    // grid lines
+    ctx.strokeStyle="rgba(255,255,255,0.025)"; ctx.lineWidth=1;
+    for(let i=0;i<W;i+=28){ctx.beginPath();ctx.moveTo(i,0);ctx.lineTo(i,H);ctx.stroke();}
+    for(let i=0;i<H;i+=28){ctx.beginPath();ctx.moveTo(0,i);ctx.lineTo(W,i);ctx.stroke();}
+    // top bar
+    ctx.fillStyle=g.color; ctx.fillRect(0,0,W,6);
+    // app label
+    ctx.fillStyle="rgba(255,255,255,0.3)"; ctx.font=`500 11px ${F}`;
+    ctx.fillText("AI NUTRITION COACH",28,36);
+    // goal
+    ctx.fillStyle=g.color+"28";
+    roundRect(ctx,26,45,180,28,14); ctx.fill();
+    ctx.fillStyle=g.color; ctx.font=`700 13px ${F}`;
+    ctx.fillText(g.title.toUpperCase()+" — "+g.sub,42,64);
+    // divider
+    ctx.strokeStyle="rgba(255,255,255,0.09)";
+    ctx.beginPath(); ctx.moveTo(28,86); ctx.lineTo(362,86); ctx.stroke();
+    // streak
+    ctx.fillStyle="rgba(255,255,255,0.32)"; ctx.font=`500 11px ${F}`;
+    ctx.fillText("STREAK",28,112);
+    ctx.fillStyle=g.color; ctx.font=`900 82px ${F}`;
+    ctx.fillText(String(S.str)+" d",24,206);
+    // divider 2
+    ctx.beginPath(); ctx.moveTo(28,228); ctx.lineTo(362,228); ctx.stroke();
+    // calories + protein
+    [[S.st.calories+" kkal","CALORIES",g.color,28],[S.st.protein+"g","PROTEIN","#4a9eff",214]].forEach(([v,l,c,x])=>{
+      ctx.fillStyle="rgba(255,255,255,0.28)"; ctx.font=`500 11px ${F}`; ctx.fillText(l,x,258);
+      ctx.fillStyle=c; ctx.font=`700 26px ${F}`; ctx.fillText(v,x,292);
+    });
+    // divider 3
+    ctx.beginPath(); ctx.moveTo(28,316); ctx.lineTo(362,316); ctx.stroke();
+    // level + body state
+    [["Level "+S.lv,"LEVEL","#f0f0f8",28],[bs.label,"BODY STATE",bs.color,214]].forEach(([v,l,c,x])=>{
+      ctx.fillStyle="rgba(255,255,255,0.28)"; ctx.font=`500 11px ${F}`; ctx.fillText(l,x,342);
+      ctx.fillStyle=c; ctx.font=`700 20px ${F}`; ctx.fillText(v,x,368);
+    });
+    // xp bar
+    ctx.beginPath(); ctx.moveTo(28,392); ctx.lineTo(362,392); ctx.stroke();
+    ctx.fillStyle="rgba(255,255,255,0.28)"; ctx.font=`500 11px ${F}`; ctx.fillText("XP",28,418);
+    ctx.fillStyle="rgba(255,255,255,0.07)"; roundRect(ctx,28,428,334,8,4); ctx.fill();
+    ctx.fillStyle=g.color; roundRect(ctx,28,428,Math.max(8,334*((S.xp%XP_MAX)/XP_MAX)),8,4); ctx.fill();
+    ctx.fillStyle="rgba(255,255,255,0.24)"; ctx.font=`400 11px ${F}`;
+    ctx.fillText(`${S.xp%XP_MAX} / ${XP_MAX} XP  —  Level ${S.lv}`,28,453);
+    // weight section
+    ctx.beginPath(); ctx.moveTo(28,472); ctx.lineTo(362,472); ctx.stroke();
+    ctx.fillStyle="rgba(255,255,255,0.28)"; ctx.font=`500 11px ${F}`; ctx.fillText("WEIGHT GOAL",28,498);
+    ctx.fillStyle="#f0f0f8"; ctx.font=`700 20px ${F}`;
+    ctx.fillText(`${S.weight||"?"} kg  ->  ${S.targetWeight||"?"} kg`,28,524);
+    // water
+    ctx.beginPath(); ctx.moveTo(28,546); ctx.lineTo(362,546); ctx.stroke();
+    ctx.fillStyle="rgba(255,255,255,0.28)"; ctx.font=`500 11px ${F}`; ctx.fillText("WATER",28,572);
+    ctx.fillStyle="#4a9eff"; ctx.font=`700 18px ${F}`;
+    ctx.fillText(`${S.water} / 2500 ml`,28,598);
+    // footer
+    ctx.fillStyle="rgba(255,255,255,0.13)"; ctx.font=`400 11px ${F}`;
+    ctx.fillText("AI Nutrition Coach",28,H-18);
+
+    const url=canvas.toDataURL("image/png");
+    const a=document.createElement("a"); a.href=url; a.download="ai-coach-progress.png";
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    const err=document.getElementById("card-err");
+    if(err){ err.style.display="none"; }
+  }catch(e){
+    const err=document.getElementById("card-err");
+    if(err){ err.textContent="Ошибка: "+e.message; err.style.display="block"; }
+  }
+}
+
+function roundRect(ctx,x,y,w,h,r){
+  ctx.beginPath();
+  ctx.moveTo(x+r,y); ctx.lineTo(x+w-r,y); ctx.arcTo(x+w,y,x+w,y+r,r);
+  ctx.lineTo(x+w,y+h-r); ctx.arcTo(x+w,y+h,x+w-r,y+h,r);
+  ctx.lineTo(x+r,y+h); ctx.arcTo(x,y+h,x,y+h-r,r);
+  ctx.lineTo(x,y+r); ctx.arcTo(x,y,x+r,y,r); ctx.closePath();
+}
+
+function showSharePreview(){
+  const g=GOALS.find(x=>x.id===S.gl);
+  const bs=BSTATES[S.bs]||BSTATES.burning;
+  document.getElementById("share-sheet").innerHTML=`
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+      <div style="font-family:'Unbounded',sans-serif;font-size:16px;font-weight:700">Превью карточки</div>
+      <button onclick="closeModal('share-modal')" style="background:none;border:none;color:rgba(255,255,255,.4);cursor:pointer;font-size:22px;line-height:1">×</button>
+    </div>
+    <div style="background:#07070e;border-radius:16px;overflow:hidden;border:2px solid ${g.color}35">
+      <div style="height:5px;background:${g.color}"></div>
+      <div style="padding:16px 20px">
+        <div style="font-size:11px;color:rgba(255,255,255,.3);margin-bottom:10px">AI NUTRITION COACH</div>
+        <div class="tag" style="background:${g.color}22;color:${g.color};margin-bottom:14px">${g.icon} ${g.title.toUpperCase()} — ${g.sub}</div>
+        <div class="text-muted" style="font-size:11px;margin-bottom:2px">STREAK</div>
+        <div style="font-family:'Unbounded',sans-serif;font-size:52px;font-weight:900;color:${g.color};line-height:1;margin-bottom:16px">${S.str}</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">
+          ${[[S.st.calories+" ккал","Калорий",g.color],[S.st.protein+"г","Белок","#4a9eff"],["Level "+S.lv,"Уровень","#f0f0f8"],[bs.label,"Состояние",bs.color]].map(([v,l,c])=>`
+            <div style="background:rgba(255,255,255,.04);border-radius:10px;padding:10px 12px">
+              <div style="font-size:10px;color:rgba(255,255,255,.32);margin-bottom:3px">${l.toUpperCase()}</div>
+              <div style="font-weight:700;font-size:14px;color:${c}">${v}</div>
+            </div>`).join("")}
+        </div>
+        <div class="text-muted" style="font-size:10px;text-align:center">AI Nutrition Coach</div>
+      </div>
+    </div>
+    <button class="btn btn-primary" style="margin-top:14px" onclick="downloadCard();closeModal('share-modal')">⬇ Скачать PNG</button>`;
+  document.getElementById("share-modal").style.display="flex";
+}
+
+// ═══════════════════════════════════════════════════
+// CLAUDE API
+// ═══════════════════════════════════════════════════
 async function callClaude(messages,system=""){
   const res=await fetch("/api/claude",{
-    method:"POST",headers:{"Content-Type":"application/json"},
-    body:JSON.stringify({model:"claude-haiku-4-5-20251001",max_tokens:2000,...(system?{system}:{}),messages})
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({model:"claude-haiku-4-5-20251001",max_tokens:1000,...(system?{system}:{}),messages})
   });
   const d=await res.json();
-  if(d.error) throw new Error(d.error.message||JSON.stringify(d.error));
+  if(d.error) throw new Error(d.error.message);
   return JSON.parse(d.content[0].text.replace(/```json|```/g,"").trim());
 }
 
-// ── MODALS ────────────────────────────────────────────────────────────────────
-function closeModal(id,e){if(!e||e.target.id===id)document.getElementById(id).style.display="none";}
-
-// ── INIT ──────────────────────────────────────────────────────────────────────
-window.addEventListener("DOMContentLoaded",function(){
-  renderGoals();
-  renderObSlide();
-  showScreen("onboard");
-});
+// ═══════════════════════════════════════════════════
+// MODALS
+// ═══════════════════════════════════════════════════
+function closeModal(id,e){
+  if(!e||e.target.id===id) document.getElementById(id).style.display="none";
+}
 </script>
 </body>
 </html>
