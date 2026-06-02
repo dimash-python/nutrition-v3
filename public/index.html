@@ -327,8 +327,8 @@ const S={
   bodyPics:[],notifOn:false,notifTimer:null,
   foodImg:null,foodB64:null,foodMime:null,foodAna:null,foodAdv:null,
   loadingFood:false,manualMode:false,currentTab:"main",
-  weekHistory:JSON.parse(localStorage.getItem("nc_week")||"{}"),
-  obSlide:0,barcodeReader:null,
+  weekHistory:(function(){try{return JSON.parse(localStorage.getItem("nc_week")||"{}");}catch(e){return {};}})(),
+  obSlide:0,barcodeReader:null,bodyLoading:false,barcodeMode:false,
 };
 
 // ── ONBOARDING ────────────────────────────────────────────────────────────────
@@ -665,13 +665,13 @@ function renderHistoryScreen(){
     days.push({key,dayName,data:S.weekHistory[key]||null,isToday:key===today});
   }
   // Сравнение недель
-  const thisWeekCal=days.slice(0,7).reduce((a,d)=>a+(d.data?.calories||0),0);
+  const thisWeekCal=days.slice(0,7).reduce((a,d)=>a+((d.data&&d.data.calories)||0),0);
   const lastWeekCal=Object.keys(S.weekHistory).filter(k=>{
     const d=new Date(k);const now=new Date();
     const diff=(now-d)/(1000*60*60*24);
     return diff>=7&&diff<14;
-  }).reduce((a,k)=>a+(S.weekHistory[k]?.calories||0),0);
-  const maxCal=Math.max(...days.map(d=>d.data?.calories||0),1);
+  }).reduce((a,k)=>a+((S.weekHistory[k]&&S.weekHistory[k].calories)||0),0);
+  const maxCal=Math.max(...days.map(d=>(d.data&&d.data.calories)||0),1);
 
   hc.innerHTML=`
     <div class="text-head" style="margin-bottom:12px">Калории за 7 дней</div>
@@ -880,7 +880,7 @@ async function analyzePhoto(){
   }
 }
 async function analyzeText(){
-  const txt=document.getElementById("txt-meal")?.value?.trim();
+  const txt=(document.getElementById("txt-meal")||{value:""}).value.trim();
   if(!txt)return;
   S.loadingFood=true;renderFoodInput();
   try{
@@ -1041,7 +1041,7 @@ function renderBodyScreen(){
   // Scenario A: user continues at TDEE (no plan)
   const mults=[1.2,1.375,1.55,1.725,1.9];
   const bmr=S.gender==="female"?10*cw+6.25*(S.height||170)-5*(S.age||25)-161:10*cw+6.25*(S.height||170)-5*(S.age||25)+5;
-  const tdee=bmr*(mults[Math.min((+document.getElementById("ud-activity")?.value||3)-1,4)]||1.55);
+  const tdee=bmr*(mults[Math.min((+(document.getElementById("ud-activity")||{}).value||3)-1,4)]||1.55);
   const scenAcal=Math.round(tdee); // maintenance
   const scenAchg=0; // no change at maintenance
   // Scenario B: following the plan
