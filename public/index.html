@@ -461,22 +461,31 @@ function updatePreview(){
   const w=+document.getElementById("ud-weight").value;
   const h=+document.getElementById("ud-height").value;
   const a=+document.getElementById("ud-age").value;
+  const tw=+document.getElementById("ud-target").value;
   const act=+document.getElementById("ud-activity").value||3;
   const pp=document.getElementById("plan-preview");
   if(!w||!h||!a||!S.gender){pp.style.display="none";return;}
   const p=calcGoals(w,h,a,S.gender,act,S.gl);
+  const optMap={loss:-380,cutting:-500,bulking:280,maint:0,sport:-180,healthy:-120};
+  const dailyDiff=Math.abs(optMap[S.gl]||350);
+  const daysToGoal=tw&&tw!==w?Math.round(Math.abs(w-tw)*7700/dailyDiff):null;
+  const g=GOALS.find(x=>x.id===S.gl);
   pp.style.display="block";
   pp.style.background="rgba(0,232,122,.05)";
   pp.style.border="1px solid rgba(0,232,122,.2)";
   pp.innerHTML=`
-    <div style="font-size:11px;color:#00e87a;font-weight:700;margin-bottom:8px">ТВОЙ ПЛАН</div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+    <div style="font-size:11px;color:#00e87a;font-weight:700;margin-bottom:8px">ТВОЙ ПЕРСОНАЛЬНЫЙ ПЛАН</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:${daysToGoal?'10px':'0'}">
       ${[[p.calories+" ккал","Калорий"],[p.protein+"г","Белок"],[p.fat+"г","Жиры"],[p.carbs+"г","Углеводы"]].map(([v,l])=>`
         <div style="background:rgba(0,232,122,.08);border-radius:8px;padding:8px 10px">
           <div style="font-weight:700;font-size:15px;color:#00e87a">${v}</div>
           <div style="font-size:11px;color:rgba(255,255,255,.4)">${l}</div>
         </div>`).join("")}
-    </div>`;
+    </div>
+    ${daysToGoal?`<div style="background:${g.color}15;border-radius:8px;padding:10px 12px;display:flex;justify-content:space-between;align-items:center">
+      <div style="font-size:12px;color:rgba(255,255,255,.55)">${w} кг → ${tw} кг</div>
+      <div style="font-weight:700;font-size:13px;color:${g.color}">~${Math.round(daysToGoal/30)} мес (${daysToGoal} д)</div>
+    </div>`:""}`;
 }
 function startMain(){
   const name=document.getElementById("ud-name").value||"Атлет";
@@ -555,12 +564,32 @@ function renderWater(){
 }
 function changeWater(d){S.water=Math.max(0,Math.min(4000,S.water+d));renderWater();}
 function renderMission(){
+  const needP=S.dg.protein-S.st.protein;
+  const needC=S.dg.calories-S.st.calories;
+  const hr=new Date().getHours();
+  var mText,mXp=50;
+  if(needP>50&&S.meals.length>0){
+    mText="Добери белок: нужно ещё "+Math.round(needP)+"г — яйца, творог или курица";mXp=60;
+  }else if(S.water<1000&&hr>12){
+    mText="Выпей 2 стакана воды прямо сейчас — у тебя только "+S.water+" мл";mXp=40;
+  }else if(S.st.calories<S.dg.calories*0.4&&hr>15){
+    mText="Ты мало ел сегодня — добавь приём пищи чтобы не замедлить метаболизм";mXp=55;
+  }else if(S.gl==="loss"||S.gl==="cutting"){
+    var opts=["Замени вечерний перекус на 150г творога","Добавь 10 мин прогулки после ужина","Выбери белок вместо углеводов в следующем приёме","Попробуй есть медленнее — мозг насыщается за 20 минут"];
+    mText=opts[new Date().getDay()%opts.length];
+  }else if(S.gl==="bulking"||S.gl==="sport"){
+    var opts=["Добавь 30г белка к следующему приёму","Выпей протеин или 200г творога","Съешь сложные углеводы за 2 ч до тренировки","Не пропускай перекус — это калории для роста"];
+    mText=opts[new Date().getDay()%opts.length];
+  }else{
+    var opts=["Съешь овощи с каждым приёмом пищи","Замени сладкое на фрукт","Выпей стакан воды до следующего приёма","Добавь 20 мин активности сегодня"];
+    mText=opts[new Date().getDay()%opts.length];
+  }
   document.getElementById("mission-card").innerHTML=`
     <div style="display:flex;justify-content:space-between;align-items:center">
       <div style="flex:1">
         <div class="tag" style="background:rgba(0,232,122,.15);color:#00e87a;font-size:10px;margin-bottom:8px">⚡ МИССИЯ ДНЯ</div>
-        <div style="font-weight:700;font-size:14px;margin-bottom:3px">+500 шагов к обычному</div>
-        <div class="text-muted" style="font-size:11px">+50 XP за выполнение</div>
+        <div style="font-weight:700;font-size:14px;margin-bottom:3px">${mText}</div>
+        <div class="text-muted" style="font-size:11px">+${mXp} XP за выполнение</div>
       </div>
       <button onclick="completeMission()" style="padding:9px 14px;font-size:12px;font-weight:700;border-radius:10px;margin-left:12px;white-space:nowrap;cursor:pointer;border:none;font-family:inherit;background:${S.missionDone?"rgba(0,232,122,.1)":"#00e87a"};color:${S.missionDone?"#00e87a":"#000"}">${S.missionDone?"✓ Готово":"Выполнил"}</button>
     </div>`;
@@ -627,13 +656,13 @@ function renderHistoryScreen(){
     days.push({key,dayName,data:S.weekHistory[key]||null,isToday:key===today});
   }
   // Сравнение недель
-  const thisWeekCal=days.slice(0,7).reduce((a,d)=>a+(d.data?.calories||0),0);
+  const thisWeekCal=days.slice(0,7).reduce((a,d)=>a+(d.data&&d.data.calories||0),0);
   const lastWeekCal=Object.keys(S.weekHistory).filter(k=>{
     const d=new Date(k);const now=new Date();
     const diff=(now-d)/(1000*60*60*24);
     return diff>=7&&diff<14;
-  }).reduce((a,k)=>a+(S.weekHistory[k]?.calories||0),0);
-  const maxCal=Math.max(...days.map(d=>d.data?.calories||0),1);
+  }).reduce((a,k)=>a+(S.weekHistory[k]&&S.weekHistory[k].calories||0),0);
+  const maxCal=Math.max(...days.map(d=>d.data&&d.data.calories||0),1);
 
   hc.innerHTML=`
     <div class="text-head" style="margin-bottom:12px">Калории за 7 дней</div>
@@ -842,7 +871,7 @@ async function analyzePhoto(){
   }
 }
 async function analyzeText(){
-  const txt=document.getElementById("txt-meal")?.value?.trim();
+  const txt=(document.getElementById("txt-meal")||{value:""}).value.trim();
   if(!txt)return;
   S.loadingFood=true;renderFoodInput();
   try{
@@ -861,7 +890,7 @@ async function finishAnalysis(a1){
   S.foodAna=a1;
   setLoadMsg("🧠 Составляю рекомендацию...");
   const nc=S.st.calories+a1.total.calories,np=S.st.protein+a1.total.protein;
-  const a2=await callClaude([{role:"user",content:`Умный совет после приёма пищи. JSON: {"mainAdvice":"конкретный совет 1-2 предложения","nextMeal":"через X ч — что конкретно съесть","warning":null,"replacement":null,"bodyState":"burning"} bodyState: burning|building|dark|sugar|perfect. Цель: ${GP[S.gl]}. Блюда: ${a1.dishes.map(d=>d.name).join(", ")}. Итого: ${nc}/${S.dg.calories} ккал. Белок: ${np}/${S.dg.protein}г. Жиры: ${S.st.fat+a1.total.fat}/${S.dg.fat}г.`}],
+  const a2=await callClaude([{role:"user",content:`Дай умный совет нутрициолога после приёма пищи. Будь КОНКРЕТНЫМ и РАЗНООБРАЗНЫМ — никогда не предлагай одно и то же.\nJSON: {"mainAdvice":"конкретный персональный совет","nextMeal":"ТОЧНО через сколько часов и КОНКРЕТНО что съесть с граммами","warning":null,"replacement":null,"bodyState":"burning"}\nbodyState: burning|building|dark|sugar|perfect.\nЦель: ${GP[S.gl]}. Пол: ${S.gender==="female"?"женский":"мужской"}. Вес: ${S.weight}кг.\nТолько что съел: ${a1.dishes.map(d=>d.name).join(", ")}.\nУже ел сегодня: ${S.meals.length>1?S.meals.slice(0,-1).map(m=>m.name).join(", "):"это первый приём"}.\nИтого за день: ${nc}/${S.dg.calories} ккал. Белок: ${np}/${S.dg.protein}г. Жиры: ${S.st.fat+a1.total.fat}/${S.dg.fat}г. Углеводы: ${S.st.carbs+a1.total.carbs}/${S.dg.carbs}г.\nДля nextMeal: предложи КОНКРЕТНОЕ блюдо которое восполняет нехватку дня. Точные граммы, время через сколько часов.`}],
     "Ты строгий AI нутрициолог. Давай конкретные советы. Верни ТОЛЬКО JSON без markdown.");
   S.foodAdv=a2;
   if(a2.bodyState&&BSTATES[a2.bodyState])S.bs=a2.bodyState;
@@ -944,7 +973,7 @@ async function showWeeklyPlan(){
     </div>`;
   document.getElementById("plan-modal").style.display="flex";
   try{
-    const plan=await callClaude([{role:"user",content:`Составь персональный план питания на 7 дней. Цель: ${GP[S.gl]}. Пол: ${S.gender==="female"?"женский":"мужской"}. Вес: ${S.weight}кг. Норма калорий: ${S.dg.calories} ккал, белок ${S.dg.protein}г, жиры ${S.dg.fat}г, углеводы ${S.dg.carbs}г. JSON: {"days":[{"day":"Понедельник","meals":[{"name":"Завтрак","food":"конкретные продукты","calories":400,"protein":25},{"name":"Обед","food":"конкретные продукты","calories":600,"protein":40},{"name":"Ужин","food":"конкретные продукты","calories":500,"protein":35},{"name":"Перекус","food":"конкретный перекус","calories":200,"protein":15}],"total_calories":1700}]} Только реальные блюда которые легко приготовить.`}],
+    const plan=await callClaude([{role:"user",content:`Составь ПЕРСОНАЛЬНЫЙ план питания на 7 дней.\nПол: ${S.gender==="female"?"женщина":"мужчина"}. Вес: ${S.weight}кг → ${S.targetWeight||"?"}кг. Цель: ${GP[S.gl]}.\nНорма: ${S.dg.calories} ккал/день, белок ${S.dg.protein}г, жиры ${S.dg.fat}г, углеводы ${S.dg.carbs}г.\nРеальные блюда с точными граммами. Разные блюда каждый день. Учитывай пол и вес.\nJSON: {"days":[{"day":"Понедельник","breakfast":"блюдо с граммами","lunch":"блюдо с граммами","dinner":"блюдо с граммами","snack":"перекус","cal":1700}]}`}],
       "Ты диетолог. Составляй вкусные и реалистичные планы питания. Верни ТОЛЬКО JSON без markdown.");
     sheet.innerHTML=`
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
@@ -978,30 +1007,86 @@ function renderBodyScreen(){
   const cw=S.weight||70;
   const optMap={loss:-380,cutting:-500,bulking:280,maint:0,sport:-180,healthy:-120};
   const optChg=((optMap[S.gl]||-350)*30)/7700;
-  const tw=S.targetWeight||(cw-5);
+  const tw=S.targetWeight||(cw-(S.gl==="bulking"?-5:5));
   const daysLeft=Math.round(Math.abs(cw-tw)*7700/Math.max(Math.abs(optMap[S.gl]||350),50));
+  const kgPerMonth=Math.abs((optMap[S.gl]||350)*30/7700).toFixed(1);
+  // Scenario A: maintenance (TDEE without plan) — no weight change
+  const mults=[1.2,1.375,1.55,1.725,1.9];
+  const bmr=S.gender==="female"?10*cw+6.25*(S.height||170)-5*(S.age||25)-161:10*cw+6.25*(S.height||170)-5*(S.age||25)+5;
+  const tdee=Math.round(bmr*(mults[2]||1.55));
+
   bc.innerHTML=`
     <div class="text-head" style="margin-bottom:10px">Два сценария — 30 дней</div>
     <div style="display:flex;gap:10px;margin-bottom:10px">
       <div class="card" style="flex:1;background:rgba(255,87,51,.07);border:1px solid rgba(255,87,51,.25)">
-        <div class="tag" style="background:rgba(255,87,51,.15);color:#ff5733;font-size:10px;margin-bottom:8px">ТАК КАК ЕСТЬ</div>
-        <div style="font-family:'Unbounded',sans-serif;font-size:26px;font-weight:900;color:#f0f0f8">${(cw+((S.st.calories-S.dg.calories)*30/7700)).toFixed(1)}<span style="font-size:12px"> кг</span></div>
-        <div class="text-muted" style="font-size:11px;margin-top:6px">${S.st.calories||S.dg.calories} ккал/день</div>
+        <div class="tag" style="background:rgba(255,87,51,.15);color:#ff5733;font-size:10px;margin-bottom:8px">БЕЗ ПЛАНА</div>
+        <div style="font-size:24px;font-weight:900;color:#f0f0f8">${cw.toFixed(1)}<span style="font-size:12px;color:rgba(255,255,255,.4)"> кг</span></div>
+        <div style="font-size:12px;color:rgba(255,255,255,.4);margin-top:4px">без изменений</div>
+        <div style="font-size:11px;color:rgba(255,255,255,.3);margin-top:3px">${tdee} ккал/день</div>
       </div>
       <div class="card" style="flex:1;background:${g.color}0a;border:1px solid ${g.color}28">
         <div class="tag" style="background:${g.color}20;color:${g.color};font-size:10px;margin-bottom:8px">ПО ПЛАНУ</div>
-        <div style="font-family:'Unbounded',sans-serif;font-size:26px;font-weight:900;color:${g.color}">${(cw+optChg).toFixed(1)}<span style="font-size:12px"> кг</span></div>
-        <div class="text-muted" style="font-size:11px;margin-top:6px">${S.dg.calories} ккал/день</div>
+        <div style="font-size:24px;font-weight:900;color:${g.color}">${(cw+optChg).toFixed(1)}<span style="font-size:12px;color:rgba(255,255,255,.4)"> кг</span></div>
+        <div style="font-size:12px;color:${g.color};font-weight:600;margin-top:4px">${optChg>0?"+":""}${optChg.toFixed(1)} кг</div>
+        <div style="font-size:11px;color:rgba(255,255,255,.3);margin-top:3px">${S.dg.calories} ккал/день</div>
       </div>
     </div>
     <div class="card" style="background:rgba(0,232,122,.05);border:1px solid rgba(0,232,122,.18);margin-bottom:14px">
       <div style="display:flex;gap:12px;align-items:center">
         <span style="font-size:26px">🎯</span>
-        <div><div class="text-muted" style="font-size:11px;margin-bottom:2px">Цель: ${tw}кг · при соблюдении плана</div>
-        <div style="font-weight:700;font-size:15px">через ~${daysLeft} дней</div></div>
+        <div>
+          <div class="text-muted" style="font-size:11px;margin-bottom:2px">Цель: ${tw}кг · при соблюдении плана</div>
+          <div style="font-weight:700;font-size:15px">через ~${daysLeft} дней (${Math.round(daysLeft/30*10)/10} мес)</div>
+          <div style="font-size:11px;color:rgba(255,255,255,.3);margin-top:2px">${kgPerMonth} кг/месяц при дефиците ${Math.abs(optMap[S.gl]||350)} ккал/день</div>
+        </div>
       </div>
     </div>
-    <div class="card" style="margin-bottom:14px">
+
+    <div class="text-head" style="margin-bottom:10px">Body Twin — Анализ тела</div>
+    ${S.bodyLoading?`
+    <div class="card" style="text-align:center;padding:24px;margin-bottom:12px">
+      <div style="font-size:36px;margin-bottom:8px" class="pulse">🔍</div>
+      <div style="font-weight:600;font-size:13px">AI анализирует тело...</div>
+    </div>`:
+    S.bodyPics.length===0?`
+    <div class="dz" style="margin-bottom:14px" onclick="document.getElementById('body-file').click()">
+      <div style="font-size:40px">🪞</div>
+      <div style="font-weight:700;font-size:15px">Загрузи фото тела</div>
+      <div class="text-muted" style="font-size:12px;line-height:1.6;text-align:center">AI оценит % жира, мышцы,<br/>тип телосложения и даст совет</div>
+      <div style="padding:10px 24px;background:var(--c);color:#000;border-radius:10px;font-size:14px;font-weight:700">Выбрать фото</div>
+    </div>`:`
+    <div style="overflow-x:auto;padding-bottom:8px;margin-bottom:10px">
+      <div style="display:flex;gap:10px;width:max-content">
+        ${S.bodyPics.map((p,i)=>`
+        <div style="width:148px;flex-shrink:0">
+          <div style="position:relative">
+            <img src="${p.url}" style="width:148px;height:196px;object-fit:cover;border-radius:12px;display:block" alt="body"/>
+            ${i===S.bodyPics.length-1?`<div class="tag" style="position:absolute;top:7px;right:7px;background:rgba(0,232,122,.9);color:#000;font-size:9px">СЕЙЧАС</div>`:""}
+          </div>
+          <div style="margin-top:8px">
+            <div style="font-size:12px;font-weight:600;color:${g.color}">${p.date}</div>
+            ${p.an?`
+              <div class="text-muted" style="font-size:11px;margin-top:3px">Жир: ~${p.an.fatPercent}% · Мышцы: ${p.an.muscleLevel}/100</div>
+              <div class="text-muted" style="font-size:11px;margin-top:2px">${p.an.bodyType||""}</div>
+              <div style="font-size:11px;color:rgba(240,240,248,.75);margin-top:4px;line-height:1.5">${p.an.note}</div>
+              <div class="tag" style="background:${g.color}15;color:${g.color};font-size:10px;margin-top:5px;white-space:normal;line-height:1.4">→ ${(p.an.nextStep||"").slice(0,55)}</div>
+            `:""}
+          </div>
+        </div>`).join("")}
+        <div style="width:148px;height:196px;border:2px dashed rgba(255,255,255,.12);border-radius:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;gap:6px" onclick="document.getElementById('body-file').click()">
+          <div style="font-size:26px">+</div>
+          <div class="text-muted" style="font-size:11px;text-align:center">Добавить<br/>фото</div>
+        </div>
+      </div>
+    </div>
+    ${S.bodyPics.length>=2&&S.bodyPics[0].an&&S.bodyPics[S.bodyPics.length-1].an?`
+    <div class="card" style="background:rgba(0,232,122,.06);border:1px solid rgba(0,232,122,.2);margin-bottom:10px">
+      <div style="font-size:12px;color:#00e87a;font-weight:700;margin-bottom:4px">📈 ПРОГРЕСС</div>
+      <div style="font-size:13px;color:rgba(240,240,248,.8)">Жир: ${S.bodyPics[0].an.fatPercent}% → ${S.bodyPics[S.bodyPics.length-1].an.fatPercent}% · ${S.bodyPics.length} фото</div>
+    </div>`:""}
+    `}
+
+    <div class="card" style="margin-bottom:20px">
       <div class="tag" style="background:rgba(255,87,51,.15);color:#ff5733;margin-bottom:10px">🔥 ПОДЕЛИТЬСЯ</div>
       <div style="font-weight:700;font-size:15px;margin-bottom:6px">Карточка прогресса</div>
       <div class="text-muted" style="font-size:13px;margin-bottom:14px">Скачай PNG и отправь друзьям как вызов</div>
@@ -1046,10 +1131,34 @@ function roundRect(ctx,x,y,w,h,r){
 }
 
 // ── CLAUDE API ────────────────────────────────────────────────────────────────
+
+function onBodyFile(e){
+  var f=e.target.files[0]; if(!f) return;
+  var url=URL.createObjectURL(f);
+  S.bodyLoading=true; renderBodyScreen();
+  var r=new FileReader();
+  r.onload=async function(ev){
+    var b=ev.target.result.split(",")[1];
+    try{
+      var an=await callClaude([{role:"user",content:[
+        {type:"image",source:{type:"base64",media_type:f.type,data:b}},
+        {type:"text",text:"Ты опытный фитнес-тренер. Детально проанализируй фото тела.\nЦель пользователя: "+GP[S.gl]+". Текущий вес: "+S.weight+"кг, желаемый: "+S.targetWeight+"кг. Пол: "+(S.gender==="female"?"женский":"мужской")+".\nОПРЕДЕЛИ: 1) % жира (смотри на складки, рельеф, живот, талию) 2) уровень мышц 1-100 3) тип телосложения 4) проблемные зоны 5) сильные стороны.\nJSON (только JSON без markdown): {fatPercent:22,muscleLevel:45,bodyType:string,problemZones:[string],strengths:[string],note:string,nextStep:string,weeklyGoal:string}"}
+      ]}],
+      "Ты AI фитнес-тренер. Давай точные реалистичные оценки. Верни ТОЛЬКО JSON без markdown.");
+      S.bodyPics.push({id:Date.now(),date:new Date().toLocaleDateString("ru",{day:"numeric",month:"long"}),url:url,an:an});
+    }catch(err){
+      S.bodyPics.push({id:Date.now(),date:new Date().toLocaleDateString("ru",{day:"numeric",month:"long"}),url:url,an:null});
+    }
+    S.bodyLoading=false;
+    renderBodyScreen();
+  };
+  r.readAsDataURL(f);
+  e.target.value="";
+}
 async function callClaude(messages,system=""){
   const res=await fetch("/api/claude",{
     method:"POST",headers:{"Content-Type":"application/json"},
-    body:JSON.stringify({model:"claude-haiku-4-5-20251001",max_tokens:2000,...(system?{system}:{}),messages})
+    body:JSON.stringify({model:"claude-haiku-4-5",max_tokens:2000,...(system?{system}:{}),messages})
   });
   const d=await res.json();
   if(d.error) throw new Error(d.error.message||JSON.stringify(d.error));
