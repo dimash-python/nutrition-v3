@@ -283,153 +283,184 @@ textarea.inp{resize:none;line-height:1.6}
 </div>
 
 <script>
-// ── GOALS ─────────────────────────────────────────────────────────────────────
-const GOALS=[
-  {id:"loss",icon:"🏃",title:"Похудение",sub:"Мягкое снижение веса",desc:"Плавно снижаем вес без стресса",color:"#ff9432",bg:"rgba(255,148,50,0.14)",tip:"Дефицит 300–400 ккал/день — стабильный −1–1.5 кг/месяц без потери мышц."},
-  {id:"cutting",icon:"🔥",title:"Сушка",sub:"Рельеф и жиросжигание",desc:"Спортивная сушка с сохранением мышц",color:"#ff5733",bg:"rgba(255,87,51,0.14)",tip:"Дефицит 400–600 ккал + 2.2г белка/кг. Циклируй углеводы."},
-  {id:"bulking",icon:"💪",title:"Масса",sub:"Набор мышц",desc:"Строим мышцы, растём в силе",color:"#00e87a",bg:"rgba(0,232,122,0.13)",tip:"Профицит 200–300 ккал + 2г белка/кг. Темп: 0.5–1 кг/месяц."},
-  {id:"maint",icon:"⚖️",title:"Поддержание",sub:"Удержание формы",desc:"Держим результат без откатов",color:"#4a9eff",bg:"rgba(74,158,255,0.13)",tip:"Точное TDEE без дефицита. 80% цельные продукты."},
-  {id:"sport",icon:"⚡",title:"Спорт",sub:"Выносливость и скорость",desc:"Максимум энергии и производительности",color:"#fbbf24",bg:"rgba(251,191,36,0.13)",tip:"Углеводы за 2–3 ч до тренировки. Белок сразу после."},
-  {id:"healthy",icon:"🌿",title:"Здоровье",sub:"Правильное питание",desc:"Натуральное и сбалансированное",color:"#a855f7",bg:"rgba(168,85,247,0.13)",tip:"Правило тарелки: ½ овощи, ¼ белок, ¼ углеводы."},
+// ═══════════════════════════════════════════════════════════════
+// GOALS & CONSTANTS
+// ═══════════════════════════════════════════════════════════════
+var GOALS=[
+  {id:"loss",   icon:"🏃",title:"Похудение",  sub:"Мягкое снижение",  desc:"Плавно снижаем без стресса",  color:"#ff9432",bg:"rgba(255,148,50,.14)",tip:"Дефицит 300-400 ккал/день = -1.5 кг/мес без потери мышц. Правило 80/20 работает лучше любой диеты."},
+  {id:"cutting",icon:"🔥",title:"Сушка",      sub:"Рельеф и жир",     desc:"Сушка с сохранением мышц",   color:"#ff5733",bg:"rgba(255,87,51,.14)", tip:"Дефицит 400-600 ккал + 2.2г белка/кг. Циклируй углеводы: больше в дни тренировок."},
+  {id:"bulking",icon:"💪",title:"Масса",       sub:"Набор мышц",       desc:"Строим мышцы и силу",        color:"#00e87a",bg:"rgba(0,232,122,.13)",  tip:"Профицит 200-300 ккал + 2г белка/кг. Темп 0.5-1 кг/мес = минимум жира при наборе."},
+  {id:"maint",  icon:"⚖️",title:"Поддержание",sub:"Удержание формы",   desc:"Держим результат",           color:"#4a9eff",bg:"rgba(74,158,255,.13)", tip:"Точное TDEE без дефицита. 80% цельные продукты — ключ к долгосрочному результату."},
+  {id:"sport",  icon:"⚡",title:"Спорт",       sub:"Выносливость",     desc:"Энергия и производительность",color:"#fbbf24",bg:"rgba(251,191,36,.13)", tip:"Углеводы за 2-3ч до тренировки. Белок сразу после. Электролиты при нагрузках >60мин."},
+  {id:"healthy",icon:"🌿",title:"Здоровье",   sub:"Правильное питание",desc:"Натуральное и сбалансированное",color:"#a855f7",bg:"rgba(168,85,247,.13)",tip:"Правило тарелки: ½ овощи, ¼ белок, ¼ углеводы. Гибкость без вины — ключ к привычке."},
 ];
-const BSTATES={
-  burning:{icon:"🔥",label:"Жир горит",color:"#ff5733"},
+var BSTATES={
+  burning:{icon:"🔥",label:"Жир горит",    color:"#ff5733"},
   building:{icon:"💪",label:"Мышцы растут",color:"#00e87a"},
-  dark:{icon:"📉",label:"Недобор калорий",color:"#4a9eff"},
-  sugar:{icon:"⚠️",label:"Перебор сахара",color:"#fbbf24"},
-  perfect:{icon:"⭐",label:"Идеальный день",color:"#a855f7"},
+  dark:    {icon:"📉",label:"Недобор",      color:"#4a9eff"},
+  sugar:   {icon:"⚠️", label:"Перебор сахара",color:"#fbbf24"},
+  perfect: {icon:"⭐",label:"Идеальный день",color:"#a855f7"},
 };
-const GP={
-  loss:"ПОХУДЕНИЕ: дефицит 300-400 ккал, белок 1.6-1.8г/кг, без жёстких ограничений",
+var GP={
+  loss:   "ПОХУДЕНИЕ: дефицит 300-400 ккал, белок 1.6-1.8г/кг, без жёстких ограничений",
   cutting:"СУШКА: дефицит 400-600 ккал, белок 2.2г/кг, минимум быстрых углеводов",
   bulking:"МАССА: профицит 200-300 ккал, белок 2г/кг, много сложных углеводов",
-  maint:"ПОДДЕРЖАНИЕ: норма TDEE, баланс всех макронутриентов",
-  sport:"СПОРТ: углеводы для энергии, белок для восстановления",
+  maint:  "ПОДДЕРЖАНИЕ: норма TDEE, баланс всех макронутриентов",
+  sport:  "СПОРТ: углеводы для энергии, белок для восстановления",
   healthy:"ЗДОРОВЬЕ: цельные продукты, правило тарелки, умеренность",
 };
-
-// Разные вопросы о голоде
-const HUNGER_Q=[
-  {q:"Ты правда голоден?",sub:"Настоящий голод или просто скука?"},
-  {q:"Подожди 5 минут",sub:"Иногда жажда маскируется под голод. Выпей воды?"},
-  {q:"Когда ты последний раз ел?",sub:"Если прошло меньше 2 часов — возможно это привычка"},
-  {q:"Что ты чувствуешь?",sub:"Голод в желудке или желание \"что-нибудь пожевать\"?"},
-  {q:"Это эмоциональный голод?",sub:"Стресс, скука и усталость часто имитируют голод"},
+var HUNGER_Q=[
+  {q:"Ты правда голоден?",sub:"Настоящий голод или привычка?"},
+  {q:"Подожди 5 минут",sub:"Иногда жажда маскируется под голод — выпей воды"},
+  {q:"Когда последний раз ел?",sub:"Если менее 2 часов — возможно это привычка"},
+  {q:"Что ты чувствуешь?",sub:"Голод в желудке или желание 'пожевать'?"},
+  {q:"Эмоциональный голод?",sub:"Стресс и усталость часто имитируют голод"},
 ];
 
-// ── STATE ─────────────────────────────────────────────────────────────────────
-const XP_MAX=5000;
-const S={
+// ═══════════════════════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════════════════════
+var XP_MAX=5000;
+var S={
   gl:null,gender:null,name:"",weight:0,height:0,age:0,targetWeight:0,
   dg:{calories:2000,protein:150,fat:65,carbs:200},
   st:{calories:0,protein:0,fat:0,carbs:0},
   meals:[],lv:1,xp:0,str:0,water:0,bs:"burning",missionDone:false,
-  bodyPics:[],notifOn:false,notifTimer:null,
+  bodyPics:[],bodyLoading:false,notifOn:false,notifTimer:null,
   foodImg:null,foodB64:null,foodMime:null,foodAna:null,foodAdv:null,
-  loadingFood:false,manualMode:false,currentTab:"main",
-  weekHistory:JSON.parse(localStorage.getItem("nc_week")||"{}"),
-  obSlide:0,barcodeReader:null,
+  loadingFood:false,manualMode:false,barcodeMode:false,currentTab:"main",
+  weekHistory:(function(){try{return JSON.parse(localStorage.getItem("nc_week")||"{}");}catch(e){return {};}}()),
+  barcodeReader:null,
 };
+var obSlide=0;
+var OB=[
+  {icon:"🤖",title:"AI Nutrition Coach",sub:"Фото еды → AI считает калории и говорит что съесть дальше",btn:"Начать →"},
+  {icon:"📸",title:"Фото → КБЖУ за 5 сек",sub:"AI видит все продукты и считает каждый грамм. Точнее любого приложения",btn:"Дальше →"},
+  {icon:"🧠",title:"Умный совет после еды",sub:"Говорит что съесть дальше под цель: похудение, масса или рельеф",btn:"Дальше →"},
+  {icon:"🪞",title:"Body Twin AI",sub:"Загрузи фото тела — AI оценит % жира, мышцы и даст персональный план",btn:"Выбрать цель →"},
+];
 
-// ── ONBOARDING ────────────────────────────────────────────────────────────────
-let obSlide=0;
+// ═══════════════════════════════════════════════════════════════
+// ONBOARDING
+// ═══════════════════════════════════════════════════════════════
+function renderOb(){
+  var s=OB[obSlide];
+  var el=document.getElementById("ob-content");
+  if(!el) return;
+  el.innerHTML=
+    "<div style='font-size:72px;margin-bottom:24px;line-height:1'>"+s.icon+"</div>"+
+    "<div style='font-family:Unbounded,sans-serif;font-size:24px;font-weight:900;line-height:1.2;margin-bottom:16px'>"+s.title+"</div>"+
+    "<div style='color:rgba(240,240,248,.42);font-size:15px;line-height:1.7'>"+s.sub+"</div>";
+  document.getElementById("ob-btn").textContent=s.btn;
+  var dots=document.getElementById("ob-dots");
+  if(!dots) return;
+  dots.innerHTML="";
+  OB.forEach(function(_,i){
+    var d=document.createElement("div");
+    d.style.cssText="height:8px;border-radius:4px;transition:all .3s;background:"+(i===obSlide?"var(--c)":"rgba(255,255,255,.2)")+";width:"+(i===obSlide?"24px":"8px");
+    dots.appendChild(d);
+  });
+}
 function nextSlide(){
-  document.getElementById("ob"+obSlide).classList.add("hidden");
   obSlide++;
-  if(obSlide>3){showScreen("goal");return;}
-  document.getElementById("ob"+obSlide).classList.remove("hidden");
+  if(obSlide>=OB.length){showScreen("goal");return;}
+  renderOb();
 }
 
-// ── SCREEN ROUTING ────────────────────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════
+// ROUTING
+// ═══════════════════════════════════════════════════════════════
 function showScreen(name){
-  ["onboard","goal","data","main","food","history","body"].forEach(s=>{
-    const el=document.getElementById("scr-"+s);
-    if(el) el.classList.toggle("hidden",s!==name);
-    if(s===name&&el) el.classList.add("fade-in");
+  ["onboard","goal","data","main","food","history","body"].forEach(function(s){
+    var el=document.getElementById("scr-"+s);
+    if(!el) return;
+    if(s===name){el.classList.remove("hidden");el.classList.add("fade-in");}
+    else{el.classList.add("hidden");el.classList.remove("fade-in");}
   });
-  const mainScreens=["main","food","history","body"];
-  const nav=document.getElementById("main-nav");
-  if(mainScreens.includes(name)){
+  var nav=document.getElementById("main-nav");
+  var mainScreens=["main","food","history","body"];
+  if(mainScreens.indexOf(name)>=0){
     nav.style.display="flex";
     S.currentTab=name;
     updateNavActive();
     if(name==="history") renderHistoryScreen();
     if(name==="body") renderBodyScreen();
+    if(name==="food") renderFoodScreen();
   } else {
     nav.style.display="none";
   }
 }
-function switchTab(tab){
-  S.currentTab=tab;
-  showScreen(tab);
-  updateNavActive();
-}
+function switchTab(t){S.currentTab=t;showScreen(t);}
 function updateNavActive(){
-  ["main","history","body"].forEach(t=>{
-    const b=document.getElementById("nav-"+t);
+  ["main","history","body"].forEach(function(t){
+    var b=document.getElementById("nav-"+t);
     if(b) b.classList.toggle("active",S.currentTab===t);
   });
-  const fl=document.getElementById("nav-food-label");
+  var fl=document.getElementById("nav-food-label");
   if(fl) fl.style.color=S.currentTab==="food"?"var(--c)":"rgba(255,255,255,.28)";
 }
 
-// ── GOAL SELECTION ────────────────────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════
+// GOAL SCREEN
+// ═══════════════════════════════════════════════════════════════
 function renderGoals(){
-  const list=document.getElementById("goals-list");
+  var list=document.getElementById("goals-list");
+  if(!list) return;
   list.innerHTML="";
-  GOALS.forEach(g=>{
-    const wrap=document.createElement("div");
-    wrap.innerHTML=`
-      <div class="card card-goal" id="gc-${g.id}" onclick="selectGoal('${g.id}')">
-        <div style="display:flex;align-items:center;gap:14px">
-          <span style="font-size:26px">${g.icon}</span>
-          <div style="flex:1">
-            <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
-              <span style="font-weight:700;font-size:15px" id="gt-${g.id}">${g.title}</span>
-              <span class="tag" style="background:${g.color}18;color:${g.color};font-size:10px;padding:1px 7px">${g.sub}</span>
-            </div>
-            <div class="text-muted" style="font-size:12px;margin-top:2px">${g.desc}</div>
-          </div>
-          <div id="gc-check-${g.id}" style="display:none;width:20px;height:20px;border-radius:50%;background:${g.color};flex-shrink:0;align-items:center;justify-content:center">
-            <span style="color:#000;font-size:13px;font-weight:900">✓</span>
-          </div>
-        </div>
-      </div>
-      <div id="gc-tip-${g.id}" class="tip-slide" style="display:none;margin-top:4px;background:${g.color}0d;border:1px solid ${g.color}28;border-radius:12px;padding:12px 14px">
-        <div style="font-size:11px;color:${g.color};font-weight:700;margin-bottom:5px">СОВЕТ</div>
-        <div style="font-size:12px;color:rgba(240,240,248,.78);line-height:1.65">${g.tip}</div>
-      </div>`;
+  GOALS.forEach(function(g){
+    var wrap=document.createElement("div");
+    wrap.innerHTML=
+      "<div class='card card-goal' id='gc-"+g.id+"' onclick='selectGoal(\""+g.id+"\")'>" +
+        "<div style='display:flex;align-items:center;gap:14px'>" +
+          "<span style='font-size:26px'>"+g.icon+"</span>" +
+          "<div style='flex:1'>" +
+            "<div style='display:flex;align-items:center;gap:8px;flex-wrap:wrap'>" +
+              "<span style='font-weight:700;font-size:15px' id='gt-"+g.id+"'>"+g.title+"</span>" +
+              "<span class='tag' style='background:"+g.color+"18;color:"+g.color+";font-size:10px;padding:1px 7px'>"+g.sub+"</span>" +
+            "</div>" +
+            "<div class='text-muted' style='font-size:12px;margin-top:2px'>"+g.desc+"</div>" +
+          "</div>" +
+          "<div id='gc-chk-"+g.id+"' style='display:none;width:20px;height:20px;border-radius:50%;background:"+g.color+";flex-shrink:0;align-items:center;justify-content:center'>" +
+            "<span style='color:#000;font-size:13px;font-weight:900'>✓</span>" +
+          "</div>" +
+        "</div>" +
+      "</div>" +
+      "<div id='gc-tip-"+g.id+"' style='display:none;margin-top:4px;background:"+g.color+"0d;border:1px solid "+g.color+"28;border-radius:12px;padding:12px 14px'>" +
+        "<div style='font-size:11px;color:"+g.color+";font-weight:700;margin-bottom:5px'>СОВЕТ НУТРИЦИОЛОГА</div>" +
+        "<div style='font-size:12px;color:rgba(240,240,248,.78);line-height:1.65'>"+g.tip+"</div>" +
+      "</div>";
     list.appendChild(wrap);
   });
 }
 function selectGoal(id){
-  GOALS.forEach(g=>{
-    const card=document.getElementById("gc-"+g.id);
-    const check=document.getElementById("gc-check-"+g.id);
-    const tip=document.getElementById("gc-tip-"+g.id);
-    const title=document.getElementById("gt-"+g.id);
-    const active=g.id===id;
+  GOALS.forEach(function(g){
+    var card=document.getElementById("gc-"+g.id);
+    var chk=document.getElementById("gc-chk-"+g.id);
+    var tip=document.getElementById("gc-tip-"+g.id);
+    var title=document.getElementById("gt-"+g.id);
+    var active=g.id===id;
     if(card){card.classList.toggle("selected",active);card.style.borderColor=active?g.color:"transparent";card.style.background=active?g.bg:"rgba(255,255,255,.03)";}
-    if(check) check.style.display=active?"flex":"none";
+    if(chk) chk.style.display=active?"flex":"none";
     if(tip) tip.style.display=active?"block":"none";
     if(title) title.style.color=active?g.color:"#f0f0f8";
   });
   S.gl=id;
-  const g=GOALS.find(x=>x.id===id);
+  var g=GOALS.filter(function(x){return x.id===id;})[0];
   setCSSVars(g);
-  const nb=document.getElementById("goal-next-btn");
-  nb.style.background=g.color; nb.style.color="#000";
+  var nb=document.getElementById("goal-next-btn");
+  if(nb){nb.style.background=g.color;nb.style.color="#000";}
 }
 function goToData(){
   if(!S.gl) return;
-  const g=GOALS.find(x=>x.id===S.gl);
+  var g=GOALS.filter(function(x){return x.id===S.gl;})[0];
   setCSSVars(g);
-  document.getElementById("goal-reminder").innerHTML=`
-    <div style="display:flex;align-items:center;gap:10px">
-      <span style="font-size:22px">${g.icon}</span>
-      <div><div style="font-size:11px;color:rgba(255,255,255,.42)">Выбранная цель</div>
-      <div style="font-weight:700;color:${g.color}">${g.title} — ${g.sub}</div></div>
-    </div>`;
+  var gr=document.getElementById("goal-reminder");
+  if(gr) gr.innerHTML=
+    "<div style='display:flex;align-items:center;gap:10px'>" +
+      "<span style='font-size:22px'>"+g.icon+"</span>" +
+      "<div><div style='font-size:11px;color:rgba(255,255,255,.42)'>Выбранная цель</div>" +
+      "<div style='font-weight:700;color:"+g.color+"'>"+g.title+" — "+g.sub+"</div></div>" +
+    "</div>";
   showScreen("data");
 }
 function setCSSVars(g){
@@ -437,631 +468,982 @@ function setCSSVars(g){
   document.documentElement.style.setProperty("--cb",g.bg);
 }
 
-// ── GENDER ────────────────────────────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════
+// DATA SCREEN
+// ═══════════════════════════════════════════════════════════════
 function setGender(v){
   S.gender=v;
   document.getElementById("gbtn-male").classList.toggle("sel",v==="male");
   document.getElementById("gbtn-female").classList.toggle("sel",v==="female");
-  document.getElementById("bmr-hint").textContent=v==="female"?"Формула Миффлина для женщин":"Формула Миффлина для мужчин";
+  var hint=document.getElementById("bmr-hint");
+  if(hint) hint.textContent=v==="female"?"Формула Миффлина для женщин: BMR = 10W + 6.25H − 5A − 161":"Формула Миффлина для мужчин: BMR = 10W + 6.25H − 5A + 5";
   updatePreview();
 }
+
 function calcGoals(w,h,a,gender,activity,goal){
-  const mults=[1.2,1.375,1.55,1.725,1.9];
-  const bmr=gender==="female"?10*w+6.25*h-5*a-161:10*w+6.25*h-5*a+5;
-  const tdee=bmr*(mults[Math.min(activity-1,4)]||1.55);
-  const calMap={loss:tdee*.83,cutting:tdee*.8,bulking:tdee*1.15,maint:tdee,sport:tdee*1.08,healthy:tdee};
-  const cal=Math.round(calMap[goal]||tdee);
-  const ppkg={loss:gender==="female"?1.6:1.8,cutting:gender==="female"?1.8:2.2,bulking:gender==="female"?1.6:2.0,maint:gender==="female"?1.3:1.6,sport:gender==="female"?1.5:1.8,healthy:gender==="female"?1.2:1.5};
-  const prot=Math.round(w*(ppkg[goal]||1.5));
-  const fat=Math.max(Math.round(cal*.27/9),35);
-  const carbs=Math.max(Math.round((cal-prot*4-fat*9)/4),40);
-  return{calories:cal,protein:prot,fat,carbs};
+  var mults=[1.2,1.375,1.55,1.725,1.9];
+  var bmr=gender==="female"?10*w+6.25*h-5*a-161:10*w+6.25*h-5*a+5;
+  var tdee=bmr*(mults[Math.min(activity-1,4)]||1.55);
+  var calMap={loss:tdee*0.83,cutting:tdee*0.8,bulking:tdee*1.15,maint:tdee,sport:tdee*1.08,healthy:tdee};
+  var cal=Math.round(calMap[goal]||tdee);
+  var ppkg={loss:gender==="female"?1.6:1.8,cutting:gender==="female"?1.8:2.2,bulking:gender==="female"?1.6:2.0,maint:gender==="female"?1.3:1.6,sport:gender==="female"?1.5:1.8,healthy:gender==="female"?1.2:1.5};
+  var prot=Math.round(w*(ppkg[goal]||1.5));
+  var fat=Math.max(Math.round(cal*0.27/9),35);
+  var carbs=Math.max(Math.round((cal-prot*4-fat*9)/4),40);
+  return {calories:cal,protein:prot,fat:fat,carbs:carbs,tdee:Math.round(tdee),bmr:Math.round(bmr)};
 }
+
+function calcTimeline(w,tw,gl){
+  var diffs={loss:-380,cutting:-500,bulking:280,maint:0,sport:-180,healthy:-120};
+  var optDiff=diffs[gl]||(-350);
+  var kgPerDay=Math.abs(optDiff)/7700;
+  var totalKg=Math.abs(w-tw);
+  var days=totalKg/kgPerDay;
+  // realistic (80% of optimal)
+  var realistic=Math.round(days/0.8);
+  // optimal
+  var optimal=Math.round(days);
+  // aggressive (120% deficit)
+  var aggressive=Math.round(days/1.2);
+  return {realistic:realistic,optimal:optimal,aggressive:aggressive,kgPerMonth:(kgPerDay*30).toFixed(2),kgPerWeek:(kgPerDay*7).toFixed(2),dailyDiff:Math.abs(optDiff)};
+}
+
 function updatePreview(){
-  const w=+document.getElementById("ud-weight").value;
-  const h=+document.getElementById("ud-height").value;
-  const a=+document.getElementById("ud-age").value;
-  const act=+document.getElementById("ud-activity").value||3;
-  const pp=document.getElementById("plan-preview");
+  var w=+(document.getElementById("ud-weight")||{value:0}).value;
+  var h=+(document.getElementById("ud-height")||{value:0}).value;
+  var a=+(document.getElementById("ud-age")||{value:0}).value;
+  var tw=+(document.getElementById("ud-target")||{value:0}).value;
+  var act=+(document.getElementById("ud-activity")||{value:3}).value||3;
+  var pp=document.getElementById("plan-preview");
+  if(!pp) return;
   if(!w||!h||!a||!S.gender){pp.style.display="none";return;}
-  const p=calcGoals(w,h,a,S.gender,act,S.gl);
+  var p=calcGoals(w,h,a,S.gender,act,S.gl);
+  var g=GOALS.filter(function(x){return x.id===S.gl;})[0];
+  var tl=tw&&tw!==w?calcTimeline(w,tw,S.gl):null;
+
   pp.style.display="block";
   pp.style.background="rgba(0,232,122,.05)";
   pp.style.border="1px solid rgba(0,232,122,.2)";
-  pp.innerHTML=`
-    <div style="font-size:11px;color:#00e87a;font-weight:700;margin-bottom:8px">ТВОЙ ПЛАН</div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
-      ${[[p.calories+" ккал","Калорий"],[p.protein+"г","Белок"],[p.fat+"г","Жиры"],[p.carbs+"г","Углеводы"]].map(([v,l])=>`
-        <div style="background:rgba(0,232,122,.08);border-radius:8px;padding:8px 10px">
-          <div style="font-weight:700;font-size:15px;color:#00e87a">${v}</div>
-          <div style="font-size:11px;color:rgba(255,255,255,.4)">${l}</div>
-        </div>`).join("")}
-    </div>`;
+
+  var html="<div style='font-size:11px;color:#00e87a;font-weight:700;margin-bottom:8px'>ТВОЙ ПЕРСОНАЛЬНЫЙ ПЛАН</div>";
+  html+="<div style='display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:"+(tl?"10px":"0")+"'>";
+  [[p.calories+" ккал","Калорий"],[p.protein+"г","Белок"],[p.fat+"г","Жиры"],[p.carbs+"г","Углеводы"]].forEach(function(item){
+    html+="<div style='background:rgba(0,232,122,.08);border-radius:8px;padding:8px 10px'>" +
+      "<div style='font-weight:700;font-size:15px;color:#00e87a'>"+item[0]+"</div>" +
+      "<div style='font-size:11px;color:rgba(255,255,255,.4)'>"+item[1]+"</div>" +
+    "</div>";
+  });
+  html+="</div>";
+  html+="<div style='font-size:11px;color:rgba(255,255,255,.35);margin-bottom:"+(tl?"8px":"0")+"'>BMR: "+p.bmr+" · TDEE: "+p.tdee+" ккал</div>";
+
+  if(tl){
+    html+="<div style='background:"+g.color+"15;border-radius:10px;padding:10px 12px'>";
+    html+="<div style='font-size:11px;color:rgba(255,255,255,.45);margin-bottom:6px'>"+w+"кг → "+tw+"кг · "+tl.kgPerMonth+" кг/мес</div>";
+    html+="<div style='display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px'>";
+    [["Реалистично",tl.realistic,"rgba(255,255,255,.6)"],["Оптимально",tl.optimal,g.color],["Агрессивно",tl.aggressive,"#ff5733"]].forEach(function(s){
+      html+="<div style='background:rgba(255,255,255,.04);border-radius:8px;padding:7px;text-align:center'>" +
+        "<div style='font-size:10px;color:rgba(255,255,255,.35);margin-bottom:3px'>"+s[0]+"</div>" +
+        "<div style='font-weight:700;font-size:13px;color:"+s[2]+"'>"+s[1]+"д</div>" +
+        "<div style='font-size:10px;color:rgba(255,255,255,.3)'>"+Math.round(s[1]/30)+" мес</div>" +
+      "</div>";
+    });
+    html+="</div></div>";
+  }
+  pp.innerHTML=html;
 }
+
+function showFErr(msg){
+  var el=document.getElementById("ferr");
+  if(!el){
+    el=document.createElement("div");
+    el.id="ferr";
+    el.style.cssText="background:rgba(255,87,51,.12);border:1px solid rgba(255,87,51,.3);border-radius:10px;padding:10px 14px;font-size:13px;color:#ff7755;margin-top:12px;text-align:center";
+    var scr=document.getElementById("scr-data");
+    if(scr) scr.appendChild(el);
+  }
+  el.textContent="⚠️ "+msg;
+  el.style.display="block";
+  clearTimeout(el._t);
+  el._t=setTimeout(function(){if(el)el.style.display="none";},3000);
+}
+
 function startMain(){
-  const name=document.getElementById("ud-name").value||"Атлет";
-  const w=+document.getElementById("ud-weight").value||70;
-  const h=+document.getElementById("ud-height").value||170;
-  const a=+document.getElementById("ud-age").value||25;
-  const tw=+document.getElementById("ud-target").value||(w-5);
-  const act=+document.getElementById("ud-activity").value||3;
+  var name=(document.getElementById("ud-name")||{value:""}).value.trim();
+  var w=+(document.getElementById("ud-weight")||{value:0}).value;
+  var h=+(document.getElementById("ud-height")||{value:0}).value;
+  var a=+(document.getElementById("ud-age")||{value:0}).value;
+  var tw=+(document.getElementById("ud-target")||{value:0}).value;
+  var act=+(document.getElementById("ud-activity")||{value:3}).value||3;
+  if(!S.gender){showFErr("Выбери пол");return;}
+  if(!name){showFErr("Введи имя");(document.getElementById("ud-name")||{}).focus();return;}
+  if(!w||w<30||w>300){showFErr("Введи корректный вес (30-300 кг)");return;}
+  if(!h||h<100||h>250){showFErr("Введи корректный рост (100-250 см)");return;}
+  if(!a||a<10||a>100){showFErr("Введи возраст (10-100 лет)");return;}
+  if(!tw||tw<30||tw>300){showFErr("Введи желаемый вес (30-300 кг)");return;}
   S.name=name;S.weight=w;S.height=h;S.age=a;S.targetWeight=tw;
   S.dg=calcGoals(w,h,a,S.gender,act,S.gl);
   showScreen("main");
   renderDashboard();
 }
 
-// ── DASHBOARD ─────────────────────────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════
+// DASHBOARD
+// ═══════════════════════════════════════════════════════════════
 function renderDashboard(){
-  const g=GOALS.find(x=>x.id===S.gl);
+  var g=GOALS.filter(function(x){return x.id===S.gl;})[0];
   setCSSVars(g);
-  document.getElementById("greeting").textContent=`Привет, ${S.name} ${S.gender==="female"?"👩":"👨"}`;
+  var gr=document.getElementById("greeting");
+  if(gr) gr.textContent="Привет, "+S.name+" "+(S.gender==="female"?"👩":"👨");
   renderXP();renderBodyState();renderCalRing();renderMacroBars();renderWater();renderMission();renderMeals();renderNotif();
 }
 function renderXP(){
-  const cur=S.xp%XP_MAX;
-  document.getElementById("level-label").textContent="Level "+S.lv;
-  document.getElementById("xp-label").textContent=`XP: ${cur} / ${XP_MAX}`;
-  document.getElementById("xp-next").textContent=`до Level ${S.lv+1}`;
-  document.getElementById("xp-bar").style.width=(cur/XP_MAX*100)+"%";
-  document.getElementById("streak-tag").textContent=`Streak: ${S.str} д.`;
+  var cur=S.xp%XP_MAX;
+  var ll=document.getElementById("level-label");if(ll) ll.textContent="Level "+S.lv;
+  var xl=document.getElementById("xp-label");if(xl) xl.textContent="XP: "+cur+" / "+XP_MAX;
+  var xn=document.getElementById("xp-next");if(xn) xn.textContent="до Level "+(S.lv+1);
+  var xb=document.getElementById("xp-bar");if(xb) xb.style.width=(cur/XP_MAX*100)+"%";
+  var st=document.getElementById("streak-tag");if(st) st.textContent="Streak: "+S.str+" д.";
 }
 function renderBodyState(){
-  const bs=BSTATES[S.bs]||BSTATES.burning;
-  const pill=document.getElementById("body-state-pill");
+  var bs=BSTATES[S.bs]||BSTATES.burning;
+  var pill=document.getElementById("body-state-pill");
+  if(!pill) return;
   pill.style.background=bs.color+"18";
-  pill.style.border=`1px solid ${bs.color}32`;
-  pill.innerHTML=`<span style="font-size:18px">${bs.icon}</span><span style="font-weight:700;color:${bs.color};font-size:14px">${bs.label}</span>`;
+  pill.style.border="1px solid "+bs.color+"32";
+  pill.innerHTML="<span style='font-size:18px'>"+bs.icon+"</span><span style='font-weight:700;color:"+bs.color+";font-size:14px'>"+bs.label+"</span>";
 }
 function renderCalRing(){
-  const g=GOALS.find(x=>x.id===S.gl);
-  const p=Math.min(Math.round(S.st.calories/Math.max(S.dg.calories,1)*100),100);
-  const C=2*Math.PI*52;
-  const offset=C-(p/100)*C;
-  const clr=p>95?"#ff5733":p>70?g.color:"#4a9eff";
-  const ring=document.getElementById("cal-ring");
-  ring.style.strokeDashoffset=offset;ring.style.stroke=clr;
-  document.getElementById("cal-ring-val").style.color=clr;
-  document.getElementById("cal-ring-val").textContent=S.st.calories;
-  document.getElementById("cal-sub").textContent=`Цель: ${S.dg.calories} · Остаток: ${Math.max(0,S.dg.calories-S.st.calories)}`;
+  var g=GOALS.filter(function(x){return x.id===S.gl;})[0];
+  var p=Math.min(Math.round(S.st.calories/Math.max(S.dg.calories,1)*100),100);
+  var C=2*Math.PI*52;
+  var offset=C-(p/100)*C;
+  var clr=p>95?"#ff5733":p>70?g.color:"#4a9eff";
+  var ring=document.getElementById("cal-ring");
+  if(ring){ring.style.strokeDashoffset=offset;ring.style.stroke=clr;}
+  var rv=document.getElementById("cal-ring-val");
+  if(rv){rv.style.color=clr;rv.textContent=S.st.calories;}
+  var cs=document.getElementById("cal-sub");
+  if(cs) cs.textContent="Цель: "+S.dg.calories+" · Остаток: "+Math.max(0,S.dg.calories-S.st.calories);
 }
 function renderMacroBars(){
-  const macros=[["Белок",S.st.protein,S.dg.protein,"#4a9eff"],["Жиры",S.st.fat,S.dg.fat,"#fbbf24"],["Углеводы",S.st.carbs,S.dg.carbs,"#a855f7"]];
-  document.getElementById("macro-bars").innerHTML=macros.map(([l,v,m,c])=>`
-    <div style="margin-bottom:8px">
-      <div style="display:flex;justify-content:space-between;margin-bottom:3px">
-        <span class="text-muted" style="font-size:11px">${l}</span>
-        <span style="font-size:11px;color:${c};font-weight:600">${v}<span style="color:rgba(255,255,255,.22)"> / ${m}г</span></span>
-      </div>
-      <div class="pbar"><div class="pbar-fill" style="width:${Math.min(100,Math.round(v/Math.max(m,1)*100))}%;background:${c}"></div></div>
-    </div>`).join("");
+  var el=document.getElementById("macro-bars");
+  if(!el) return;
+  var macros=[["Белок",S.st.protein,S.dg.protein,"#4a9eff"],["Жиры",S.st.fat,S.dg.fat,"#fbbf24"],["Углеводы",S.st.carbs,S.dg.carbs,"#a855f7"]];
+  el.innerHTML=macros.map(function(m){
+    var pct=Math.min(100,Math.round(m[1]/Math.max(m[2],1)*100));
+    return "<div style='margin-bottom:8px'>" +
+      "<div style='display:flex;justify-content:space-between;margin-bottom:3px'>" +
+        "<span class='text-muted' style='font-size:11px'>"+m[0]+"</span>" +
+        "<span style='font-size:11px;color:"+m[3]+";font-weight:600'>"+m[1]+"<span style='color:rgba(255,255,255,.22)'> / "+m[2]+"г</span></span>" +
+      "</div>" +
+      "<div class='pbar'><div class='pbar-fill' style='width:"+pct+"%;background:"+m[3]+"'></div></div>" +
+    "</div>";
+  }).join("");
 }
 function renderWater(){
-  const pct=Math.min(100,Math.round(S.water/2500*100));
-  const msg=S.water>=2500?"✅ Норма выполнена!":S.water>=1500?"Хорошо, добавь ещё":"Пей больше воды";
-  document.getElementById("water-card").innerHTML=`
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
-      <div>
-        <div class="tag" style="background:rgba(74,158,255,.15);color:#4a9eff;font-size:10px;margin-bottom:4px">💧 ВОДА</div>
-        <div style="font-weight:700;font-size:14px">${S.water} / 2500 мл</div>
-      </div>
-      <div style="display:flex;gap:6px">
-        <button class="btn-sm" onclick="changeWater(-250)">−250</button>
-        <button class="btn-sm" style="background:rgba(74,158,255,.15);border-color:rgba(74,158,255,.3);color:#4a9eff" onclick="changeWater(250)">+250 мл</button>
-      </div>
-    </div>
-    <div class="pbar" style="height:6px"><div class="pbar-fill" style="width:${pct}%;background:linear-gradient(90deg,#4a9eff,#00e87a)"></div></div>
-    <div class="text-muted" style="font-size:11px;margin-top:5px">${msg}</div>`;
+  var wc=document.getElementById("water-card");
+  if(!wc) return;
+  var pct=Math.min(100,Math.round(S.water/2500*100));
+  var msg=S.water>=2500?"✅ Норма выполнена!":S.water>=1500?"Хорошо, добавь ещё":"Пей больше воды";
+  wc.innerHTML=
+    "<div style='display:flex;justify-content:space-between;align-items:center;margin-bottom:10px'>" +
+      "<div><div class='tag' style='background:rgba(74,158,255,.15);color:#4a9eff;font-size:10px;margin-bottom:4px'>💧 ВОДА</div>" +
+        "<div style='font-weight:700;font-size:14px'>"+S.water+" / 2500 мл</div></div>" +
+      "<div style='display:flex;gap:6px'>" +
+        "<button class='btn-sm' onclick='changeWater(-250)'>−250</button>" +
+        "<button class='btn-sm' style='background:rgba(74,158,255,.15);border-color:rgba(74,158,255,.3);color:#4a9eff' onclick='changeWater(250)'>+250 мл</button>" +
+      "</div>" +
+    "</div>" +
+    "<div class='pbar' style='height:6px'><div class='pbar-fill' style='width:"+pct+"%;background:linear-gradient(90deg,#4a9eff,#00e87a)'></div></div>" +
+    "<div class='text-muted' style='font-size:11px;margin-top:5px'>"+msg+"</div>";
 }
 function changeWater(d){S.water=Math.max(0,Math.min(4000,S.water+d));renderWater();}
+
 function renderMission(){
-  document.getElementById("mission-card").innerHTML=`
-    <div style="display:flex;justify-content:space-between;align-items:center">
-      <div style="flex:1">
-        <div class="tag" style="background:rgba(0,232,122,.15);color:#00e87a;font-size:10px;margin-bottom:8px">⚡ МИССИЯ ДНЯ</div>
-        <div style="font-weight:700;font-size:14px;margin-bottom:3px">+500 шагов к обычному</div>
-        <div class="text-muted" style="font-size:11px">+50 XP за выполнение</div>
-      </div>
-      <button onclick="completeMission()" style="padding:9px 14px;font-size:12px;font-weight:700;border-radius:10px;margin-left:12px;white-space:nowrap;cursor:pointer;border:none;font-family:inherit;background:${S.missionDone?"rgba(0,232,122,.1)":"#00e87a"};color:${S.missionDone?"#00e87a":"#000"}">${S.missionDone?"✓ Готово":"Выполнил"}</button>
-    </div>`;
+  var mc=document.getElementById("mission-card");
+  if(!mc) return;
+  var needP=S.dg.protein-S.st.protein;
+  var hr=new Date().getHours();
+  var g=GOALS.filter(function(x){return x.id===S.gl;})[0];
+  var text,xp=50;
+  if(needP>50&&S.meals.length>0){text="Добери "+Math.round(needP)+"г белка — яйца, творог или курица";xp=60;}
+  else if(S.water<800&&hr>12){text="Выпей 2 стакана воды прямо сейчас (у тебя "+S.water+" мл)";xp=40;}
+  else if(S.st.calories<S.dg.calories*0.35&&hr>15){text="Мало ел сегодня — добавь приём чтобы не замедлить метаболизм";xp=55;}
+  else if(S.gl==="loss"||S.gl==="cutting"){
+    var opts=["Замени вечерний перекус на 150г творога","Добавь 10мин прогулки после ужина","Ешь белок первым — так меньше съешь углеводов","Выпей стакан воды за 20мин до еды"];
+    text=opts[new Date().getDay()%opts.length];
+  }else if(S.gl==="bulking"||S.gl==="sport"){
+    var opts=["Добавь 30г белка к следующему приёму","Съешь углеводы за 2ч до тренировки","Не пропускай перекус — это калории для роста","Добавь 1 ст.л. орехов к завтраку"];
+    text=opts[new Date().getDay()%opts.length];
+  }else{
+    var opts=["Съешь овощи с каждым приёмом","Замени сладкое на фрукт","Выпей воды до следующего приёма","Жуй медленно — мозг насыщается 20 минут"];
+    text=opts[new Date().getDay()%opts.length];
+  }
+  mc.innerHTML=
+    "<div style='display:flex;justify-content:space-between;align-items:center'>" +
+      "<div style='flex:1'>" +
+        "<div class='tag' style='background:rgba(0,232,122,.15);color:#00e87a;font-size:10px;margin-bottom:8px'>⚡ МИССИЯ ДНЯ</div>" +
+        "<div style='font-weight:700;font-size:14px;margin-bottom:3px'>"+text+"</div>" +
+        "<div class='text-muted' style='font-size:11px'>+"+xp+" XP за выполнение</div>" +
+      "</div>" +
+      "<button onclick='completeMission()' style='padding:9px 14px;font-size:12px;font-weight:700;border-radius:10px;margin-left:12px;white-space:nowrap;cursor:pointer;border:none;font-family:inherit;background:"+(S.missionDone?"rgba(0,232,122,.1)":"#00e87a")+";color:"+(S.missionDone?"#00e87a":"#000")+"'>"+(S.missionDone?"✓ Готово":"Выполнил")+"</button>" +
+    "</div>";
 }
 function completeMission(){if(S.missionDone)return;S.missionDone=true;S.str++;addXP(50);renderMission();renderXP();}
+
 function renderMeals(){
-  const g=GOALS.find(x=>x.id===S.gl);
-  const list=document.getElementById("meals-list");
-  document.getElementById("meals-count").textContent=S.meals.length+" приёмов";
-  if(!S.meals.length){list.innerHTML=`<div class="text-muted" style="text-align:center;padding:20px 0;font-size:13px">Нажми + чтобы добавить первый приём</div>`;return;}
-  list.innerHTML=S.meals.map(m=>`
-    <div class="meal-row">
-      <div style="width:36px;height:36px;border-radius:10px;background:${g.bg};display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:16px">🍽</div>
-      <div style="flex:1;min-width:0">
-        <div style="font-weight:600;font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${m.name}</div>
-        <div class="text-muted" style="font-size:11px;margin-top:2px">${m.time} · Б${m.protein} Ж${m.fat} У${m.carbs}</div>
-      </div>
-      <div style="font-weight:800;font-size:14px;color:${g.color};flex-shrink:0">${m.calories}</div>
-    </div>`).join("");
+  var g=GOALS.filter(function(x){return x.id===S.gl;})[0];
+  var list=document.getElementById("meals-list");
+  var mc=document.getElementById("meals-count");
+  if(!list) return;
+  if(mc) mc.textContent=S.meals.length+" приёмов";
+  if(!S.meals.length){
+    list.innerHTML="<div class='text-muted' style='text-align:center;padding:20px 0;font-size:13px'>Нажми + чтобы добавить первый приём</div>";
+    return;
+  }
+  list.innerHTML=S.meals.map(function(m){
+    return "<div class='meal-row'>" +
+      "<div style='width:36px;height:36px;border-radius:10px;background:"+g.bg+";display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:16px'>🍽</div>" +
+      "<div style='flex:1;min-width:0'>" +
+        "<div style='font-weight:600;font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap'>"+m.name+"</div>" +
+        "<div class='text-muted' style='font-size:11px;margin-top:2px'>"+m.time+" · Б"+m.protein+" Ж"+m.fat+" У"+m.carbs+"</div>" +
+      "</div>" +
+      "<div style='font-weight:800;font-size:14px;color:"+g.color+";flex-shrink:0'>"+m.calories+"</div>" +
+    "</div>";
+  }).join("");
 }
+
 function renderNotif(){
-  document.getElementById("notif-card").innerHTML=`
-    <div style="display:flex;justify-content:space-between;align-items:center">
-      <div>
-        <div class="tag" style="background:rgba(168,85,247,.15);color:#a855f7;font-size:10px;margin-bottom:6px">🔔 НАПОМИНАНИЯ</div>
-        <div style="font-weight:600;font-size:14px;margin-bottom:2px">${S.notifOn?"Каждые 3–4 часа":"Напоминать о еде?"}</div>
-        <div class="text-muted" style="font-size:11px">${S.notifOn?"Уведомлю о следующем приёме":"Уведомление в браузере"}</div>
-      </div>
-      <button onclick="toggleNotif()" style="padding:9px 16px;font-size:12px;font-weight:700;border-radius:10px;margin-left:12px;white-space:nowrap;cursor:pointer;font-family:inherit;background:${S.notifOn?"rgba(168,85,247,.15)":"#a855f7"};color:${S.notifOn?"#a855f7":"#000"};border:${S.notifOn?"1px solid rgba(168,85,247,.4)":"none"}">${S.notifOn?"Выкл":"Включить"}</button>
-    </div>`;
+  var nc=document.getElementById("notif-card");
+  if(!nc) return;
+  nc.innerHTML=
+    "<div style='display:flex;justify-content:space-between;align-items:center'>" +
+      "<div>" +
+        "<div class='tag' style='background:rgba(168,85,247,.15);color:#a855f7;font-size:10px;margin-bottom:6px'>🔔 НАПОМИНАНИЯ</div>" +
+        "<div style='font-weight:600;font-size:14px;margin-bottom:2px'>"+(S.notifOn?"Каждые 3-4 часа":"Напоминать о еде?")+"</div>" +
+        "<div class='text-muted' style='font-size:11px'>"+(S.notifOn?"Уведомлю о приёме пищи":"Уведомление в браузере")+"</div>" +
+      "</div>" +
+      "<button onclick='toggleNotif()' style='padding:9px 16px;font-size:12px;font-weight:700;border-radius:10px;margin-left:12px;white-space:nowrap;cursor:pointer;font-family:inherit;background:"+(S.notifOn?"rgba(168,85,247,.15)":"#a855f7")+";color:"+(S.notifOn?"#a855f7":"#000")+";border:"+(S.notifOn?"1px solid rgba(168,85,247,.4)":"none")+"'>"+(S.notifOn?"Выкл":"Включить")+"</button>" +
+    "</div>";
 }
-async function toggleNotif(){
+function toggleNotif(){
   if(S.notifOn){clearInterval(S.notifTimer);S.notifOn=false;renderNotif();return;}
   if(!("Notification" in window)){alert("Уведомления не поддерживаются");return;}
-  const perm=await Notification.requestPermission();
-  if(perm==="granted"){
-    S.notifOn=true;renderNotif();
-    setTimeout(()=>new Notification("AI Nutrition Coach",{body:"Напоминания включены!"}),800);
-    S.notifTimer=setInterval(()=>new Notification("AI Nutrition Coach",{body:"Пора записать приём пищи!"}),3.5*60*60*1000);
-  } else alert("Разреши уведомления в настройках браузера");
+  Notification.requestPermission().then(function(p){
+    if(p==="granted"){
+      S.notifOn=true;renderNotif();
+      setTimeout(function(){new Notification("AI Nutrition Coach",{body:"Напоминания включены!"});},800);
+      S.notifTimer=setInterval(function(){new Notification("AI Nutrition Coach",{body:"Пора записать приём пищи!"});},3.5*60*60*1000);
+    } else alert("Разреши уведомления в настройках браузера");
+  });
 }
 function addXP(n){S.xp+=n;if(S.xp>=XP_MAX*S.lv)S.lv++;renderXP();}
 
-// ── HISTORY SCREEN ────────────────────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════
+// HISTORY
+// ═══════════════════════════════════════════════════════════════
 function saveToHistory(meal){
-  const today=new Date().toISOString().slice(0,10);
+  var today=new Date().toISOString().slice(0,10);
   if(!S.weekHistory[today]) S.weekHistory[today]={calories:0,protein:0,fat:0,carbs:0,meals:[]};
   S.weekHistory[today].calories+=meal.calories;
   S.weekHistory[today].protein+=meal.protein;
   S.weekHistory[today].fat+=meal.fat;
   S.weekHistory[today].carbs+=meal.carbs;
-  S.weekHistory[today].meals.push(meal);
-  localStorage.setItem("nc_week",JSON.stringify(S.weekHistory));
+  S.weekHistory[today].meals.push(meal.name);
+  try{localStorage.setItem("nc_week",JSON.stringify(S.weekHistory));}catch(e){}
 }
 function renderHistoryScreen(){
-  const g=GOALS.find(x=>x.id===S.gl);
-  const hc=document.getElementById("history-content");
-  const today=new Date().toISOString().slice(0,10);
-  const days=[];
-  for(let i=6;i>=0;i--){
-    const d=new Date();d.setDate(d.getDate()-i);
-    const key=d.toISOString().slice(0,10);
-    const dayName=d.toLocaleDateString("ru",{weekday:"short"});
-    days.push({key,dayName,data:S.weekHistory[key]||null,isToday:key===today});
+  var g=GOALS.filter(function(x){return x.id===S.gl;})[0];
+  var hc=document.getElementById("history-content");
+  if(!hc) return;
+  var today=new Date().toISOString().slice(0,10);
+  var days=[];
+  for(var i=6;i>=0;i--){
+    var d=new Date(); d.setDate(d.getDate()-i);
+    var key=d.toISOString().slice(0,10);
+    days.push({key:key,day:d.toLocaleDateString("ru",{weekday:"short"}),data:S.weekHistory[key]||null,isToday:key===today});
   }
-  // Сравнение недель
-  const thisWeekCal=days.slice(0,7).reduce((a,d)=>a+(d.data?.calories||0),0);
-  const lastWeekCal=Object.keys(S.weekHistory).filter(k=>{
-    const d=new Date(k);const now=new Date();
-    const diff=(now-d)/(1000*60*60*24);
+  var thisWeekCal=days.reduce(function(a,d){return a+(d.data&&d.data.calories?d.data.calories:0);},0);
+  var lastWeekCal=Object.keys(S.weekHistory).filter(function(k){
+    var d=new Date(k); var now=new Date();
+    var diff=(now-d)/(1000*60*60*24);
     return diff>=7&&diff<14;
-  }).reduce((a,k)=>a+(S.weekHistory[k]?.calories||0),0);
-  const maxCal=Math.max(...days.map(d=>d.data?.calories||0),1);
+  }).reduce(function(a,k){return a+(S.weekHistory[k]&&S.weekHistory[k].calories?S.weekHistory[k].calories:0);},0);
+  var maxCal=Math.max.apply(null,days.map(function(d){return d.data&&d.data.calories?d.data.calories:0;}).concat([1]));
 
-  hc.innerHTML=`
-    <div class="text-head" style="margin-bottom:12px">Калории за 7 дней</div>
-    <div class="card" style="margin-bottom:14px;padding:16px">
-      <div style="display:flex;align-items:flex-end;gap:6px;height:80px;margin-bottom:8px">
-        ${days.map(d=>{
-          const h=d.data?Math.max(8,Math.round((d.data.calories/maxCal)*80)):4;
-          const isOver=d.data&&d.data.calories>S.dg.calories;
-          const clr=d.isToday?g.color:isOver?"#ff5733":"rgba(255,255,255,.25)";
-          return`<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px">
-            <div style="width:100%;height:${h}px;border-radius:4px 4px 0 0;background:${clr};transition:height .5s"></div>
-            <div class="text-muted" style="font-size:10px">${d.dayName}</div>
-          </div>`;
-        }).join("")}
-      </div>
-      <div style="display:flex;justify-content:space-between">
-        <div class="text-muted" style="font-size:11px">Эта неделя: ${thisWeekCal} ккал</div>
-        <div class="text-muted" style="font-size:11px">Норма: ${S.dg.calories*7} ккал</div>
-      </div>
-    </div>
-    ${lastWeekCal>0?`
-    <div class="text-head" style="margin-bottom:10px">Сравнение недель</div>
-    <div class="card" style="margin-bottom:14px">
-      <div style="display:flex;gap:12px">
-        <div style="flex:1;background:rgba(255,255,255,.04);border-radius:10px;padding:12px;text-align:center">
-          <div class="text-muted" style="font-size:11px;margin-bottom:4px">Эта неделя</div>
-          <div style="font-family:'Unbounded',sans-serif;font-size:20px;font-weight:900;color:${g.color}">${Math.round(thisWeekCal/7)}</div>
-          <div class="text-muted" style="font-size:10px">ккал/день</div>
-        </div>
-        <div style="flex:1;background:rgba(255,255,255,.04);border-radius:10px;padding:12px;text-align:center">
-          <div class="text-muted" style="font-size:11px;margin-bottom:4px">Прошлая</div>
-          <div style="font-family:'Unbounded',sans-serif;font-size:20px;font-weight:900;color:rgba(255,255,255,.5)">${Math.round(lastWeekCal/7)}</div>
-          <div class="text-muted" style="font-size:10px">ккал/день</div>
-        </div>
-        <div style="flex:1;background:rgba(255,255,255,.04);border-radius:10px;padding:12px;text-align:center">
-          <div class="text-muted" style="font-size:11px;margin-bottom:4px">Разница</div>
-          <div style="font-family:'Unbounded',sans-serif;font-size:20px;font-weight:900;color:${thisWeekCal<lastWeekCal?"#00e87a":"#ff5733"}">${thisWeekCal<lastWeekCal?"↓":"↑"}${Math.abs(Math.round((thisWeekCal-lastWeekCal)/7))}</div>
-          <div class="text-muted" style="font-size:10px">ккал/день</div>
-        </div>
-      </div>
-    </div>`:""}
-    <div class="text-head" style="margin-bottom:10px">По дням</div>
-    ${days.reverse().map(d=>`
-    <div class="card" style="margin-bottom:8px;padding:12px 16px">
-      <div style="display:flex;justify-content:space-between;align-items:center">
-        <div>
-          <div style="font-weight:600;font-size:14px">${d.isToday?"Сегодня":d.dayName}</div>
-          ${d.data?`<div class="text-muted" style="font-size:11px;margin-top:2px">Б${d.data.protein}г · Ж${d.data.fat}г · У${d.data.carbs}г</div>`:`<div class="text-muted" style="font-size:11px;margin-top:2px">Нет данных</div>`}
-        </div>
-        ${d.data?`<div style="font-family:'Unbounded',sans-serif;font-size:18px;font-weight:900;color:${d.data.calories>S.dg.calories?"#ff5733":g.color}">${d.data.calories}</div>`:""}
-      </div>
-    </div>`).join("")}`;
+  var html="<div class='text-head' style='margin-bottom:12px'>КАЛОРИИ ЗА 7 ДНЕЙ</div>";
+  html+="<div class='card' style='margin-bottom:14px;padding:16px'>";
+  html+="<div style='display:flex;align-items:flex-end;gap:6px;height:80px;margin-bottom:8px'>";
+  days.forEach(function(d){
+    var cal=d.data&&d.data.calories?d.data.calories:0;
+    var h=cal?Math.max(8,Math.round(cal/maxCal*80)):4;
+    var over=cal>S.dg.calories;
+    var clr=d.isToday?g.color:over?"#ff5733":"rgba(255,255,255,.25)";
+    html+="<div style='flex:1;display:flex;flex-direction:column;align-items:center;gap:4px'>" +
+      "<div style='width:100%;height:"+h+"px;border-radius:4px 4px 0 0;background:"+clr+";transition:height .5s'></div>" +
+      "<div class='text-muted' style='font-size:10px'>"+d.day+"</div>" +
+    "</div>";
+  });
+  html+="</div>";
+  html+="<div style='display:flex;justify-content:space-between'>" +
+    "<div class='text-muted' style='font-size:11px'>Эта неделя: "+thisWeekCal+" ккал</div>" +
+    "<div class='text-muted' style='font-size:11px'>Норма: "+S.dg.calories*7+" ккал</div>" +
+  "</div></div>";
+
+  if(lastWeekCal>0){
+    html+="<div class='text-head' style='margin-bottom:10px'>СРАВНЕНИЕ НЕДЕЛЬ</div>";
+    html+="<div class='card' style='margin-bottom:14px'><div style='display:flex;gap:10px'>";
+    [["Эта неделя",Math.round(thisWeekCal/7)+" ккал/д",g.color],["Прошлая",Math.round(lastWeekCal/7)+" ккал/д","rgba(255,255,255,.5)"],["Разница",(thisWeekCal<lastWeekCal?"↓":"↑")+Math.abs(Math.round((thisWeekCal-lastWeekCal)/7))+" ккал",thisWeekCal<lastWeekCal?"#00e87a":"#ff5733"]].forEach(function(s){
+      html+="<div style='flex:1;background:rgba(255,255,255,.04);border-radius:10px;padding:10px 8px;text-align:center'>" +
+        "<div class='text-muted' style='font-size:10px;margin-bottom:4px'>"+s[0]+"</div>" +
+        "<div style='font-weight:700;font-size:14px;color:"+s[2]+"'>"+s[1]+"</div>" +
+      "</div>";
+    });
+    html+="</div></div>";
+  }
+
+  html+="<div class='text-head' style='margin-bottom:10px'>ПО ДНЯМ</div>";
+  days.slice().reverse().forEach(function(d){
+    html+="<div class='card' style='margin-bottom:8px;padding:12px 16px'>" +
+      "<div style='display:flex;justify-content:space-between;align-items:center'>" +
+        "<div><div style='font-weight:600;font-size:14px'>"+(d.isToday?"Сегодня":d.day)+"</div>" +
+          "<div class='text-muted' style='font-size:11px;margin-top:2px'>"+(d.data?"Б"+d.data.protein+"г · Ж"+d.data.fat+"г · У"+d.data.carbs+"г":"Нет данных")+"</div></div>" +
+        (d.data?"<div style='font-family:Unbounded,sans-serif;font-size:18px;font-weight:900;color:"+(d.data.calories>S.dg.calories?"#ff5733":g.color)+"'>"+d.data.calories+"</div>":"") +
+      "</div></div>";
+  });
+  hc.innerHTML=html;
 }
 
-// ── FOOD SCREEN ───────────────────────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════
+// FOOD SCREEN
+// ═══════════════════════════════════════════════════════════════
 function openFood(){
-  S.foodAna=null;S.foodAdv=null;S.foodImg=null;S.foodB64=null;S.loadingFood=false;
-  switchTab("food");
-  renderFoodScreen();
-  setTimeout(()=>document.getElementById("food-file").click(),150);
+  S.foodAna=null;S.foodAdv=null;S.foodImg=null;S.foodB64=null;S.loadingFood=false;S.manualMode=false;S.barcodeMode=false;
+  showScreen("food");
+  setTimeout(function(){var ff=document.getElementById("food-file");if(ff)ff.click();},150);
 }
 function renderFoodScreen(){
-  const g=GOALS.find(x=>x.id===S.gl);
-  const fc=document.getElementById("food-content");
+  var g=GOALS.filter(function(x){return x.id===S.gl;})[0];
+  var fc=document.getElementById("food-content");
+  if(!fc) return;
   if(S.foodAna){renderFoodResults(fc,g);return;}
-  fc.innerHTML=`
-    <div style="display:flex;gap:8px;margin-bottom:16px">
-      <button class="mode-btn ${!S.manualMode&&!S.barcodeMode?"sel":""}" onclick="setFoodMode('photo')">📸 Фото</button>
-      <button class="mode-btn ${S.barcodeMode?"sel":""}" onclick="setFoodMode('barcode')">🔲 Штрихкод</button>
-      <button class="mode-btn ${S.manualMode?"sel":""}" onclick="setFoodMode('text')">✏️ Текст</button>
-    </div>
-    <div id="food-input-area"></div>`;
+  var modeHTML=
+    "<div style='display:flex;gap:8px;margin-bottom:16px'>" +
+      "<button class='mode-btn "+((!S.manualMode&&!S.barcodeMode)?"sel":"")+"' onclick='setFoodMode(\"photo\")'>📸 Фото</button>" +
+      "<button class='mode-btn "+(S.barcodeMode?"sel":"")+"' onclick='setFoodMode(\"barcode\")'>🔲 Штрихкод</button>" +
+      "<button class='mode-btn "+(S.manualMode?"sel":"")+"' onclick='setFoodMode(\"text\")'>✏️ Текст</button>" +
+    "</div>" +
+    "<div id='food-input-area'></div>";
+  fc.innerHTML=modeHTML;
   renderFoodInput();
 }
 function setFoodMode(mode){
-  S.manualMode=mode==="text";
-  S.barcodeMode=mode==="barcode";
+  S.manualMode=mode==="text";S.barcodeMode=mode==="barcode";
   renderFoodScreen();
   if(mode==="barcode") startBarcode();
 }
 function renderFoodInput(){
-  const g=GOALS.find(x=>x.id===S.gl);
-  const area=document.getElementById("food-input-area");
+  var g=GOALS.filter(function(x){return x.id===S.gl;})[0];
+  var area=document.getElementById("food-input-area");
   if(!area) return;
   if(S.loadingFood){
-    area.innerHTML=`
-      <div class="card" style="text-align:center;padding:36px 20px">
-        <div style="font-size:48px;margin-bottom:14px" class="pulse">🤖</div>
-        <div style="font-weight:700;font-size:15px;margin-bottom:6px" id="load-msg">Анализирую...</div>
-        <div class="text-muted" style="font-size:12px">Несколько секунд...</div>
-      </div>`;return;
+    area.innerHTML=
+      "<div class='card' style='text-align:center;padding:36px 20px'>" +
+        "<div style='font-size:48px;margin-bottom:14px' class='pulse'>🤖</div>" +
+        "<div style='font-weight:700;font-size:15px;margin-bottom:6px' id='load-msg'>Анализирую...</div>" +
+        "<div class='text-muted' style='font-size:12px'>Несколько секунд...</div>" +
+      "</div>";
+    return;
   }
   if(S.manualMode){
-    area.innerHTML=`
-      <textarea id="txt-meal" class="inp" style="height:100px" placeholder="Что вы ели? Например: куриная грудка 200г, рис 150г, огурец"></textarea>
-      <button class="btn btn-primary" style="margin-top:10px" onclick="analyzeText()">Проанализировать</button>`;
+    area.innerHTML=
+      "<textarea id='txt-meal' class='inp' style='height:100px' placeholder='Что вы ели? Например: куриная грудка 200г, рис 150г'></textarea>" +
+      "<button class='btn btn-primary' style='margin-top:10px' onclick='analyzeText()'>Проанализировать</button>";
   } else if(!S.barcodeMode){
-    area.innerHTML=`
-      ${S.foodImg?`<div class="card" style="padding:0;overflow:hidden;border-radius:16px;margin-bottom:14px"><img src="${S.foodImg}" style="width:100%;max-height:220px;object-fit:cover;display:block"/></div>`:""}
-      <div class="dz" onclick="document.getElementById('food-file').click()">
-        <div style="font-size:52px">📸</div>
-        <div style="font-weight:700;font-size:17px">Загрузить фото еды</div>
-        <div class="text-muted" style="font-size:13px;line-height:1.65">AI определит КБЖУ и даст<br/>совет под цель «${g.title}»</div>
-        <div style="padding:10px 24px;background:var(--c);color:#000;border-radius:10px;font-size:14px;font-weight:700">Выбрать фото</div>
-      </div>`;
+    area.innerHTML=
+      (S.foodImg?"<div class='card' style='padding:0;overflow:hidden;border-radius:16px;margin-bottom:14px'><img src='"+S.foodImg+"' style='width:100%;max-height:220px;object-fit:cover;display:block'/></div>":"") +
+      "<div class='dz' onclick='document.getElementById(\"food-file\").click()'>" +
+        "<div style='font-size:52px'>📸</div>" +
+        "<div style='font-weight:700;font-size:17px'>Загрузить фото еды</div>" +
+        "<div class='text-muted' style='font-size:13px;line-height:1.65'>AI определит КБЖУ и даст<br/>совет под цель «"+g.title+"»</div>" +
+        "<div style='padding:10px 24px;background:var(--c);color:#000;border-radius:10px;font-size:14px;font-weight:700'>Выбрать фото</div>" +
+      "</div>";
   }
 }
 
-// ── BARCODE ───────────────────────────────────────────────────────────────────
 function startBarcode(){
   document.getElementById("barcode-modal").style.display="flex";
   try{
     if(window.ZXing){
-      const hints=new Map();
-      const formats=[window.ZXing.BarcodeFormat.EAN_13,window.ZXing.BarcodeFormat.EAN_8,window.ZXing.BarcodeFormat.UPC_A];
-      hints.set(window.ZXing.DecodeHintType.POSSIBLE_FORMATS,formats);
-      S.barcodeReader=new window.ZXing.BrowserBarcodeReader(hints);
-      S.barcodeReader.decodeFromVideoDevice(null,"barcode-video",async(result,err)=>{
-        if(result){
-          const barcode=result.getText();
-          stopBarcode();
-          await lookupBarcode(barcode);
-        }
+      S.barcodeReader=new window.ZXing.BrowserBarcodeReader();
+      S.barcodeReader.decodeFromVideoDevice(null,"barcode-video",function(result,err){
+        if(result){stopBarcode();lookupBarcode(result.getText());}
       });
     }
-  }catch(e){
-    document.getElementById("barcode-status").textContent="Ошибка камеры: "+e.message;
-  }
+  }catch(e){var bs=document.getElementById("barcode-status");if(bs) bs.textContent="Ошибка камеры: "+e.message;}
 }
 function stopBarcode(){
   if(S.barcodeReader){try{S.barcodeReader.reset();}catch(e){}}
   document.getElementById("barcode-modal").style.display="none";
-  S.barcodeMode=false;
-  renderFoodScreen();
+  S.barcodeMode=false;renderFoodScreen();
 }
-async function lookupBarcode(barcode){
+function lookupBarcode(barcode){
   S.loadingFood=true;renderFoodInput();
-  try{
-    setLoadMsg("🔍 Ищу продукт по штрихкоду...");
-    const a1=await callClaude([{role:"user",content:`Штрихкод продукта: ${barcode}. Определи продукт и его КБЖУ на 100г. JSON: {"dishes":[{"name":"название продукта","weight":100,"calories":200,"protein":10,"fat":8,"carbs":25}],"total":{"calories":200,"protein":10,"fat":8,"carbs":25,"weight":100}} Если не знаешь — укажи примерные значения типичного продукта.`}],
-      "Ты AI нутрициолог. Верни ТОЛЬКО JSON без markdown.");
-    await finishAnalysis(a1);
-  }catch(e){
+  fetch("/api/claude",{method:"POST",headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({model:"claude-haiku-4-5",max_tokens:1000,
+      system:"Ты нутрициолог. Верни ТОЛЬКО JSON без markdown.",
+      messages:[{role:"user",content:"Штрихкод: "+barcode+". Определи продукт и КБЖУ на 100г. JSON: {dishes:[{name:string,weight:100,calories:number,protein:number,fat:number,carbs:number}],total:{calories:number,protein:number,fat:number,carbs:number,weight:100}}"}]})
+  }).then(function(r){return r.json();}).then(function(d){
+    if(d.error) throw new Error(d.error.message);
+    var txt=d.content[0].text.replace(/```json|```/g,"").trim();
+    var js=txt.indexOf("{");var je=txt.lastIndexOf("}")+1;
+    if(js>=0&&je>js) txt=txt.slice(js,je);
+    finishAnalysis(JSON.parse(txt));
+  }).catch(function(e){
     S.loadingFood=false;
     S.foodAna={error:true,dishes:[],total:{calories:0,protein:0,fat:0,carbs:0}};
-    renderFoodResults(document.getElementById("food-content"),GOALS.find(x=>x.id===S.gl));
-  }
+    S.foodAdv={mainAdvice:"Штрихкод не распознан. Попробуй описать текстом."};
+    renderFoodResults(document.getElementById("food-content"),GOALS.filter(function(x){return x.id===S.gl;})[0]);
+  });
 }
 
-// ── FOOD ANALYSIS ─────────────────────────────────────────────────────────────
 function onFoodFile(e){
-  const f=e.target.files[0];if(!f)return;
+  var f=e.target.files[0];if(!f) return;
   S.foodImg=URL.createObjectURL(f);S.foodMime=f.type;S.foodAna=null;S.foodAdv=null;
-  const r=new FileReader();
-  r.onload=ev=>{S.foodB64=ev.target.result.split(",")[1];};
+  var r=new FileReader();
+  r.onload=function(ev){S.foodB64=ev.target.result.split(",")[1];};
   r.readAsDataURL(f);
-  // Случайный вопрос о голоде
-  const q=HUNGER_Q[Math.floor(Math.random()*HUNGER_Q.length)];
-  document.getElementById("hunger-sheet").innerHTML=`
-    <div style="text-align:center;margin-bottom:24px">
-      <div style="font-size:54px;margin-bottom:12px">🤔</div>
-      <div style="font-family:'Unbounded',sans-serif;font-size:20px;font-weight:800;margin-bottom:10px">${q.q}</div>
-      <div class="text-muted" style="font-size:14px;line-height:1.75">${q.sub}</div>
-    </div>
-    <div style="display:flex;flex-direction:column;gap:10px">
-      <button class="btn btn-primary" onclick="closeModal('hunger-modal');analyzePhoto()">🍽 Да, голоден — анализируй</button>
-      <button class="btn btn-ghost" onclick="closeModal('hunger-modal');cancelFood()">Нет, это привычка</button>
-      <div class="text-muted" style="font-size:11px;text-align:center;margin-top:4px">Этот вопрос экономит 200–400 ккал в день</div>
-    </div>`;
+  var q=HUNGER_Q[Math.floor(Math.random()*HUNGER_Q.length)];
+  document.getElementById("hunger-sheet").innerHTML=
+    "<div style='text-align:center;margin-bottom:24px'>" +
+      "<div style='font-size:54px;margin-bottom:12px'>🤔</div>" +
+      "<div style='font-family:Unbounded,sans-serif;font-size:20px;font-weight:800;margin-bottom:10px'>"+q.q+"</div>" +
+      "<div class='text-muted' style='font-size:14px;line-height:1.75'>"+q.sub+"</div>" +
+    "</div>" +
+    "<div style='display:flex;flex-direction:column;gap:10px'>" +
+      "<button class='btn btn-primary' onclick='closeModal(\"hunger-modal\");analyzePhoto()'>🍽 Да, голоден — анализируй</button>" +
+      "<button class='btn btn-ghost' onclick='closeModal(\"hunger-modal\");cancelFood()'>Нет, это привычка</button>" +
+      "<div class='text-muted' style='font-size:11px;text-align:center;margin-top:4px'>Этот вопрос экономит 200-400 ккал в день</div>" +
+    "</div>";
   document.getElementById("hunger-modal").style.display="flex";
   e.target.value="";
 }
 function cancelFood(){S.foodImg=null;S.foodB64=null;renderFoodInput();}
 
-async function analyzePhoto(){
-  if(!S.foodB64)return;
+function analyzePhoto(){
+  if(!S.foodB64) return;
   S.loadingFood=true;renderFoodInput();
-  try{
-    setLoadMsg("🔍 Распознаю продукты...");
-    const prompt=`Ты профессиональный нутрициолог с 15-летним опытом. Анализируй фото еды с максимальной точностью.
-
-ПРАВИЛА:
-- Определи ВСЕ продукты включая соусы, масло, гарниры
-- Оцени вес каждого визуально (по размеру тарелки)
-- Учитывай способ приготовления: жареное +30% к калориям
-- Маленькая тарелка = 200-250г, большая = 350-400г
-- Если видишь соус или масло — добавляй отдельной строкой
-
-Цель пользователя: ${GP[S.gl]}
-Уже съедено сегодня: ${S.st.calories} ккал из ${S.dg.calories} ккал
-Белок съедено: ${S.st.protein}г из ${S.dg.protein}г
-
-Верни ТОЛЬКО JSON без markdown:
-{"dishes":[{"name":"точное название","weight":200,"calories":350,"protein":25,"fat":12,"carbs":40,"cooking_method":"способ","confidence":"высокая"}],"total":{"calories":350,"protein":25,"fat":12,"carbs":40,"weight":200},"notes":"важные замечания если есть"}`;
-
-    const a1=await callClaude([{role:"user",content:[
-      {type:"image",source:{type:"base64",media_type:S.foodMime||"image/jpeg",data:S.foodB64}},
-      {type:"text",text:prompt}
-    ]}],"Ты профессиональный нутрициолог. Верни ТОЛЬКО JSON без markdown.");
-    await finishAnalysis(a1);
-  }catch(e){
-    S.foodAna={error:true,dishes:[],total:{calories:0,protein:0,fat:0,carbs:0}};
-    S.foodAdv={mainAdvice:"Ошибка анализа. Попробуй снова."};
+  var mealsList=S.meals.length?S.meals.map(function(m){return m.name;}).join(", "):"ничего";
+  var prompt=
+    "Ты профессиональный нутрициолог. Анализируй фото еды с максимальной точностью.\n"+
+    "ОПРЕДЕЛИ ВСЕ продукты включая соусы и масло.\n"+
+    "УЧИТЫВАЙ способ приготовления: жареное +30% калорий.\n"+
+    "Цель: "+GP[S.gl]+". Пол: "+(S.gender==="female"?"женский":"мужской")+". Вес: "+S.weight+"кг.\n"+
+    "Уже съел сегодня: "+mealsList+". Итого: "+S.st.calories+"/"+S.dg.calories+" ккал. Белок: "+S.st.protein+"/"+S.dg.protein+"г.\n"+
+    "JSON: {dishes:[{name:string,weight:number,calories:number,protein:number,fat:number,carbs:number,cooking_method:string}],total:{calories:number,protein:number,fat:number,carbs:number,weight:number},notes:string}";
+  fetch("/api/claude",{method:"POST",headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({model:"claude-haiku-4-5",max_tokens:1000,
+      system:"Ты AI нутрициолог. Верни ТОЛЬКО JSON без markdown.",
+      messages:[{role:"user",content:[
+        {type:"image",source:{type:"base64",media_type:S.foodMime||"image/jpeg",data:S.foodB64}},
+        {type:"text",text:prompt}
+      ]}]})
+  }).then(function(r){return r.json();}).then(function(d){
+    if(d.error) throw new Error(d.error.message);
+    var txt=d.content[0].text.replace(/```json|```/g,"").trim();
+    var js=txt.indexOf("{");var je=txt.lastIndexOf("}")+1;
+    if(js>=0&&je>js) txt=txt.slice(js,je);
+    finishAnalysis(JSON.parse(txt));
+  }).catch(function(e){
     S.loadingFood=false;
-    renderFoodResults(document.getElementById("food-content"),GOALS.find(x=>x.id===S.gl));
-  }
+    S.foodAna={error:true,dishes:[],total:{calories:0,protein:0,fat:0,carbs:0}};
+    S.foodAdv={mainAdvice:"Ошибка анализа. Попробуй снова или опиши текстом."};
+    renderFoodResults(document.getElementById("food-content"),GOALS.filter(function(x){return x.id===S.gl;})[0]);
+  });
 }
-async function analyzeText(){
-  const txt=document.getElementById("txt-meal")?.value?.trim();
-  if(!txt)return;
+
+function analyzeText(){
+  var inp=document.getElementById("txt-meal");
+  var txt=inp?inp.value.trim():"";
+  if(!txt) return;
   S.loadingFood=true;renderFoodInput();
-  try{
-    setLoadMsg("🔍 Анализирую...");
-    const a1=await callClaude([{role:"user",content:`Проанализируй еду: "${txt}". Учитывай способ приготовления и типичные размеры порций. JSON: {"dishes":[{"name":"название","weight":200,"calories":350,"protein":25,"fat":12,"carbs":40}],"total":{"calories":350,"protein":25,"fat":12,"carbs":40,"weight":200}} Цель: ${GP[S.gl]}. Съедено: ${S.st.calories}/${S.dg.calories} ккал.`}],
-      "Ты AI нутрициолог. Верни ТОЛЬКО JSON без markdown.");
-    await finishAnalysis(a1);
-  }catch(e){
-    S.foodAna={error:true,dishes:[],total:{calories:0,protein:0,fat:0,carbs:0}};
-    S.foodAdv={mainAdvice:"Ошибка. Попробуй снова."};
+  fetch("/api/claude",{method:"POST",headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({model:"claude-haiku-4-5",max_tokens:1000,
+      system:"Ты AI нутрициолог. Верни ТОЛЬКО JSON без markdown.",
+      messages:[{role:"user",content:
+        "Проанализируй еду: \""+txt+"\". Учитывай типичные размеры порций.\n"+
+        "Цель: "+GP[S.gl]+". Уже съел: "+S.st.calories+"/"+S.dg.calories+" ккал.\n"+
+        "JSON: {dishes:[{name:string,weight:number,calories:number,protein:number,fat:number,carbs:number}],total:{calories:number,protein:number,fat:number,carbs:number,weight:number},notes:string}"
+      }]})
+  }).then(function(r){return r.json();}).then(function(d){
+    if(d.error) throw new Error(d.error.message);
+    var txt2=d.content[0].text.replace(/```json|```/g,"").trim();
+    var js=txt2.indexOf("{");var je=txt2.lastIndexOf("}")+1;
+    if(js>=0&&je>js) txt2=txt2.slice(js,je);
+    finishAnalysis(JSON.parse(txt2));
+  }).catch(function(){
     S.loadingFood=false;
-    renderFoodResults(document.getElementById("food-content"),GOALS.find(x=>x.id===S.gl));
-  }
+    S.foodAna={error:true,dishes:[],total:{calories:0,protein:0,fat:0,carbs:0}};
+    S.foodAdv={mainAdvice:"Ошибка. Попробуй ещё раз."};
+    renderFoodResults(document.getElementById("food-content"),GOALS.filter(function(x){return x.id===S.gl;})[0]);
+  });
 }
-async function finishAnalysis(a1){
+
+function finishAnalysis(a1){
   S.foodAna=a1;
   setLoadMsg("🧠 Составляю рекомендацию...");
-  const nc=S.st.calories+a1.total.calories,np=S.st.protein+a1.total.protein;
-  const a2=await callClaude([{role:"user",content:`Умный совет после приёма пищи. JSON: {"mainAdvice":"конкретный совет 1-2 предложения","nextMeal":"через X ч — что конкретно съесть","warning":null,"replacement":null,"bodyState":"burning"} bodyState: burning|building|dark|sugar|perfect. Цель: ${GP[S.gl]}. Блюда: ${a1.dishes.map(d=>d.name).join(", ")}. Итого: ${nc}/${S.dg.calories} ккал. Белок: ${np}/${S.dg.protein}г. Жиры: ${S.st.fat+a1.total.fat}/${S.dg.fat}г.`}],
-    "Ты строгий AI нутрициолог. Давай конкретные советы. Верни ТОЛЬКО JSON без markdown.");
-  S.foodAdv=a2;
-  if(a2.bodyState&&BSTATES[a2.bodyState])S.bs=a2.bodyState;
-  S.st.calories+=a1.total.calories;S.st.protein+=a1.total.protein;S.st.fat+=a1.total.fat;S.st.carbs+=a1.total.carbs;
-  const meal={id:Date.now(),name:a1.dishes.map(d=>d.name).join(" + "),time:new Date().toLocaleTimeString("ru",{hour:"2-digit",minute:"2-digit"}),calories:a1.total.calories,protein:a1.total.protein,fat:a1.total.fat,carbs:a1.total.carbs};
-  S.meals.push(meal);
-  saveToHistory(meal);
-  addXP(100+Math.floor(Math.random()*60));
-  renderCalRing();renderMacroBars();renderMeals();renderBodyState();
-  S.loadingFood=false;
-  renderFoodResults(document.getElementById("food-content"),GOALS.find(x=>x.id===S.gl));
+  var nc=S.st.calories+a1.total.calories;
+  var np=S.st.protein+a1.total.protein;
+  var nf=S.st.fat+a1.total.fat;
+  var nc2=S.st.carbs+a1.total.carbs;
+  var mealsList=S.meals.length?S.meals.map(function(m){return m.name;}).join(", "):"первый приём";
+  fetch("/api/claude",{method:"POST",headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({model:"claude-haiku-4-5",max_tokens:800,
+      system:"Ты строгий AI нутрициолог. Давай КОНКРЕТНЫЕ РАЗНООБРАЗНЫЕ советы. Верни ТОЛЬКО JSON без markdown.",
+      messages:[{role:"user",content:
+        "Дай умный совет после приёма пищи. Будь конкретным и разнообразным — не повторяй стандартные советы.\n"+
+        "Цель: "+GP[S.gl]+". Пол: "+(S.gender==="female"?"женский":"мужской")+". Вес: "+S.weight+"кг.\n"+
+        "Только что съел: "+a1.dishes.map(function(d){return d.name;}).join(", ")+".\n"+
+        "Уже ел сегодня: "+mealsList+".\n"+
+        "Итого за день: "+nc+"/"+S.dg.calories+" ккал. Белок: "+np+"/"+S.dg.protein+"г. Жиры: "+nf+"/"+S.dg.fat+"г. Углеводы: "+nc2+"/"+S.dg.carbs+"г.\n"+
+        "Для nextMeal предложи КОНКРЕТНОЕ блюдо с граммовкой которое восполняет нехватку дня.\n"+
+        "JSON: {mainAdvice:string,nextMeal:string,warning:null,replacement:null,bodyState:string} bodyState: burning|building|dark|sugar|perfect"
+      }]})
+  }).then(function(r){return r.json();}).then(function(d){
+    var a2={mainAdvice:"Хороший приём!",nextMeal:"Следующий через 3-4ч",bodyState:"burning"};
+    try{
+      var txt=d.content[0].text.replace(/```json|```/g,"").trim();
+      var js=txt.indexOf("{");var je=txt.lastIndexOf("}")+1;
+      if(js>=0&&je>js) a2=JSON.parse(txt.slice(js,je));
+    }catch(e){}
+    S.foodAdv=a2;
+    if(a2.bodyState&&BSTATES[a2.bodyState]) S.bs=a2.bodyState;
+    S.st.calories+=a1.total.calories;S.st.protein+=a1.total.protein;S.st.fat+=a1.total.fat;S.st.carbs+=a1.total.carbs;
+    var meal={id:Date.now(),name:a1.dishes.map(function(d){return d.name;}).join(" + "),time:new Date().toLocaleTimeString("ru",{hour:"2-digit",minute:"2-digit"}),calories:a1.total.calories,protein:a1.total.protein,fat:a1.total.fat,carbs:a1.total.carbs};
+    S.meals.push(meal);saveToHistory(meal);
+    addXP(100+Math.floor(Math.random()*60));
+    renderCalRing();renderMacroBars();renderMeals();renderBodyState();renderMission();
+    S.loadingFood=false;
+    renderFoodResults(document.getElementById("food-content"),GOALS.filter(function(x){return x.id===S.gl;})[0]);
+  }).catch(function(){
+    S.st.calories+=a1.total.calories;S.st.protein+=a1.total.protein;S.st.fat+=a1.total.fat;S.st.carbs+=a1.total.carbs;
+    S.foodAdv={mainAdvice:"Записано. Продолжай следить за рационом.",nextMeal:"Следующий приём через 3-4 часа.",bodyState:"burning"};
+    var meal={id:Date.now(),name:a1.dishes.map(function(d){return d.name;}).join(" + "),time:new Date().toLocaleTimeString("ru",{hour:"2-digit",minute:"2-digit"}),calories:a1.total.calories,protein:a1.total.protein,fat:a1.total.fat,carbs:a1.total.carbs};
+    S.meals.push(meal);saveToHistory(meal);
+    addXP(80);renderCalRing();renderMacroBars();renderMeals();renderBodyState();renderMission();
+    S.loadingFood=false;
+    renderFoodResults(document.getElementById("food-content"),GOALS.filter(function(x){return x.id===S.gl;})[0]);
+  });
 }
-function setLoadMsg(m){const el=document.getElementById("load-msg");if(el)el.textContent=m;}
+
+function setLoadMsg(m){var el=document.getElementById("load-msg");if(el) el.textContent=m;}
+
 function renderFoodResults(fc,g){
-  const a1=S.foodAna,a2=S.foodAdv;
+  var a1=S.foodAna,a2=S.foodAdv;
   if(a1.error){
-    fc.innerHTML=`
-      <div class="card" style="text-align:center;padding:24px;margin-bottom:14px">
-        <div style="font-size:36px;margin-bottom:8px">🔄</div>
-        <div style="font-weight:700;margin-bottom:4px">Не удалось распознать</div>
-        <div class="text-muted" style="font-size:12px">Попробуй другое фото или опиши текстом</div>
-      </div>
-      ${a2?`<div class="card" style="margin-bottom:10px"><div style="font-size:14px;line-height:1.6">${a2.mainAdvice}</div></div>`:""}
-      <button class="btn btn-primary" onclick="resetFood()">↩ Попробовать снова</button>`;return;
+    fc.innerHTML=
+      "<div class='card' style='text-align:center;padding:24px;margin-bottom:14px'>" +
+        "<div style='font-size:36px;margin-bottom:8px'>🔄</div>" +
+        "<div style='font-weight:700;margin-bottom:4px'>Не удалось распознать</div>" +
+        "<div class='text-muted' style='font-size:12px'>Попробуй другое фото или опиши текстом</div>" +
+      "</div>" +
+      (a2?"<div class='card' style='margin-bottom:10px'><div style='font-size:14px;line-height:1.6'>"+a2.mainAdvice+"</div></div>":"") +
+      "<button class='btn btn-primary' onclick='resetFood()'>↩ Попробовать снова</button>";
+    return;
   }
-  fc.innerHTML=`
-    <div class="text-head" style="margin-bottom:10px">Обнаружено</div>
-    <div class="card" style="margin-bottom:12px">
-      ${a1.dishes.map((d,i)=>`
-        <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;${i<a1.dishes.length-1?"border-bottom:1px solid rgba(255,255,255,.05)":""}">
-          <div>
-            <div style="font-weight:600;font-size:14px">${d.name}</div>
-            <div class="text-muted" style="font-size:11px;margin-top:2px">≈${d.weight}г${d.cooking_method?" · "+d.cooking_method:""}${d.confidence?" · "+d.confidence:""}</div>
-          </div>
-          <div style="text-align:right">
-            <div style="font-weight:800;font-size:15px;color:${g.color}">${d.calories} ккал</div>
-            <div class="text-muted" style="font-size:11px">Б${d.protein} Ж${d.fat} У${d.carbs}</div>
-          </div>
-        </div>`).join("")}
-      <div style="padding:10px 0 0;border-top:1px solid rgba(255,255,255,.08);display:flex;justify-content:space-between;align-items:center">
-        <span style="font-weight:700">Итого</span>
-        <div style="text-align:right">
-          <div style="font-weight:900;font-size:18px;color:${g.color}">${a1.total.calories} ккал</div>
-          <div class="text-muted" style="font-size:11px">Б${a1.total.protein} Ж${a1.total.fat} У${a1.total.carbs}</div>
-        </div>
-      </div>
-      ${a1.notes?`<div class="text-muted" style="font-size:11px;margin-top:8px;padding-top:8px;border-top:1px solid rgba(255,255,255,.05)">💡 ${a1.notes}</div>`:""}
-    </div>
-    ${a2?`
-      <div class="text-head" style="margin-bottom:10px">Умный совет AI</div>
-      <div class="card" style="background:${g.color}0e;border:1px solid ${g.color}28;margin-bottom:10px">
-        <div style="display:flex;gap:10px"><span style="font-size:22px;flex-shrink:0">🧠</span><div style="font-size:14px;font-weight:600;line-height:1.6;color:rgba(240,240,248,.9)">${a2.mainAdvice}</div></div>
-      </div>
-      ${a2.warning?`<div class="card" style="background:rgba(255,87,51,.07);border:1px solid rgba(255,87,51,.2);margin-bottom:10px"><div style="display:flex;gap:10px"><span style="font-size:18px;flex-shrink:0">⚠️</span><div style="font-size:13px;color:#ff7755;font-weight:500;line-height:1.55">${a2.warning}</div></div></div>`:""}
-      ${a2.replacement?`<div class="card" style="background:rgba(74,158,255,.07);border:1px solid rgba(74,158,255,.2);margin-bottom:10px"><div style="display:flex;gap:10px"><span style="font-size:18px;flex-shrink:0">💡</span><div><div style="font-size:11px;color:#4a9eff;font-weight:700;margin-bottom:3px">ЗАМЕНА ДЛЯ УЛУЧШЕНИЯ</div><div style="font-size:13px;color:rgba(240,240,248,.82);line-height:1.55">${a2.replacement}</div></div></div></div>`:""}
-      <div class="card" style="background:rgba(0,232,122,.06);border:1px solid rgba(0,232,122,.2);margin-bottom:14px">
-        <div style="display:flex;gap:10px"><span style="font-size:18px;flex-shrink:0">⏰</span><div><div style="font-size:11px;color:#00e87a;font-weight:700;margin-bottom:3px">СЛЕДУЮЩИЙ ПРИЁМ</div><div style="font-size:13px;color:rgba(240,240,248,.82);line-height:1.55">${a2.nextMeal||""}</div></div></div>
-      </div>
-    `:""}
-    <button class="btn btn-primary" onclick="resetFood()">↩ Новый приём пищи</button>`;
+  var html="<div class='text-head' style='margin-bottom:10px'>ОБНАРУЖЕНО</div>";
+  html+="<div class='card' style='margin-bottom:12px'>";
+  a1.dishes.forEach(function(d,i){
+    html+="<div style='display:flex;justify-content:space-between;align-items:center;padding:10px 0;"+(i<a1.dishes.length-1?"border-bottom:1px solid rgba(255,255,255,.05)":"")+"'>" +
+      "<div><div style='font-weight:600;font-size:14px'>"+d.name+"</div>" +
+        "<div class='text-muted' style='font-size:11px;margin-top:2px'>≈"+d.weight+"г"+(d.cooking_method?" · "+d.cooking_method:"")+"</div></div>" +
+      "<div style='text-align:right'><div style='font-weight:800;font-size:15px;color:"+g.color+"'>"+d.calories+" ккал</div>" +
+        "<div class='text-muted' style='font-size:11px'>Б"+d.protein+" Ж"+d.fat+" У"+d.carbs+"</div></div>" +
+    "</div>";
+  });
+  html+="<div style='padding:10px 0 0;border-top:1px solid rgba(255,255,255,.08);display:flex;justify-content:space-between;align-items:center'>" +
+    "<span style='font-weight:700'>Итого</span>" +
+    "<div style='text-align:right'><div style='font-weight:900;font-size:18px;color:"+g.color+"'>"+a1.total.calories+" ккал</div>" +
+      "<div class='text-muted' style='font-size:11px'>Б"+a1.total.protein+" Ж"+a1.total.fat+" У"+a1.total.carbs+"</div></div>" +
+  "</div>";
+  if(a1.notes) html+="<div class='text-muted' style='font-size:11px;margin-top:8px;padding-top:8px;border-top:1px solid rgba(255,255,255,.05)'>💡 "+a1.notes+"</div>";
+  html+="</div>";
+  if(a2){
+    html+="<div class='text-head' style='margin-bottom:10px'>УМНЫЙ СОВЕТ AI</div>";
+    html+="<div class='card' style='background:"+g.color+"0e;border:1px solid "+g.color+"28;margin-bottom:10px'>" +
+      "<div style='display:flex;gap:10px'><span style='font-size:22px;flex-shrink:0'>🧠</span>" +
+        "<div style='font-size:14px;font-weight:600;line-height:1.6;color:rgba(240,240,248,.9)'>"+a2.mainAdvice+"</div></div></div>";
+    if(a2.warning) html+="<div class='card' style='background:rgba(255,87,51,.07);border:1px solid rgba(255,87,51,.2);margin-bottom:10px'><div style='display:flex;gap:10px'><span style='font-size:18px;flex-shrink:0'>⚠️</span><div style='font-size:13px;color:#ff7755;line-height:1.55'>"+a2.warning+"</div></div></div>";
+    if(a2.replacement) html+="<div class='card' style='background:rgba(74,158,255,.07);border:1px solid rgba(74,158,255,.2);margin-bottom:10px'><div style='display:flex;gap:10px'><span style='font-size:18px;flex-shrink:0'>💡</span><div><div style='font-size:11px;color:#4a9eff;font-weight:700;margin-bottom:3px'>ЗАМЕНА ДЛЯ УЛУЧШЕНИЯ</div><div style='font-size:13px;color:rgba(240,240,248,.82);line-height:1.55'>"+a2.replacement+"</div></div></div></div>";
+    html+="<div class='card' style='background:rgba(0,232,122,.06);border:1px solid rgba(0,232,122,.2);margin-bottom:14px'>" +
+      "<div style='display:flex;gap:10px'><span style='font-size:18px;flex-shrink:0'>⏰</span>" +
+        "<div><div style='font-size:11px;color:#00e87a;font-weight:700;margin-bottom:3px'>СЛЕДУЮЩИЙ ПРИЁМ</div>" +
+          "<div style='font-size:13px;color:rgba(240,240,248,.82);line-height:1.55'>"+(a2.nextMeal||"")+"</div></div></div></div>";
+  }
+  html+="<button class='btn btn-primary' onclick='resetFood()'>↩ Новый приём пищи</button>";
+  fc.innerHTML=html;
 }
 function resetFood(){
   S.foodAna=null;S.foodAdv=null;S.foodImg=null;S.foodB64=null;S.loadingFood=false;S.manualMode=false;S.barcodeMode=false;
   renderFoodScreen();
 }
 
-// ── WEEKLY PLAN ───────────────────────────────────────────────────────────────
-async function showWeeklyPlan(){
-  const g=GOALS.find(x=>x.id===S.gl);
-  const sheet=document.getElementById("plan-sheet");
-  sheet.innerHTML=`
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
-      <div style="font-family:'Unbounded',sans-serif;font-size:16px;font-weight:700">План питания на неделю</div>
-      <button onclick="closeModal('plan-modal')" style="background:none;border:none;color:rgba(255,255,255,.4);cursor:pointer;font-size:22px">×</button>
-    </div>
-    <div style="text-align:center;padding:32px 0">
-      <div style="font-size:48px;margin-bottom:14px" class="pulse">🤖</div>
-      <div style="font-weight:700;font-size:15px;margin-bottom:6px">AI составляет твой план...</div>
-      <div class="text-muted" style="font-size:12px">Это займёт 10–15 секунд</div>
-    </div>`;
+// ═══════════════════════════════════════════════════════════════
+// WEEKLY PLAN
+// ═══════════════════════════════════════════════════════════════
+function showWeeklyPlan(){
+  var g=GOALS.filter(function(x){return x.id===S.gl;})[0];
+  var sheet=document.getElementById("plan-sheet");
+  sheet.innerHTML=
+    "<div style='display:flex;justify-content:space-between;align-items:center;margin-bottom:20px'>" +
+      "<div style='font-family:Unbounded,sans-serif;font-size:16px;font-weight:700'>План на 7 дней</div>" +
+      "<button onclick='closeModal(\"plan-modal\")' style='background:none;border:none;color:rgba(255,255,255,.4);cursor:pointer;font-size:24px'>×</button>" +
+    "</div>" +
+    "<div style='text-align:center;padding:32px 0'>" +
+      "<div style='font-size:48px;margin-bottom:14px' class='pulse'>🤖</div>" +
+      "<div style='font-weight:700;font-size:15px;margin-bottom:6px'>AI составляет твой план...</div>" +
+      "<div class='text-muted' style='font-size:12px'>10-15 секунд</div>" +
+    "</div>";
   document.getElementById("plan-modal").style.display="flex";
-  try{
-    const plan=await callClaude([{role:"user",content:`Составь персональный план питания на 7 дней. Цель: ${GP[S.gl]}. Пол: ${S.gender==="female"?"женский":"мужской"}. Вес: ${S.weight}кг. Норма калорий: ${S.dg.calories} ккал, белок ${S.dg.protein}г, жиры ${S.dg.fat}г, углеводы ${S.dg.carbs}г. JSON: {"days":[{"day":"Понедельник","meals":[{"name":"Завтрак","food":"конкретные продукты","calories":400,"protein":25},{"name":"Обед","food":"конкретные продукты","calories":600,"protein":40},{"name":"Ужин","food":"конкретные продукты","calories":500,"protein":35},{"name":"Перекус","food":"конкретный перекус","calories":200,"protein":15}],"total_calories":1700}]} Только реальные блюда которые легко приготовить.`}],
-      "Ты диетолог. Составляй вкусные и реалистичные планы питания. Верни ТОЛЬКО JSON без markdown.");
-    sheet.innerHTML=`
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
-        <div style="font-family:'Unbounded',sans-serif;font-size:16px;font-weight:700">План на 7 дней</div>
-        <button onclick="closeModal('plan-modal')" style="background:none;border:none;color:rgba(255,255,255,.4);cursor:pointer;font-size:22px">×</button>
-      </div>
-      ${plan.days.map(d=>`
-        <div class="card" style="margin-bottom:10px">
-          <div style="font-weight:700;font-size:14px;color:${g.color};margin-bottom:10px">${d.day} · ${d.total_calories} ккал</div>
-          ${d.meals.map(m=>`
-            <div style="display:flex;justify-content:space-between;align-items:flex-start;padding:7px 0;border-bottom:1px solid rgba(255,255,255,.05)">
-              <div>
-                <div style="font-size:12px;color:rgba(255,255,255,.4);font-weight:600">${m.name}</div>
-                <div style="font-size:13px;margin-top:2px">${m.food}</div>
-              </div>
-              <div style="text-align:right;flex-shrink:0;margin-left:10px">
-                <div style="font-size:13px;font-weight:700;color:${g.color}">${m.calories}</div>
-                <div class="text-muted" style="font-size:11px">Б${m.protein}г</div>
-              </div>
-            </div>`).join("")}
-        </div>`).join("")}`;
-  }catch(e){
-    sheet.innerHTML=`<div style="text-align:center;padding:32px"><div style="font-size:36px;margin-bottom:12px">❌</div><div style="font-weight:700;margin-bottom:8px">Ошибка генерации</div><button class="btn btn-primary" onclick="closeModal('plan-modal')">Закрыть</button></div>`;
-  }
+  fetch("/api/claude",{method:"POST",headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({model:"claude-haiku-4-5",max_tokens:3000,
+      system:"Ты профессиональный диетолог. Составляй реалистичные планы с точными граммами. Верни ТОЛЬКО валидный JSON без markdown.",
+      messages:[{role:"user",content:
+        "Составь ПЕРСОНАЛЬНЫЙ план питания на 7 дней.\n"+
+        "Пол: "+(S.gender==="female"?"женщина":"мужчина")+". Возраст: "+S.age+"лет. Вес: "+S.weight+"кг → "+S.targetWeight+"кг.\n"+
+        "Цель: "+GP[S.gl]+".\n"+
+        "Норма: "+S.dg.calories+" ккал/день, белок "+S.dg.protein+"г, жиры "+S.dg.fat+"г, углеводы "+S.dg.carbs+"г.\n"+
+        "Реальные блюда с точными граммами. РАЗНЫЕ блюда каждый день.\n"+
+        "JSON: {days:[{day:\"Понедельник\",breakfast:\"блюдо с граммами\",lunch:\"блюдо с граммами\",dinner:\"блюдо с граммами\",snack:\"перекус с граммами\",cal:number}]}"
+      }]})
+  }).then(function(r){return r.json();}).then(function(d){
+    if(d.error) throw new Error(d.error.message||"API error");
+    var txt=d.content[0].text.replace(/```json|```/g,"").trim();
+    var js=txt.indexOf("{");var je=txt.lastIndexOf("}")+1;
+    if(js>=0&&je>js) txt=txt.slice(js,je);
+    var plan=JSON.parse(txt);
+    var html=
+      "<div style='display:flex;justify-content:space-between;align-items:center;margin-bottom:16px'>" +
+        "<div style='font-family:Unbounded,sans-serif;font-size:16px;font-weight:700'>Твой план на 7 дней</div>" +
+        "<button onclick='closeModal(\"plan-modal\")' style='background:none;border:none;color:rgba(255,255,255,.4);cursor:pointer;font-size:24px'>×</button>" +
+      "</div>" +
+      "<div style='font-size:12px;color:rgba(255,255,255,.35);margin-bottom:14px;padding:8px 12px;background:rgba(255,255,255,.04);border-radius:8px'>" +
+        (S.gender==="female"?"👩":"👨")+" "+S.weight+"кг → "+S.targetWeight+"кг · "+S.dg.calories+" ккал/день</div>";
+    plan.days.forEach(function(day){
+      html+="<div class='card' style='margin-bottom:10px'>" +
+        "<div style='font-weight:700;font-size:14px;color:"+g.color+";margin-bottom:10px'>"+day.day+" · "+day.cal+" ккал</div>";
+      [["🌅 Завтрак",day.breakfast],["🍽 Обед",day.lunch],["🌙 Ужин",day.dinner],["🍎 Перекус",day.snack]].forEach(function(item){
+        html+="<div style='padding:7px 0;border-bottom:1px solid rgba(255,255,255,.05)'>" +
+          "<div style='font-size:11px;color:rgba(255,255,255,.4);font-weight:600;margin-bottom:2px'>"+item[0]+"</div>" +
+          "<div style='font-size:13px;color:rgba(240,240,248,.85)'>"+(item[1]||"—")+"</div>" +
+        "</div>";
+      });
+      html+="</div>";
+    });
+    sheet.innerHTML=html;
+  }).catch(function(e){
+    sheet.innerHTML=
+      "<div style='text-align:center;padding:32px'>" +
+        "<div style='font-size:36px;margin-bottom:12px'>❌</div>" +
+        "<div style='font-weight:700;margin-bottom:6px'>Ошибка генерации</div>" +
+        "<div class='text-muted' style='font-size:12px;margin-bottom:16px'>"+e.message+"</div>" +
+        "<button class='btn btn-primary' onclick='showWeeklyPlan()'>Попробовать снова</button>" +
+      "</div>";
+  });
 }
 
-// ── BODY SCREEN ───────────────────────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════
+// BODY TWIN AI
+// ═══════════════════════════════════════════════════════════════
 function renderBodyScreen(){
-  const g=GOALS.find(x=>x.id===S.gl);
-  const bc=document.getElementById("body-content");
-  const cw=S.weight||70;
-  const optMap={loss:-380,cutting:-500,bulking:280,maint:0,sport:-180,healthy:-120};
-  const optChg=((optMap[S.gl]||-350)*30)/7700;
-  const tw=S.targetWeight||(cw-5);
-  const daysLeft=Math.round(Math.abs(cw-tw)*7700/Math.max(Math.abs(optMap[S.gl]||350),50));
-  bc.innerHTML=`
-    <div class="text-head" style="margin-bottom:10px">Два сценария — 30 дней</div>
-    <div style="display:flex;gap:10px;margin-bottom:10px">
-      <div class="card" style="flex:1;background:rgba(255,87,51,.07);border:1px solid rgba(255,87,51,.25)">
-        <div class="tag" style="background:rgba(255,87,51,.15);color:#ff5733;font-size:10px;margin-bottom:8px">ТАК КАК ЕСТЬ</div>
-        <div style="font-family:'Unbounded',sans-serif;font-size:26px;font-weight:900;color:#f0f0f8">${(cw+((S.st.calories-S.dg.calories)*30/7700)).toFixed(1)}<span style="font-size:12px"> кг</span></div>
-        <div class="text-muted" style="font-size:11px;margin-top:6px">${S.st.calories||S.dg.calories} ккал/день</div>
-      </div>
-      <div class="card" style="flex:1;background:${g.color}0a;border:1px solid ${g.color}28">
-        <div class="tag" style="background:${g.color}20;color:${g.color};font-size:10px;margin-bottom:8px">ПО ПЛАНУ</div>
-        <div style="font-family:'Unbounded',sans-serif;font-size:26px;font-weight:900;color:${g.color}">${(cw+optChg).toFixed(1)}<span style="font-size:12px"> кг</span></div>
-        <div class="text-muted" style="font-size:11px;margin-top:6px">${S.dg.calories} ккал/день</div>
-      </div>
-    </div>
-    <div class="card" style="background:rgba(0,232,122,.05);border:1px solid rgba(0,232,122,.18);margin-bottom:14px">
-      <div style="display:flex;gap:12px;align-items:center">
-        <span style="font-size:26px">🎯</span>
-        <div><div class="text-muted" style="font-size:11px;margin-bottom:2px">Цель: ${tw}кг · при соблюдении плана</div>
-        <div style="font-weight:700;font-size:15px">через ~${daysLeft} дней</div></div>
-      </div>
-    </div>
-    <div class="card" style="margin-bottom:14px">
-      <div class="tag" style="background:rgba(255,87,51,.15);color:#ff5733;margin-bottom:10px">🔥 ПОДЕЛИТЬСЯ</div>
-      <div style="font-weight:700;font-size:15px;margin-bottom:6px">Карточка прогресса</div>
-      <div class="text-muted" style="font-size:13px;margin-bottom:14px">Скачай PNG и отправь друзьям как вызов</div>
-      <button class="btn btn-primary" onclick="downloadCard()">⬇ Скачать PNG</button>
-    </div>`;
+  var g=GOALS.filter(function(x){return x.id===S.gl;})[0];
+  var bc=document.getElementById("body-content");
+  if(!bc) return;
+  var cw=S.weight||70;
+  var tw=S.targetWeight||(S.gl==="bulking"?cw+5:cw-5);
+  var optMap={loss:-380,cutting:-500,bulking:280,maint:0,sport:-180,healthy:-120};
+  var optDiff=optMap[S.gl]||(-350);
+  var optChg=(optDiff*30)/7700;
+  var daysLeft=Math.round(Math.abs(cw-tw)*7700/Math.max(Math.abs(optDiff),50));
+  var months=Math.round(daysLeft/30*10)/10;
+  var kgPerMonth=Math.abs(optDiff*30/7700).toFixed(2);
+  var kgPerWeek=Math.abs(optDiff*7/7700).toFixed(2);
+  var mults=[1.2,1.375,1.55,1.725,1.9];
+  var bmr=S.gender==="female"?10*cw+6.25*(S.height||170)-5*(S.age||25)-161:10*cw+6.25*(S.height||170)-5*(S.age||25)+5;
+  var tdee=Math.round(bmr*(mults[2]||1.55));
+
+  var html="";
+
+  // ── Scenarios ──
+  html+="<div class='text-head' style='margin-bottom:10px'>ДВА СЦЕНАРИЯ — 30 ДНЕЙ</div>";
+  html+="<div style='display:flex;gap:10px;margin-bottom:10px'>";
+  html+="<div class='card' style='flex:1;background:rgba(255,87,51,.07);border:1px solid rgba(255,87,51,.25)'>";
+  html+="<div class='tag' style='background:rgba(255,87,51,.15);color:#ff5733;font-size:10px;margin-bottom:8px'>БЕЗ ПЛАНА</div>";
+  html+="<div style='font-size:24px;font-weight:900;color:#f0f0f8'>"+cw.toFixed(1)+"<span style='font-size:12px;color:rgba(255,255,255,.4)'> кг</span></div>";
+  html+="<div style='font-size:12px;color:rgba(255,255,255,.4);margin-top:4px'>вес не изменится</div>";
+  html+="<div style='font-size:11px;color:rgba(255,255,255,.3);margin-top:3px'>"+tdee+" ккал/день (TDEE)</div>";
+  html+="</div>";
+  html+="<div class='card' style='flex:1;background:"+g.color+"0a;border:1px solid "+g.color+"28'>";
+  html+="<div class='tag' style='background:"+g.color+"20;color:"+g.color+";font-size:10px;margin-bottom:8px'>ПО ПЛАНУ</div>";
+  html+="<div style='font-size:24px;font-weight:900;color:"+g.color+"'>"+(cw+optChg).toFixed(1)+"<span style='font-size:12px;color:rgba(255,255,255,.4)'> кг</span></div>";
+  html+="<div style='font-size:12px;color:"+g.color+";font-weight:600;margin-top:4px'>"+(optChg>0?"+":"")+optChg.toFixed(1)+" кг</div>";
+  html+="<div style='font-size:11px;color:rgba(255,255,255,.3);margin-top:3px'>"+S.dg.calories+" ккал/день</div>";
+  html+="</div></div>";
+
+  // ── Progress to goal ──
+  html+="<div class='card' style='background:rgba(0,232,122,.05);border:1px solid rgba(0,232,122,.18);margin-bottom:14px'>";
+  html+="<div style='display:flex;gap:12px;align-items:center'><span style='font-size:24px'>🎯</span>";
+  html+="<div style='flex:1'>";
+  html+="<div style='font-size:11px;color:rgba(255,255,255,.4);margin-bottom:4px'>Цель: "+tw+"кг при соблюдении плана</div>";
+  html+="<div style='font-weight:700;font-size:16px;margin-bottom:4px'>через ~"+daysLeft+" дней ("+months+" мес)</div>";
+  html+="<div style='display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-top:6px'>";
+  [["В день",Math.abs(optDiff)+" ккал","#4a9eff"],["В неделю",kgPerWeek+" кг","var(--c)"],["В месяц",kgPerMonth+" кг","#00e87a"]].forEach(function(s){
+    html+="<div style='background:rgba(255,255,255,.04);border-radius:8px;padding:6px;text-align:center'>" +
+      "<div style='font-size:10px;color:rgba(255,255,255,.35);margin-bottom:2px'>"+s[0]+"</div>" +
+      "<div style='font-weight:700;font-size:12px;color:"+s[2]+"'>"+s[1]+"</div>" +
+    "</div>";
+  });
+  html+="</div></div></div></div>";
+
+  // ── Body Twin ──
+  html+="<div class='text-head' style='margin-bottom:12px'>BODY TWIN — AI АНАЛИЗ ТЕЛА</div>";
+  if(S.bodyLoading){
+    html+="<div class='card' style='text-align:center;padding:32px;margin-bottom:14px'>";
+    html+="<div style='font-size:44px;margin-bottom:12px' class='pulse'>🔍</div>";
+    html+="<div style='font-weight:700;font-size:15px;margin-bottom:4px'>AI анализирует твоё тело...</div>";
+    html+="<div class='text-muted' style='font-size:12px'>Определяю % жира, тип телосложения и план</div>";
+    html+="</div>";
+  } else if(S.bodyPics.length===0){
+    html+="<div style='border:2px dashed rgba(255,255,255,.14);border-radius:18px;padding:36px 20px;display:flex;flex-direction:column;align-items:center;gap:14px;cursor:pointer;text-align:center;margin-bottom:14px' onclick='document.getElementById(\"body-file\").click()'>";
+    html+="<div style='font-size:52px'>🪞</div>";
+    html+="<div style='font-weight:700;font-size:17px'>Загрузи фото тела</div>";
+    html+="<div class='text-muted' style='font-size:13px;line-height:1.65'>AI определит % жира · уровень мышц 1-100<br/>тип телосложения · проблемные зоны · план</div>";
+    html+="<div style='padding:11px 28px;background:var(--c);color:#000;border-radius:10px;font-size:14px;font-weight:700'>Выбрать фото</div>";
+    html+="</div>";
+  } else {
+    // Photos timeline
+    html+="<div style='overflow-x:auto;padding-bottom:8px;margin-bottom:12px'>";
+    html+="<div style='display:flex;gap:10px;width:max-content'>";
+    S.bodyPics.forEach(function(p,i){
+      html+="<div style='width:155px;flex-shrink:0'>";
+      html+="<div style='position:relative'>";
+      html+="<img src='"+p.url+"' style='width:155px;height:200px;object-fit:cover;border-radius:12px;display:block'/>";
+      if(i===S.bodyPics.length-1) html+="<div class='tag' style='position:absolute;top:7px;right:7px;background:rgba(0,232,122,.9);color:#000;font-size:9px'>СЕЙЧАС</div>";
+      html+="</div>";
+      html+="<div style='margin-top:8px'>";
+      html+="<div style='font-size:12px;font-weight:600;color:"+g.color+";margin-bottom:4px'>"+p.date+"</div>";
+      if(p.an){
+        // Fitness rating bar
+        var rating=p.an.fitnessRating||Math.round((100-p.an.fatPercent*2+p.an.muscleLevel)/2);
+        html+="<div style='background:rgba(255,255,255,.05);border-radius:8px;padding:8px;margin-bottom:6px'>";
+        html+="<div style='display:flex;justify-content:space-between;margin-bottom:4px'>";
+        html+="<span style='font-size:10px;color:rgba(255,255,255,.4)'>Фитнес-рейтинг</span>";
+        html+="<span style='font-size:11px;font-weight:700;color:"+g.color+"'>"+rating+"/100</span></div>";
+        html+="<div style='height:4px;background:rgba(255,255,255,.08);border-radius:2px'><div style='height:100%;width:"+Math.min(100,rating)+"%%;border-radius:2px;background:"+g.color+"'></div></div>";
+        html+="</div>";
+        html+="<div style='font-size:11px;color:rgba(240,240,248,.42);margin-bottom:3px'>Жир: ~"+p.an.fatPercent+"% · Мышцы: "+p.an.muscleLevel+"/100</div>";
+        if(p.an.bodyType) html+="<div style='font-size:11px;color:rgba(240,240,248,.42);margin-bottom:4px'>"+p.an.bodyType+"</div>";
+        html+="<div style='font-size:11px;color:rgba(240,240,248,.75);line-height:1.5;margin-bottom:6px'>"+p.an.note+"</div>";
+        if(p.an.nextStep) html+="<div class='tag' style='background:"+g.color+"15;color:"+g.color+";font-size:10px;white-space:normal;line-height:1.4;display:block'>→ "+p.an.nextStep.slice(0,65)+"</div>";
+      }
+      html+="</div></div>";
+    });
+    html+="<div style='width:155px;height:200px;border:2px dashed rgba(255,255,255,.12);border-radius:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;gap:6px' onclick='document.getElementById(\"body-file\").click()'>";
+    html+="<div style='font-size:28px'>+</div><div class='text-muted' style='font-size:11px;text-align:center'>Добавить<br/>фото</div></div>";
+    html+="</div></div>";
+
+    // Latest detailed analysis
+    var last=S.bodyPics[S.bodyPics.length-1];
+    if(last&&last.an){
+      var an=last.an;
+      html+="<div class='card' style='margin-bottom:12px;background:"+g.color+"08;border:1px solid "+g.color+"20'>";
+      html+="<div style='font-size:12px;color:"+g.color+";font-weight:700;margin-bottom:10px'>🧬 ДЕТАЛЬНЫЙ АНАЛИЗ · "+last.date+"</div>";
+      // Key metrics
+      html+="<div style='display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px'>";
+      [[an.fatPercent+"%","% Жира","#ff5733"],[an.muscleLevel+"/100","Мышцы","#00e87a"],[an.bodyType||"—","Тип","#4a9eff"],[(an.fitnessRating||"—")+"/100","Рейтинг",g.color]].forEach(function(s){
+        html+="<div style='background:rgba(255,255,255,.05);border-radius:10px;padding:10px'>" +
+          "<div style='font-weight:700;font-size:16px;color:"+s[2]+";margin-bottom:2px'>"+s[0]+"</div>" +
+          "<div style='font-size:11px;color:rgba(255,255,255,.4)'>"+s[1]+"</div>" +
+        "</div>";
+      });
+      html+="</div>";
+      if(an.problemZones&&an.problemZones.length){
+        html+="<div style='margin-bottom:8px'>";
+        html+="<div style='font-size:11px;color:#ff5733;font-weight:600;margin-bottom:4px'>⚠️ СЛАБЫЕ ЗОНЫ</div>";
+        html+="<div style='font-size:12px;color:rgba(240,240,248,.7)'>"+an.problemZones.join(" · ")+"</div></div>";
+      }
+      if(an.strengths&&an.strengths.length){
+        html+="<div style='margin-bottom:8px'>";
+        html+="<div style='font-size:11px;color:#00e87a;font-weight:600;margin-bottom:4px'>✅ СИЛЬНЫЕ СТОРОНЫ</div>";
+        html+="<div style='font-size:12px;color:rgba(240,240,248,.7)'>"+an.strengths.join(" · ")+"</div></div>";
+      }
+      if(an.strategy){
+        html+="<div style='background:rgba(255,255,255,.04);border-radius:8px;padding:10px;margin-bottom:8px'>";
+        html+="<div style='font-size:11px;color:"+g.color+";font-weight:600;margin-bottom:3px'>🎯 РЕКОМЕНДУЕМАЯ СТРАТЕГИЯ</div>";
+        html+="<div style='font-size:13px;color:rgba(240,240,248,.85)'>"+an.strategy+"</div></div>";
+      }
+      if(an.weeklyGoal){
+        html+="<div style='background:rgba(0,232,122,.08);border-radius:8px;padding:10px'>";
+        html+="<div style='font-size:11px;color:#00e87a;font-weight:600;margin-bottom:3px'>📅 ЦЕЛЬ НА ЭТУ НЕДЕЛЮ</div>";
+        html+="<div style='font-size:13px;color:rgba(240,240,248,.85)'>"+an.weeklyGoal+"</div></div>";
+      }
+      html+="</div>";
+
+      // Projections
+      if(an.projections){
+        html+="<div class='card' style='margin-bottom:12px'>";
+        html+="<div style='font-size:12px;color:rgba(255,255,255,.6);font-weight:600;margin-bottom:10px'>📈 ПРОГНОЗ РЕЗУЛЬТАТОВ</div>";
+        html+="<div style='display:grid;grid-template-columns:1fr 1fr;gap:8px'>";
+        [["1 месяц",an.projections.month1||"—"],["3 месяца",an.projections.month3||"—"],["6 месяцев",an.projections.month6||"—"],["12 месяцев",an.projections.month12||"—"]].forEach(function(s,i){
+          var colors=["#4a9eff",g.color,"#00e87a","#a855f7"];
+          html+="<div style='background:rgba(255,255,255,.04);border-radius:10px;padding:10px'>" +
+            "<div style='font-size:10px;color:rgba(255,255,255,.35);margin-bottom:3px'>"+s[0]+"</div>" +
+            "<div style='font-size:12px;font-weight:600;color:"+colors[i]+"'>"+s[1]+"</div>" +
+          "</div>";
+        });
+        html+="</div></div>";
+      }
+
+      // Confidence
+      if(an.confidence){
+        html+="<div style='font-size:11px;color:rgba(255,255,255,.3);text-align:center;margin-bottom:12px'>";
+        html+="Уверенность анализа: "+an.confidence+"% · Не является медицинским диагнозом</div>";
+      }
+    }
+
+    // Progress comparison
+    if(S.bodyPics.length>=2&&S.bodyPics[0].an&&S.bodyPics[S.bodyPics.length-1].an){
+      var first=S.bodyPics[0].an;
+      var last2=S.bodyPics[S.bodyPics.length-1].an;
+      var fatDiff=(last2.fatPercent-first.fatPercent).toFixed(1);
+      var muscleDiff=(last2.muscleLevel-first.muscleLevel);
+      html+="<div class='card' style='background:rgba(0,232,122,.06);border:1px solid rgba(0,232,122,.2);margin-bottom:12px'>";
+      html+="<div style='font-size:12px;color:#00e87a;font-weight:700;margin-bottom:8px'>📊 ПРОГРЕСС · "+S.bodyPics.length+" фото</div>";
+      html+="<div style='display:grid;grid-template-columns:1fr 1fr;gap:8px'>";
+      [["% Жира",first.fatPercent+"% → "+last2.fatPercent+"%",(fatDiff<0?"#00e87a":"#ff5733")],["Мышцы",first.muscleLevel+" → "+last2.muscleLevel+"/100",(muscleDiff>0?"#00e87a":"#4a9eff")]].forEach(function(s){
+        html+="<div style='background:rgba(255,255,255,.04);border-radius:8px;padding:8px'>" +
+          "<div style='font-size:10px;color:rgba(255,255,255,.35);margin-bottom:3px'>"+s[0]+"</div>" +
+          "<div style='font-size:12px;font-weight:600;color:"+s[2]+"'>"+s[1]+"</div>" +
+        "</div>";
+      });
+      html+="</div></div>";
+    }
+  }
+
+  // Share card
+  html+="<div class='card' style='margin-bottom:20px'>";
+  html+="<div class='tag' style='background:rgba(255,87,51,.15);color:#ff5733;margin-bottom:10px'>🔥 ПОДЕЛИТЬСЯ</div>";
+  html+="<div style='font-weight:700;font-size:15px;margin-bottom:6px'>Карточка прогресса</div>";
+  html+="<div class='text-muted' style='font-size:13px;margin-bottom:14px'>Скачай PNG и отправь друзьям как вызов</div>";
+  html+="<button class='btn btn-primary' onclick='downloadCard()'>⬇ Скачать PNG</button></div>";
+
+  bc.innerHTML=html;
 }
 
-// ── SHARE CARD ────────────────────────────────────────────────────────────────
+function onBodyFile(e){
+  var f=e.target.files[0]; if(!f) return;
+  var url=URL.createObjectURL(f);
+  S.bodyLoading=true; renderBodyScreen();
+  var r=new FileReader();
+  r.onload=function(ev){
+    var b=ev.target.result.split(",")[1];
+    fetch("/api/claude",{method:"POST",headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({model:"claude-haiku-4-5",max_tokens:1500,
+        system:"Ты опытный фитнес-тренер и нутрициолог. Верни ТОЛЬКО валидный JSON без markdown.",
+        messages:[{role:"user",content:[
+          {type:"image",source:{type:"base64",media_type:f.type,data:b}},
+          {type:"text",text:
+            "Детально проанализируй телосложение на фото. Цель: "+GP[S.gl]+". Вес: "+S.weight+"кг → "+S.targetWeight+"кг. Пол: "+(S.gender==="female"?"женский":"мужской")+".\n"+
+            "ОПРЕДЕЛИ ТОЧНО:\n"+
+            "1. % жира тела (смотри на складки, рельеф мышц, живот, талию)\n"+
+            "2. Уровень мышц 1-100 (видимость мышц, объём, симметрия)\n"+
+            "3. Тип телосложения (эктоморф/мезоморф/эндоморф)\n"+
+            "4. Проблемные зоны (максимум 3)\n"+
+            "5. Сильные стороны телосложения\n"+
+            "6. Общий фитнес-рейтинг 1-100\n"+
+            "7. Рекомендуемая стратегия (набор/сушка/поддержание/рекомпозиция)\n"+
+            "8. Прогноз через 1/3/6/12 месяцев при соблюдении плана\n"+
+            "9. Уровень уверенности анализа 1-100%\n\n"+
+            "JSON: {fatPercent:22,muscleLevel:45,bodyType:string,problemZones:[string],strengths:[string],fitnessRating:65,note:string,nextStep:string,strategy:string,weeklyGoal:string,projections:{month1:string,month3:string,month6:string,month12:string},confidence:75}"
+          }
+        ]}]})
+    }).then(function(r){return r.json();}).then(function(d){
+      var an=null;
+      try{
+        var txt=d.content[0].text.replace(/```json|```/g,"").trim();
+        var js=txt.indexOf("{");var je=txt.lastIndexOf("}")+1;
+        if(js>=0&&je>js) txt=txt.slice(js,je);
+        an=JSON.parse(txt);
+      }catch(err){an=null;}
+      S.bodyPics.push({id:Date.now(),date:new Date().toLocaleDateString("ru",{day:"numeric",month:"long"}),url:url,an:an});
+      S.bodyLoading=false;renderBodyScreen();
+    }).catch(function(){
+      S.bodyPics.push({id:Date.now(),date:new Date().toLocaleDateString("ru",{day:"numeric",month:"long"}),url:url,an:null});
+      S.bodyLoading=false;renderBodyScreen();
+    });
+  };
+  r.readAsDataURL(f);
+  e.target.value="";
+}
+
+// ═══════════════════════════════════════════════════════════════
+// SHARE CARD
+// ═══════════════════════════════════════════════════════════════
 function downloadCard(){
   try{
-    const g=GOALS.find(x=>x.id===S.gl);
-    const bs=BSTATES[S.bs]||BSTATES.burning;
-    const W=390,H=600,F="-apple-system,Helvetica,Arial,sans-serif";
-    const canvas=document.createElement("canvas");
+    var g=GOALS.filter(function(x){return x.id===S.gl;})[0];
+    var bs=BSTATES[S.bs]||BSTATES.burning;
+    var W=390,H=600,F="-apple-system,Helvetica,Arial,sans-serif";
+    var canvas=document.createElement("canvas");
     canvas.width=W*2;canvas.height=H*2;
-    const ctx=canvas.getContext("2d");ctx.scale(2,2);
+    var ctx=canvas.getContext("2d");ctx.scale(2,2);
     ctx.fillStyle="#07070e";ctx.fillRect(0,0,W,H);
     ctx.fillStyle=g.color;ctx.fillRect(0,0,W,5);
-    ctx.fillStyle="rgba(255,255,255,0.3)";ctx.font=`500 11px ${F}`;ctx.fillText("AI NUTRITION COACH",28,34);
-    ctx.fillStyle=g.color;ctx.font=`700 22px ${F}`;ctx.fillText(g.icon+" "+g.title,28,72);
-    ctx.strokeStyle="rgba(255,255,255,0.09)";ctx.beginPath();ctx.moveTo(28,90);ctx.lineTo(362,90);ctx.stroke();
-    ctx.fillStyle="rgba(255,255,255,0.32)";ctx.font=`500 11px ${F}`;ctx.fillText("STREAK",28,114);
-    ctx.fillStyle=g.color;ctx.font=`900 72px ${F}`;ctx.fillText(String(S.str)+" дней",24,196);
+    ctx.fillStyle="rgba(255,255,255,.3)";ctx.font="500 11px "+F;ctx.fillText("AI NUTRITION COACH",28,34);
+    ctx.fillStyle=g.color;ctx.font="700 20px "+F;ctx.fillText(g.icon+" "+g.title,28,68);
+    ctx.strokeStyle="rgba(255,255,255,.09)";ctx.beginPath();ctx.moveTo(28,86);ctx.lineTo(362,86);ctx.stroke();
+    ctx.fillStyle="rgba(255,255,255,.32)";ctx.font="500 11px "+F;ctx.fillText("STREAK",28,110);
+    ctx.fillStyle=g.color;ctx.font="900 70px "+F;ctx.fillText(String(S.str)+" дней",24,196);
     ctx.beginPath();ctx.moveTo(28,216);ctx.lineTo(362,216);ctx.stroke();
-    ctx.fillStyle="rgba(255,255,255,0.28)";ctx.font=`500 11px ${F}`;ctx.fillText("CALORIES",28,248);ctx.fillText("PROTEIN",214,248);
-    ctx.fillStyle=g.color;ctx.font=`700 24px ${F}`;ctx.fillText(S.st.calories+" kkal",28,280);
-    ctx.fillStyle="#4a9eff";ctx.fillText(S.st.protein+"g",214,280);
-    ctx.beginPath();ctx.moveTo(28,300);ctx.lineTo(362,300);ctx.stroke();
-    ctx.fillStyle="rgba(255,255,255,0.28)";ctx.font=`500 11px ${F}`;ctx.fillText("LEVEL",28,330);ctx.fillText("BODY STATE",214,330);
-    ctx.fillStyle="#f0f0f8";ctx.font=`700 18px ${F}`;ctx.fillText("Level "+S.lv,28,356);
-    ctx.fillStyle=bs.color;ctx.fillText(bs.label,214,356);
-    ctx.fillStyle="rgba(255,255,255,0.13)";ctx.font=`400 11px ${F}`;ctx.fillText("AI Nutrition Coach",28,H-16);
-    const url=canvas.toDataURL("image/png");
-    const a=document.createElement("a");a.href=url;a.download="progress.png";
+    [[S.st.calories+" kkal","CALORIES",g.color,28],[S.st.protein+"g","PROTEIN","#4a9eff",214]].forEach(function(item){
+      ctx.fillStyle="rgba(255,255,255,.28)";ctx.font="500 11px "+F;ctx.fillText(item[1],item[3],248);
+      ctx.fillStyle=item[2];ctx.font="700 24px "+F;ctx.fillText(item[0],item[3],278);
+    });
+    ctx.beginPath();ctx.moveTo(28,298);ctx.lineTo(362,298);ctx.stroke();
+    [["Level "+S.lv,"LEVEL","#f0f0f8",28],[bs.label,"BODY STATE",bs.color,214]].forEach(function(item){
+      ctx.fillStyle="rgba(255,255,255,.28)";ctx.font="500 11px "+F;ctx.fillText(item[1],item[3],326);
+      ctx.fillStyle=item[2];ctx.font="700 18px "+F;ctx.fillText(item[0],item[3],350);
+    });
+    ctx.fillStyle="rgba(255,255,255,.13)";ctx.font="400 11px "+F;ctx.fillText("AI Nutrition Coach",28,H-16);
+    var url=canvas.toDataURL("image/png");
+    var a=document.createElement("a");a.href=url;a.download="progress.png";
     document.body.appendChild(a);a.click();document.body.removeChild(a);
   }catch(e){alert("Ошибка: "+e.message);}
 }
-function roundRect(ctx,x,y,w,h,r){
-  ctx.beginPath();ctx.moveTo(x+r,y);ctx.lineTo(x+w-r,y);ctx.arcTo(x+w,y,x+w,y+r,r);
-  ctx.lineTo(x+w,y+h-r);ctx.arcTo(x+w,y+h,x+w-r,y+h,r);ctx.lineTo(x+r,y+h);
-  ctx.arcTo(x,y+h,x,y+h-r,r);ctx.lineTo(x,y+r);ctx.arcTo(x,y,x+r,y,r);ctx.closePath();
-}
 
-// ── CLAUDE API ────────────────────────────────────────────────────────────────
-async function callClaude(messages,system=""){
-  const res=await fetch("/api/claude",{
-    method:"POST",headers:{"Content-Type":"application/json"},
-    body:JSON.stringify({model:"claude-haiku-4-5-20251001",max_tokens:2000,...(system?{system}:{}),messages})
+// ═══════════════════════════════════════════════════════════════
+// CLAUDE API
+// ═══════════════════════════════════════════════════════════════
+function callClaude(messages,system){
+  return fetch("/api/claude",{method:"POST",headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({model:"claude-haiku-4-5",max_tokens:1000,...(system?{system:system}:{}),messages:messages})
+  }).then(function(r){return r.json();}).then(function(d){
+    if(d.error) throw new Error(d.error.message||JSON.stringify(d.error));
+    var txt=d.content[0].text.replace(/```json|```/g,"").trim();
+    var js=txt.indexOf("{");var je=txt.lastIndexOf("}")+1;
+    if(js>=0&&je>js) txt=txt.slice(js,je);
+    return JSON.parse(txt);
   });
-  const d=await res.json();
-  if(d.error) throw new Error(d.error.message||JSON.stringify(d.error));
-  return JSON.parse(d.content[0].text.replace(/```json|```/g,"").trim());
 }
 
-// ── MODALS ────────────────────────────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════
+// MODALS & INIT
+// ═══════════════════════════════════════════════════════════════
 function closeModal(id,e){if(!e||e.target.id===id)document.getElementById(id).style.display="none";}
 
-// ── INIT ──────────────────────────────────────────────────────────────────────
-window.addEventListener("DOMContentLoaded",()=>{
+window.addEventListener("DOMContentLoaded",function(){
   renderGoals();
+  renderOb();
   showScreen("onboard");
 });
 </script>
