@@ -208,6 +208,7 @@ textarea.inp{resize:none;line-height:1.6}
       </div>
       <div class="card" id="meals-list"><div class="text-muted" style="text-align:center;padding:20px 0;font-size:13px">Нажми + чтобы добавить первый приём</div></div>
     </div>
+    <div id="workout-card" style="margin-bottom:12px"></div>
     <div class="card" style="margin-bottom:20px" id="notif-card"></div>
   </div>
 
@@ -1059,7 +1060,7 @@ function finishAnalysis(a1){
     if(a2.bodyState&&BSTATES[a2.bodyState]) S.bs=a2.bodyState;
     S.st.calories+=a1.total.calories;S.st.protein+=a1.total.protein;S.st.fat+=a1.total.fat;S.st.carbs+=a1.total.carbs;
     var meal={id:Date.now(),name:a1.dishes.map(function(d){return d.name;}).join(" + "),time:new Date().toLocaleTimeString("ru",{hour:"2-digit",minute:"2-digit"}),calories:a1.total.calories,protein:a1.total.protein,fat:a1.total.fat,carbs:a1.total.carbs};
-    S.meals.push(meal);saveToHistory(meal);
+    S.meals.push(meal);saveToHistory(meal);addToFavorites(meal);
     addXP(100+Math.floor(Math.random()*60));
     renderCalRing();renderMacroBars();renderMeals();renderBodyState();renderMission();
     S.loadingFood=false;
@@ -1146,7 +1147,7 @@ function showWeeklyPlan(){
   document.getElementById("plan-modal").style.display="flex";
   fetch("/api/claude",{method:"POST",headers:{"Content-Type":"application/json"},
     body:JSON.stringify({model:"claude-haiku-4-5",max_tokens:3000,
-      system:"Ты профессиональный диетолог. Составляй реалистичные планы с точными граммами. Верни ТОЛЬКО валидный JSON без markdown.",
+      system:"Ты диетолог. Составляй БЮДЖЕТНЫЕ планы из ПРОСТЫХ доступных продуктов: яйца, куриные бёдра/грудка, гречка, рис, овсянка, творог 5%, кефир, картофель, капуста, морковь, огурец, помидор, яблоко, банан. СТРОГО запрещено: стейк, лосось, тунец-стейк, авокадо, киноа, спаржа. Точные граммы. Только JSON.",
       messages:[{role:"user",content:
         "Составь ПЕРСОНАЛЬНЫЙ план питания на 7 дней.\n"+
         "Пол: "+(S.gender==="female"?"женщина":"мужчина")+". Возраст: "+S.age+"лет. Вес: "+S.weight+"кг → "+S.targetWeight+"кг.\n"+
@@ -1388,6 +1389,7 @@ function renderBodyScreen(){
   html+="<button class='btn btn-primary' onclick='downloadCard()'>⬇ Скачать PNG</button></div>";
 
   bc.innerHTML=html;
+  setTimeout(function(){renderWeightGraph();},30);
 }
 
 function onBodyFile(e){
@@ -1727,7 +1729,7 @@ function renderWorkoutCard(){
 }
 
 // SHOPPING LIST
-var PRKZT={"яйц":70,"омлет":70,"куриц":380,"бедр":380,"грудк":320,"гречк":90,"рис":100,"овсянк":70,"геркулес":70,"творог":220,"кефир":140,"молоко":120,"картоф":55,"капуст":50,"морков":60,"огурц":130,"помидор":180,"томат":180,"яблок":130,"банан":140,"хлеб":80,"лук":50,"сыр":600,"йогурт":180,"говяд":550,"свинин":500};
+var PRKZT={"яйц":70,"омлет":70,"яйцо":70,"куриц":380,"бедр":380,"грудк":320,"куриц":380,"гречк":90,"гречка":90,"рис":100,"рис ":100,"овсянк":70,"геркулес":70,"творог":220,"кефир":140,"молоко":120,"картоф":55,"картошк":55,"капуст":50,"морков":60,"огурец":130,"огурц":130,"помидор":180,"томат":180,"яблок":130,"банан":140,"хлеб":80,"лаваш":100,"лук":50,"перец":150,"свекл":70,"сыр":600,"йогурт":180,"говяд":550,"свинин":500,"тунец":400,"рыб":450,"масло":90,"оливк":200,"греч":90,"овощ":80,"фрукт":120};
 
 function getPKZT(name){
   var l=name.toLowerCase();
