@@ -417,14 +417,15 @@ function goToData(){
   var sub=S.subGlData;
   var icon=sub?sub.icon:g.icon;
   var color=sub?sub.color:g.color;
-  var title2=g.title+(sub?" — "+sub.label:"");
-  var training2=sub?("<div style='font-size:11px;color:rgba(255,255,255,.38);margin-top:2px'>"+sub.training+"</div>"):"";
+  var label=g.title+(sub?" — "+sub.label:"");
   var gr=document.getElementById("goal-reminder");
   if(gr) gr.innerHTML=
     "<div style='display:flex;align-items:center;gap:10px'>" +
       "<span style='font-size:22px'>"+icon+"</span>" +
       "<div><div style='font-size:11px;color:rgba(255,255,255,.42)'>Выбранная цель</div>" +
-      "<div style='font-weight:700;color:"+color+"'>"+title2+"</div>"+training2+"</div>" +
+      "<div style='font-weight:700;color:"+color+"'>"+label+"</div>" +
+      (sub?"<div style='font-size:11px;color:rgba(255,255,255,.38);margin-top:2px'>"+sub.training+"</div>":"") +
+      "</div>" +
     "</div>";
   showScreen("data");
 }
@@ -449,18 +450,16 @@ function calcGoals(w,h,a,gender,activity,goal){
   var mults=[1.2,1.375,1.55,1.725,1.9];
   var bmr=gender==="female"?10*w+6.25*h-5*a-161:10*w+6.25*h-5*a+5;
   var tdee=bmr*(mults[Math.min(activity-1,4)]||1.55);
-  var sub=S.subGlData;
   var cal,prot;
-  if(sub){
-    cal=Math.round(tdee*sub.calFactor);
-    prot=Math.round(w*sub.proteinFactor);
+  if(S.subGlData){
+    cal=Math.round(tdee*S.subGlData.calFactor);
+    prot=Math.round(w*S.subGlData.proteinFactor);
   } else {
     var calMap={loss:tdee*0.83,cutting:tdee*0.8,bulking:tdee*1.15,maint:tdee,sport:tdee*1.08,healthy:tdee};
     cal=Math.round(calMap[goal]||tdee);
     var ppkg={loss:gender==="female"?1.6:1.8,cutting:gender==="female"?1.8:2.2,bulking:gender==="female"?1.6:2.0,maint:gender==="female"?1.3:1.6,sport:gender==="female"?1.5:1.8,healthy:gender==="female"?1.2:1.5};
     prot=Math.round(w*(ppkg[goal]||1.5));
   }
-  var _dummy_=0; // placeholder
   var fat=Math.max(Math.round(cal*0.27/9),35);
   var carbs=Math.max(Math.round((cal-prot*4-fat*9)/4),40);
   return {calories:cal,protein:prot,fat:fat,carbs:carbs,tdee:Math.round(tdee),bmr:Math.round(bmr)};
@@ -911,7 +910,7 @@ function analyzePhoto(){
     "Ты профессиональный нутрициолог. Анализируй фото еды с максимальной точностью.\n"+
     "ОПРЕДЕЛИ ВСЕ продукты включая соусы и масло.\n"+
     "УЧИТЫВАЙ способ приготовления: жареное +30% калорий.\n"+
-    "Цель: "+getGoalPrompt()+". Пол: "+(S.gender==="female"?"женский":"мужской")+". Вес: "+S.weight+"кг.\n"+
+    "Цель: "+GP[S.gl]+". Пол: "+(S.gender==="female"?"женский":"мужской")+". Вес: "+S.weight+"кг.\n"+
     "Уже съел сегодня: "+mealsList+". Итого: "+S.st.calories+"/"+S.dg.calories+" ккал. Белок: "+S.st.protein+"/"+S.dg.protein+"г.\n"+
     "JSON: {dishes:[{name:string,weight:number,calories:number,protein:number,fat:number,carbs:number,cooking_method:string}],total:{calories:number,protein:number,fat:number,carbs:number,weight:number},notes:string}";
   fetch("/api/claude",{method:"POST",headers:{"Content-Type":"application/json"},
@@ -945,7 +944,7 @@ function analyzeText(){
       system:"Ты AI нутрициолог. Верни ТОЛЬКО JSON без markdown.",
       messages:[{role:"user",content:
         "Проанализируй еду: \""+txt+"\". Учитывай типичные размеры порций.\n"+
-        "Цель: "+getGoalPrompt()+". Уже съел: "+S.st.calories+"/"+S.dg.calories+" ккал.\n"+
+        "Цель: "+GP[S.gl]+". Уже съел: "+S.st.calories+"/"+S.dg.calories+" ккал.\n"+
         "JSON: {dishes:[{name:string,weight:number,calories:number,protein:number,fat:number,carbs:number}],total:{calories:number,protein:number,fat:number,carbs:number,weight:number},notes:string}"
       }]})
   }).then(function(r){return r.json();}).then(function(d){
@@ -975,7 +974,7 @@ function finishAnalysis(a1){
       system:"Ты строгий AI нутрициолог. Давай КОНКРЕТНЫЕ РАЗНООБРАЗНЫЕ советы. Верни ТОЛЬКО JSON без markdown.",
       messages:[{role:"user",content:
         "Дай умный совет после приёма пищи. Будь конкретным и разнообразным — не повторяй стандартные советы.\n"+
-        "Цель: "+getGoalPrompt()+". Пол: "+(S.gender==="female"?"женский":"мужской")+". Вес: "+S.weight+"кг.\n"+
+        "Цель: "+GP[S.gl]+". Пол: "+(S.gender==="female"?"женский":"мужской")+". Вес: "+S.weight+"кг.\n"+
         "Только что съел: "+a1.dishes.map(function(d){return d.name;}).join(", ")+".\n"+
         "Уже ел сегодня: "+mealsList+".\n"+
         "Итого за день: "+nc+"/"+S.dg.calories+" ккал. Белок: "+np+"/"+S.dg.protein+"г. Жиры: "+nf+"/"+S.dg.fat+"г. Углеводы: "+nc2+"/"+S.dg.carbs+"г.\n"+
@@ -1084,7 +1083,7 @@ function showWeeklyPlan(){
       messages:[{role:"user",content:
         "Составь ПЕРСОНАЛЬНЫЙ план питания на 7 дней.\n"+
         "Пол: "+(S.gender==="female"?"женщина":"мужчина")+". Возраст: "+S.age+"лет. Вес: "+S.weight+"кг → "+S.targetWeight+"кг.\n"+
-        "Цель: "+getGoalPrompt()+".\n"+
+        "Цель: "+GP[S.gl]+".\n"+
         "Норма: "+S.dg.calories+" ккал/день, белок "+S.dg.protein+"г, жиры "+S.dg.fat+"г, углеводы "+S.dg.carbs+"г.\n"+
         "Реальные блюда с точными граммами. РАЗНЫЕ блюда каждый день.\n"+
         "JSON: {days:[{day:\"Понедельник\",breakfast:\"блюдо с граммами\",lunch:\"блюдо с граммами\",dinner:\"блюдо с граммами\",snack:\"перекус с граммами\",cal:number}]}"
@@ -1129,12 +1128,6 @@ function showWeeklyPlan(){
 // BODY TWIN AI
 // ═══════════════════════════════════════════════════════════════
 function renderBodyScreen(){
-  if(renderBodyScreen._busy) return;
-  renderBodyScreen._busy=true;
-  try { _renderBodyScreenInner(); } catch(e){ console.log("renderBodyScreen error:",e); }
-  renderBodyScreen._busy=false;
-}
-function _renderBodyScreenInner(){
   var g=GOALS.filter(function(x){return x.id===S.gl;})[0];
   var bc=document.getElementById("body-content");
   if(!bc) return;
@@ -1218,7 +1211,7 @@ function _renderBodyScreenInner(){
         html+="<div style='display:flex;justify-content:space-between;margin-bottom:4px'>";
         html+="<span style='font-size:10px;color:rgba(255,255,255,.4)'>Фитнес-рейтинг</span>";
         html+="<span style='font-size:11px;font-weight:700;color:"+g.color+"'>"+rating+"/100</span></div>";
-        html+="<div style='height:4px;background:rgba(255,255,255,.08);border-radius:2px'><div style='height:100%;width:"+Math.min(100,rating)+"%;border-radius:2px;background:"+g.color+"'></div></div>";
+        html+="<div style='height:4px;background:rgba(255,255,255,.08);border-radius:2px'><div style='height:100%;width:"+Math.min(100,rating)+"%%;border-radius:2px;background:"+g.color+"'></div></div>";
         html+="</div>";
         html+="<div style='font-size:11px;color:rgba(240,240,248,.42);margin-bottom:3px'>Жир: ~"+p.an.fatPercent+"% · Мышцы: "+p.an.muscleLevel+"/100</div>";
         if(p.an.bodyType) html+="<div style='font-size:11px;color:rgba(240,240,248,.42);margin-bottom:4px'>"+p.an.bodyType+"</div>";
@@ -1332,7 +1325,7 @@ function onBodyFile(e){
         messages:[{role:"user",content:[
           {type:"image",source:{type:"base64",media_type:f.type,data:b}},
           {type:"text",text:
-            "Детально проанализируй телосложение на фото. Цель: "+getGoalPrompt()+". Вес: "+S.weight+"кг → "+S.targetWeight+"кг. Пол: "+(S.gender==="female"?"женский":"мужской")+".\n"+
+            "Детально проанализируй телосложение на фото. Цель: "+GP[S.gl]+". Вес: "+S.weight+"кг → "+S.targetWeight+"кг. Пол: "+(S.gender==="female"?"женский":"мужской")+".\n"+
             "ОПРЕДЕЛИ ТОЧНО:\n"+
             "1. % жира тела (смотри на складки, рельеф мышц, живот, талию)\n"+
             "2. Уровень мышц 1-100 (видимость мышц, объём, симметрия)\n"+
@@ -1401,11 +1394,11 @@ function downloadCard(){
 }
 
 // ═══════════════════════════════════════════════════════════════
-// SUB-GOALS SYSTEM
+// SUB-GOALS
 // ═══════════════════════════════════════════════════════════════
 var SUB_GOALS={
   loss:[
-    {id:"loss_soft",label:"Мягкое похудение",desc:"-0.5 кг/мес, без жертв",icon:"🌿",color:"#ff9432",calFactor:0.88,proteinFactor:1.5,deficit:220,training:"2-3 тренировки в неделю"},
+    {id:"loss_soft",label:"Мягкое похудение",desc:"-0.5 кг/мес, без жертв",icon:"🌿",color:"#ff9432",calFactor:0.88,proteinFactor:1.5,deficit:220,training:"2-3 тренировки/нед"},
     {id:"loss_fast",label:"Быстрое похудение",desc:"-1.5 кг/мес, тренировки обязательны",icon:"⚡",color:"#ff5733",calFactor:0.82,proteinFactor:1.8,deficit:580,training:"4 тренировки/нед (3 силовых + 1 кардио)"}
   ],
   cutting:[
@@ -1422,42 +1415,30 @@ var SUB_GOALS={
   ]
 };
 
-function getGoalPrompt(){
-  var base=getGoalPrompt()||"";
-  if(S.subGlData){
-    base=base+" | Режим: "+S.subGlData.label+" | "+S.subGlData.desc+" | Тренировки: "+S.subGlData.training;
-  }
-  return base;
-}
-
 function renderSubGoals(goalId){
   var sc=document.getElementById("sub-goals-container");
   if(!sc) return;
   var g=null;
   for(var gi=0;gi<GOALS.length;gi++){if(GOALS[gi].id===goalId){g=GOALS[gi];break;}}
   var subs=SUB_GOALS[goalId];
-  if(!subs||!g){
+  if(!subs){
     sc.innerHTML=""; sc.style.display="none";
     var nb=document.getElementById("goal-next-btn");
     if(nb&&g){nb.style.background=g.color;nb.style.color="#000";}
     return;
   }
   var h="<div style='margin-top:6px;padding:14px;background:"+g.color+"0a;border:1.5px solid "+g.color+"28;border-radius:14px'>";
-  h+="<div style='font-size:11px;color:"+g.color+";font-weight:700;margin-bottom:10px;letter-spacing:.04em'>ВЫБЕРИ РЕЖИМ:</div>";
+  h+="<div style='font-size:11px;color:"+g.color+";font-weight:700;margin-bottom:10px'>ВЫБЕРИ РЕЖИМ:</div>";
   for(var si=0;si<subs.length;si++){
     var s=subs[si];
     h+="<div id='sub-"+s.id+"' data-goal='"+goalId+"' data-sub='"+s.id+"' onclick='onSubClick(this)' ";
-    h+="style='cursor:pointer;padding:12px;border-radius:10px;border:1.5px solid rgba(255,255,255,.08);";
-    h+="background:rgba(255,255,255,.03);margin-bottom:"+(si<subs.length-1?"8px":"0")+"'>";
+    h+="style='cursor:pointer;padding:12px;border-radius:10px;border:1.5px solid rgba(255,255,255,.08);background:rgba(255,255,255,.03);margin-bottom:"+(si<subs.length-1?"8":"0")+"px'>";
     h+="<div style='display:flex;align-items:center;gap:10px'>";
     h+="<span style='font-size:22px'>"+s.icon+"</span>";
     h+="<div style='flex:1'>";
     h+="<div style='font-weight:700;font-size:13px;color:#f0f0f8' id='sub-lbl-"+s.id+"'>"+s.label+"</div>";
-    h+="<div style='font-size:11px;color:rgba(255,255,255,.42);margin-top:2px'>"+s.desc+"</div>";
-    h+="</div>";
-    h+="<div id='sub-chk-"+s.id+"' style='display:none;width:18px;height:18px;border-radius:50%;";
-    h+="background:"+s.color+";flex-shrink:0;align-items:center;justify-content:center;";
-    h+="font-size:10px;font-weight:900;color:#000'>v</div>";
+    h+="<div style='font-size:11px;color:rgba(255,255,255,.42);margin-top:2px'>"+s.desc+"</div></div>";
+    h+="<div id='sub-chk-"+s.id+"' style='display:none;width:18px;height:18px;border-radius:50%;background:"+s.color+";flex-shrink:0;align-items:center;justify-content:center;font-size:11px;font-weight:900;color:#000'>✓</div>";
     h+="</div></div>";
   }
   h+="</div>";
@@ -1476,15 +1457,11 @@ function onSubClick(el){
   if(!sub) return;
   S.subGl=subId; S.subGlData=sub;
   for(var i=0;i<subs.length;i++){
-    var s=subs[i];
+    var s=subs[i]; var active=(s.id===subId);
     var card=document.getElementById("sub-"+s.id);
     var chk=document.getElementById("sub-chk-"+s.id);
     var lbl=document.getElementById("sub-lbl-"+s.id);
-    var active=(s.id===subId);
-    if(card){
-      card.style.borderColor=active?s.color:"rgba(255,255,255,.08)";
-      card.style.background=active?(s.color+"18"):"rgba(255,255,255,.03)";
-    }
+    if(card){card.style.borderColor=active?s.color:"rgba(255,255,255,.08)";card.style.background=active?s.color+"18":"rgba(255,255,255,.03)";}
     if(chk) chk.style.display=active?"flex":"none";
     if(lbl) lbl.style.color=active?s.color:"#f0f0f8";
   }
