@@ -1500,7 +1500,7 @@ function downloadCard(){
 // ═══════════════════════════════════════════════════════════════
 function callClaude(messages,system){
   return fetch("/api/claude",{method:"POST",headers:{"Content-Type":"application/json"},
-    body:JSON.stringify({model:"claude-haiku-4-5",max_tokens:1000,...(system?{system:system}:{}),messages:messages})
+    body:(function(){var b={model:"claude-haiku-4-5",max_tokens:1000,messages:messages};if(system)b.system=system;return JSON.stringify(b);}())
   }).then(function(r){return r.json();}).then(function(d){
     if(d.error) throw new Error(d.error.message||JSON.stringify(d.error));
     var txt=d.content[0].text.replace(/```json|```/g,"").trim();
@@ -1520,6 +1520,14 @@ window.addEventListener("DOMContentLoaded",function(){
   renderOb();
   showScreen("onboard");
 });
+// Fallback in case DOMContentLoaded already fired
+if(document.readyState==="complete"||document.readyState==="interactive"){
+  setTimeout(function(){
+    if(!document.getElementById("ob-content").innerHTML){
+      renderGoals();renderOb();showScreen("onboard");
+    }
+  },50);
+}
 </script>
 </body>
 </html>
