@@ -1079,13 +1079,13 @@ function showWeeklyPlan(){
   document.getElementById("plan-modal").style.display="flex";
   fetch("/api/claude",{method:"POST",headers:{"Content-Type":"application/json"},
     body:JSON.stringify({model:"claude-haiku-4-5",max_tokens:3000,
-      system:"Ты профессиональный диетолог. Составляй реалистичные планы с точными граммами. Верни ТОЛЬКО валидный JSON без markdown.",
+      system:"Ты диетолог. Составляй БЮДЖЕТНЫЕ планы из доступных продуктов: яйца, куриные бёдра, гречка, рис, овсянка, творог, кефир, картофель, капуста, морковь, огурцы, помидоры, яблоки, бананы. БЕЗ стейков и лосося. Точные граммы. Верни ТОЛЬКО валидный JSON.",
       messages:[{role:"user",content:
         "Составь ПЕРСОНАЛЬНЫЙ план питания на 7 дней.\n"+
         "Пол: "+(S.gender==="female"?"женщина":"мужчина")+". Возраст: "+S.age+"лет. Вес: "+S.weight+"кг → "+S.targetWeight+"кг.\n"+
         "Цель: "+GP[S.gl]+".\n"+
         "Норма: "+S.dg.calories+" ккал/день, белок "+S.dg.protein+"г, жиры "+S.dg.fat+"г, углеводы "+S.dg.carbs+"г.\n"+
-        "Реальные блюда с точными граммами. РАЗНЫЕ блюда каждый день.\n"+
+        "Бюджетные доступные продукты. Разные блюда каждый день. Точные граммы.\n"+
         "JSON: {days:[{day:\"Понедельник\",breakfast:\"блюдо с граммами\",lunch:\"блюдо с граммами\",dinner:\"блюдо с граммами\",snack:\"перекус с граммами\",cal:number}]}"
       }]})
   }).then(function(r){return r.json();}).then(function(d){
@@ -1348,6 +1348,21 @@ function onBodyFile(e){
         an=JSON.parse(txt);
       }catch(err){an=null;}
       S.bodyPics.push({id:Date.now(),date:new Date().toLocaleDateString("ru",{day:"numeric",month:"long"}),url:url,an:an});
+      // Update macros based on body composition
+      if(an&&an.fatPercent&&S.weight&&S.dg){
+        var leanMass=S.weight*(1-an.fatPercent/100);
+        // Adjust protein based on lean mass (more accurate than total weight)
+        var protMulti={loss:2.0,cutting:2.4,bulking:2.2,maint:1.8,sport:2.0,healthy:1.6};
+        var pm=protMulti[S.gl]||2.0;
+        var newProt=Math.round(leanMass*pm);
+        var newFat=Math.max(Math.round(S.dg.calories*0.27/9),35);
+        var newCarbs=Math.max(Math.round((S.dg.calories-newProt*4-newFat*9)/4),40);
+        S.dg.protein=newProt;
+        S.dg.fat=newFat;
+        S.dg.carbs=newCarbs;
+        // Re-render dashboard if on main screen
+        if(S.currentTab==="main") renderMacroBars();
+      }
       S.bodyLoading=false;renderBodyScreen();
     }).catch(function(){
       S.bodyPics.push({id:Date.now(),date:new Date().toLocaleDateString("ru",{day:"numeric",month:"long"}),url:url,an:null});
