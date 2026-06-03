@@ -1129,6 +1129,12 @@ function showWeeklyPlan(){
 // BODY TWIN AI
 // ═══════════════════════════════════════════════════════════════
 function renderBodyScreen(){
+  if(renderBodyScreen._busy) return;
+  renderBodyScreen._busy=true;
+  try { _renderBodyScreenInner(); } catch(e){ console.log("renderBodyScreen error:",e); }
+  renderBodyScreen._busy=false;
+}
+function _renderBodyScreenInner(){
   var g=GOALS.filter(function(x){return x.id===S.gl;})[0];
   var bc=document.getElementById("body-content");
   if(!bc) return;
@@ -1212,7 +1218,7 @@ function renderBodyScreen(){
         html+="<div style='display:flex;justify-content:space-between;margin-bottom:4px'>";
         html+="<span style='font-size:10px;color:rgba(255,255,255,.4)'>Фитнес-рейтинг</span>";
         html+="<span style='font-size:11px;font-weight:700;color:"+g.color+"'>"+rating+"/100</span></div>";
-        html+="<div style='height:4px;background:rgba(255,255,255,.08);border-radius:2px'><div style='height:100%;width:"+Math.min(100,rating)+"%%;border-radius:2px;background:"+g.color+"'></div></div>";
+        html+="<div style='height:4px;background:rgba(255,255,255,.08);border-radius:2px'><div style='height:100%;width:"+Math.min(100,rating)+"%;border-radius:2px;background:"+g.color+"'></div></div>";
         html+="</div>";
         html+="<div style='font-size:11px;color:rgba(240,240,248,.42);margin-bottom:3px'>Жир: ~"+p.an.fatPercent+"% · Мышцы: "+p.an.muscleLevel+"/100</div>";
         if(p.an.bodyType) html+="<div style='font-size:11px;color:rgba(240,240,248,.42);margin-bottom:4px'>"+p.an.bodyType+"</div>";
