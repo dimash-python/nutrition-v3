@@ -71,14 +71,47 @@ textarea.inp{resize:none;line-height:1.6}
 </style>
 </head>
 <body>
+<div id="version-badge" style="position:fixed;top:8px;right:8px;background:#00e87a;color:#000;font-size:10px;font-weight:900;padding:4px 8px;border-radius:6px;z-index:99999;font-family:monospace">v3.1</div>
+<div id="err-display" style="display:none;position:fixed;top:0;left:0;right:0;background:rgba(255,0,0,.9);color:#fff;font-size:12px;padding:12px;z-index:99999;word-break:break-all"></div>
 <div id="app">
 
   <!-- ONBOARDING -->
   <div id="scr-onboard" class="screen fade-in" style="padding:0;overflow:hidden">
     <div style="height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 28px;text-align:center;background:linear-gradient(180deg,#0d0d1a 0%,#07070e 100%)">
-      <div id="ob-content" style="max-width:320px;width:100%"></div>
-      <div id="ob-dots" style="display:flex;gap:8px;margin-top:28px"></div>
-      <button id="ob-btn" class="btn btn-primary" style="margin-top:24px;width:100%;max-width:300px" onclick="nextSlide()">Начать</button>
+
+      <!-- SLIDE 1 static content - always visible -->
+      <div id="ob-slide-wrap" style="max-width:320px;width:100%">
+        <div id="ob-s0">
+          <div style="font-size:80px;margin-bottom:24px;line-height:1">🤖</div>
+          <div style="font-family:Unbounded,sans-serif;font-size:26px;font-weight:900;line-height:1.2;margin-bottom:16px">AI Nutrition<br/>Coach</div>
+          <div style="color:rgba(240,240,248,.42);font-size:15px;line-height:1.7">Фото еды → AI считает калории и говорит что съесть дальше</div>
+        </div>
+        <div id="ob-s1" style="display:none">
+          <div style="font-size:80px;margin-bottom:24px;line-height:1">📸</div>
+          <div style="font-family:Unbounded,sans-serif;font-size:24px;font-weight:900;line-height:1.2;margin-bottom:16px">Фото → КБЖУ<br/>за 5 секунд</div>
+          <div style="color:rgba(240,240,248,.42);font-size:15px;line-height:1.7">AI видит все продукты и считает каждый грамм отдельно</div>
+        </div>
+        <div id="ob-s2" style="display:none">
+          <div style="font-size:80px;margin-bottom:24px;line-height:1">🧠</div>
+          <div style="font-family:Unbounded,sans-serif;font-size:24px;font-weight:900;line-height:1.2;margin-bottom:16px">Умный совет<br/>после каждой еды</div>
+          <div style="color:rgba(240,240,248,.42);font-size:15px;line-height:1.7">Говорит что съесть дальше под цель: похудение, масса или рельеф</div>
+        </div>
+        <div id="ob-s3" style="display:none">
+          <div style="font-size:80px;margin-bottom:24px;line-height:1">🪞</div>
+          <div style="font-family:Unbounded,sans-serif;font-size:24px;font-weight:900;line-height:1.2;margin-bottom:16px">Body Twin AI</div>
+          <div style="color:rgba(240,240,248,.42);font-size:15px;line-height:1.7">Загрузи фото тела — AI оценит % жира, мышцы и даст план</div>
+        </div>
+      </div>
+
+      <!-- Dots -->
+      <div style="display:flex;gap:8px;margin-top:28px" id="ob-dots-wrap">
+        <div id="dot0" style="height:8px;width:24px;border-radius:4px;background:var(--c)"></div>
+        <div id="dot1" style="height:8px;width:8px;border-radius:4px;background:rgba(255,255,255,.2)"></div>
+        <div id="dot2" style="height:8px;width:8px;border-radius:4px;background:rgba(255,255,255,.2)"></div>
+        <div id="dot3" style="height:8px;width:8px;border-radius:4px;background:rgba(255,255,255,.2)"></div>
+      </div>
+
+      <button id="ob-next-btn" class="btn btn-primary" style="margin-top:24px;width:100%;max-width:300px" onclick="obNext()">Начать →</button>
       <button onclick="showScreen('goal')" style="margin-top:10px;background:none;border:none;color:rgba(255,255,255,.25);font-size:13px;cursor:pointer;font-family:inherit;padding:8px 16px">Пропустить</button>
     </div>
   </div>
@@ -240,6 +273,11 @@ textarea.inp{resize:none;line-height:1.6}
 </div>
 
 <script>
+window.onerror=function(msg,src,line){
+  var el=document.getElementById("err-display");
+  if(el){el.style.display="block";el.textContent="JS Error line "+line+": "+msg;}
+  return false;
+};
 // ═══════════════════════════════════════════════════════════════
 // GOALS & CONSTANTS
 // ═══════════════════════════════════════════════════════════════
@@ -1338,8 +1376,8 @@ function renderBodyScreen(){
   html+="<div class='card' style='margin-bottom:14px'>";
   html+="<div style='display:flex;gap:8px;align-items:flex-end;margin-bottom:10px'>";
   html+="<div style='flex:1'><div style='font-size:11px;color:rgba(255,255,255,.42);margin-bottom:5px'>Обновить вес (кг)</div>";
-  html+="<input id='new-wt' class='inp' type='number' placeholder='"+cw+"' value='"+cw+"' min='30' max='300'/></div>";
-  html+="<button onclick='addWeightEntry(document.getElementById("new-wt").value)' style='padding:12px 16px;font-size:13px;font-weight:700;border-radius:10px;background:var(--c);color:#000;border:none;cursor:pointer;font-family:inherit'>Сохранить</button></div>";
+  html+="<input id='upd-wt' class='inp' type='number' placeholder='"+cw+"' value='"+cw+"' min='30' max='300'/></div>";
+  html+="<button onclick='saveNewWeight()' style='padding:12px 16px;font-size:13px;font-weight:700;border-radius:10px;background:var(--c);color:#000;border:none;cursor:pointer;font-family:inherit'>Сохранить</button></div>";
   html+="<div id='weight-graph-area'></div></div>";
 
   // Share card
@@ -1528,6 +1566,7 @@ function onSubClick(el){
 }
 
 // WEIGHT LOG
+function saveNewWeight(){var el=document.getElementById("upd-wt");if(el)addWeightEntry(el.value);}
 function addWeightEntry(val){
   var w=parseFloat(val);
   if(!w||w<20||w>300) return;
@@ -1775,9 +1814,24 @@ function showShoppingList(){
 }
 
 
+var obCur=0;
+function obNext(){
+  var slides=["ob-s0","ob-s1","ob-s2","ob-s3"];
+  var dots=["dot0","dot1","dot2","dot3"];
+  obCur++;
+  if(obCur>=slides.length){showScreen("goal");return;}
+  for(var i=0;i<slides.length;i++){
+    var s=document.getElementById(slides[i]);
+    var d=document.getElementById(dots[i]);
+    if(s) s.style.display=i===obCur?"block":"none";
+    if(d){d.style.width=i===obCur?"24px":"8px";d.style.background=i===obCur?"var(--c)":"rgba(255,255,255,.2)";}
+  }
+  var btn=document.getElementById("ob-next-btn");
+  if(btn) btn.textContent=obCur===slides.length-1?"Выбрать цель →":"Дальше →";
+}
+
 window.addEventListener("DOMContentLoaded",function(){
-  renderGoals();
-  renderOb();
+  try{renderGoals();}catch(e){console.log("renderGoals error:",e);}
   showScreen("onboard");
 });
 </script>
