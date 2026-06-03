@@ -75,60 +75,15 @@ textarea.inp{resize:none;line-height:1.6}
 
   <!-- ONBOARDING -->
   <div id="scr-onboard" class="screen fade-in" style="padding:0;overflow:hidden">
-    <div style="position:relative;height:100vh;overflow:hidden">
-      <div class="ob-slide" id="ob0" style="background:linear-gradient(180deg,#0d0d1a 0%,#07070e 100%)">
-        <div class="ob-icon">🤖</div>
-        <div class="h1" style="font-size:32px;margin-bottom:16px">AI Nutrition<br/>Coach</div>
-        <div class="text-muted" style="font-size:16px;line-height:1.7">Фотографируй еду — AI мгновенно считает калории и говорит что съесть дальше</div>
-        <div class="ob-dots" id="ob-dots">
-          <div class="ob-dot active"></div>
-          <div class="ob-dot"></div>
-          <div class="ob-dot"></div>
-          <div class="ob-dot"></div>
-        </div>
-        <button class="btn btn-primary" style="margin-top:32px;width:100%;max-width:300px" onclick="nextSlide()">Начать →</button>
-      </div>
-      <div class="ob-slide hidden" id="ob1" style="background:#07070e">
-        <div class="ob-icon">📸</div>
-        <div class="h1" style="font-size:26px;margin-bottom:16px">Фото еды<br/>→ КБЖУ за 5 сек</div>
-        <div class="text-muted" style="font-size:15px;line-height:1.7">AI видит курицу, рис, соус — и считает каждый грамм отдельно. Точнее чем любое приложение</div>
-        <div class="ob-dots">
-          <div class="ob-dot"></div>
-          <div class="ob-dot active"></div>
-          <div class="ob-dot"></div>
-          <div class="ob-dot"></div>
-        </div>
-        <button class="btn btn-primary" style="margin-top:32px;width:100%;max-width:300px" onclick="nextSlide()">Дальше →</button>
-      </div>
-      <div class="ob-slide hidden" id="ob2" style="background:#07070e">
-        <div class="ob-icon">🧠</div>
-        <div class="h1" style="font-size:26px;margin-bottom:16px">Умный совет<br/>после каждой еды</div>
-        <div class="text-muted" style="font-size:15px;line-height:1.7">Не просто считает — говорит что съесть дальше под твою цель: похудение, масса или рельеф</div>
-        <div class="ob-dots">
-          <div class="ob-dot"></div>
-          <div class="ob-dot"></div>
-          <div class="ob-dot active"></div>
-          <div class="ob-dot"></div>
-        </div>
-        <button class="btn btn-primary" style="margin-top:32px;width:100%;max-width:300px" onclick="nextSlide()">Дальше →</button>
-      </div>
-      <div class="ob-slide hidden" id="ob3" style="background:#07070e">
-        <div class="ob-icon">🎯</div>
-        <div class="h1" style="font-size:26px;margin-bottom:16px">Твой личный<br/>нутрициолог</div>
-        <div class="text-muted" style="font-size:15px;line-height:1.7">Персональный план, история питания, сравнение недель и план на 7 дней от AI</div>
-        <div class="ob-dots">
-          <div class="ob-dot"></div>
-          <div class="ob-dot"></div>
-          <div class="ob-dot"></div>
-          <div class="ob-dot active"></div>
-        </div>
-        <button class="btn btn-primary" style="margin-top:32px;width:100%;max-width:300px" onclick="showScreen('goal')">Выбрать цель →</button>
-        <button class="btn" style="margin-top:10px;width:100%;max-width:300px;background:none;color:rgba(255,255,255,.3);font-size:13px" onclick="showScreen('goal')">Пропустить</button>
-      </div>
+    <div style="height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 28px;text-align:center;background:linear-gradient(180deg,#0d0d1a 0%,#07070e 100%)">
+      <div id="ob-content" style="max-width:320px;width:100%"></div>
+      <div id="ob-dots" style="display:flex;gap:8px;margin-top:28px"></div>
+      <button id="ob-btn" class="btn btn-primary" style="margin-top:24px;width:100%;max-width:300px" onclick="nextSlide()">Начать →</button>
+      <button onclick="showScreen('goal')" style="margin-top:10px;background:none;border:none;color:rgba(255,255,255,.25);font-size:13px;cursor:pointer;font-family:inherit;padding:8px 16px">Пропустить</button>
     </div>
   </div>
 
-  <!-- GOAL -->
+<!-- GOAL -->
   <div id="scr-goal" class="screen hidden" style="padding:48px 20px 32px">
     <div class="tag" style="background:rgba(0,232,122,.1);color:#00e87a;margin-bottom:24px">✦ AI Nutrition Coach</div>
     <div class="h1" style="margin-bottom:8px">Выбери<br/>свою цель</div>
