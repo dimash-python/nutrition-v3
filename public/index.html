@@ -134,6 +134,7 @@ textarea.inp{resize:none;line-height:1.6}
     <div class="h1" style="margin-bottom:8px">Выбери<br/>свою цель</div>
     <p class="text-muted" style="margin-bottom:24px">AI подберёт план под твой пол, тело и режим</p>
     <div id="goals-list" style="display:flex;flex-direction:column;gap:8px"></div>
+    <div id="sub-goals-container" style="display:none"></div>
     <button class="btn" id="goal-next-btn" style="margin-top:20px;background:rgba(255,255,255,.06);color:rgba(255,255,255,.2)" onclick="goToData()">Продолжить →</button>
   </div>
 
@@ -294,6 +295,41 @@ var GOALS=[
   {id:"sport",  icon:"⚡",title:"Спорт",       sub:"Выносливость",     desc:"Энергия и производительность",color:"#fbbf24",bg:"rgba(251,191,36,.13)", tip:"Углеводы за 2-3ч до тренировки. Белок сразу после. Электролиты при нагрузках >60мин."},
   {id:"healthy",icon:"🌿",title:"Здоровье",   sub:"Правильное питание",desc:"Натуральное и сбалансированное",color:"#a855f7",bg:"rgba(168,85,247,.13)",tip:"Правило тарелки: ½ овощи, ¼ белок, ¼ углеводы. Гибкость без вины — ключ к привычке."},
 ];
+
+var SUB_GOALS={
+  loss:[
+    {id:"loss_soft", label:"Мягкое похудение", desc:"−0.5 кг/мес · без стресса · гибкое питание",
+     icon:"🌿", color:"#ff9432", calFactor:0.88, proteinFactor:1.5, deficit:220,
+     training:"2-3 тренировки/нед", tip:"Дефицит всего 220 ккал — даже не почувствуешь. Идеал для тех кто хочет без жертв и срывов."},
+    {id:"loss_fast", label:"Быстрое похудение", desc:"−1.5 кг/мес · тренировки обязательны",
+     icon:"⚡", color:"#ff5733", calFactor:0.82, proteinFactor:1.8, deficit:580,
+     training:"4 тренировки/нед (3 силовых + 1 кардио)", tip:"Дефицит 580 ккал + тренировки = результат за 2-3 мес. Требует дисциплины, зато работает быстро."}
+  ],
+  cutting:[
+    {id:"cutting_regular", label:"Обычная сушка", desc:"−1 кг/мес · 4-6 мес · сохраняет мышцы",
+     icon:"🔥", color:"#ff5733", calFactor:0.82, proteinFactor:2.0, deficit:450,
+     training:"3-4 силовых/нед + 2 кардио", tip:"80% чистое питание, 20% гибкость. Мышцы сохраняются, жир уходит постепенно. Долгосрочный результат."},
+    {id:"cutting_hard", label:"Жёсткая сушка", desc:"−2 кг/мес · 1-3 мес · к событию",
+     icon:"💥", color:"#ff2200", calFactor:0.77, proteinFactor:2.5, deficit:700,
+     training:"5 дней: 3 силовых + 2 HIIT кардио", tip:"Углеводы только в дни тренировок. Белок 2.5г/кг защищает мышцы. Идеально если через 2-3 мес важная дата."}
+  ],
+  bulking:[
+    {id:"bulk_clean", label:"Чистый набор", desc:"+0.5 кг/мес · минимум жира",
+     icon:"🎯", color:"#00e87a", calFactor:1.08, proteinFactor:2.0, deficit:-200,
+     training:"4 силовых/нед · прогрессивная нагрузка", tip:"Профицит 200 ккал — почти весь прирост идёт в мышцы, не жир. Медленно, но максимально чисто."},
+    {id:"bulk_aggressive", label:"Агрессивный набор", desc:"+1.5 кг/мес · максимум массы",
+     icon:"💪", color:"#00ff88", calFactor:1.18, proteinFactor:2.2, deficit:-500,
+     training:"5 силовых/нед · тяжёлые базовые упражнения", tip:"Профицит 500 ккал = быстрый рост. Часть идёт в жир — потом сушка. Для тех кто хочет массу быстро."}
+  ],
+  sport:[
+    {id:"sport_endurance", label:"Выносливость", desc:"бег · вело · плавание · марафон",
+     icon:"🏃", color:"#fbbf24", calFactor:1.1, proteinFactor:1.6, deficit:-100,
+     training:"5-6 кардио/нед + 2 силовых", tip:"55-60% калорий из углеводов. Электролиты при нагрузках >60 мин. Белок для восстановления мышц."},
+    {id:"sport_strength", label:"Сила и скорость", desc:"CrossFit · единоборства · командный спорт",
+     icon:"⚡", color:"#ff9432", calFactor:1.12, proteinFactor:2.0, deficit:-150,
+     training:"4-5 силовых/нед + специализация", tip:"Белок 2г/кг для силы и восстановления. Углеводы вокруг тренировок. Сон 8+ часов — ключевой фактор."}
+  ]
+};
 var BSTATES={
   burning:{icon:"🔥",label:"Жир горит",    color:"#ff5733"},
   building:{icon:"💪",label:"Мышцы растут",color:"#00e87a"},
@@ -309,6 +345,13 @@ var GP={
   sport:  "СПОРТ: углеводы для энергии, белок для восстановления",
   healthy:"ЗДОРОВЬЕ: цельные продукты, правило тарелки, умеренность",
 };
+function getGoalPrompt(){
+  var base=getGoalPrompt()||"";
+  if(S.subGlData){
+    base+=" · Режим: "+S.subGlData.label+" · "+S.subGlData.desc+" · Тренировки: "+S.subGlData.training;
+  }
+  return base;
+}
 var HUNGER_Q=[
   {q:"Ты правда голоден?",sub:"Настоящий голод или привычка?"},
   {q:"Подожди 5 минут",sub:"Иногда жажда маскируется под голод — выпей воды"},
@@ -322,7 +365,7 @@ var HUNGER_Q=[
 // ═══════════════════════════════════════════════════════════════
 var XP_MAX=5000;
 var S={
-  gl:null,gender:null,name:"",weight:0,height:0,age:0,targetWeight:0,
+  gl:null,subGl:null,subGlData:null,gender:null,name:"",weight:0,height:0,age:0,targetWeight:0,
   dg:{calories:2000,protein:150,fat:65,carbs:200},
   st:{calories:0,protein:0,fat:0,carbs:0},
   meals:[],lv:1,xp:0,str:0,water:0,bs:"burning",missionDone:false,
@@ -433,6 +476,7 @@ function renderGoals(){
   });
 }
 function selectGoal(id){
+  S.gl=id; S.subGl=null; S.subGlData=null;
   GOALS.forEach(function(g){
     var card=document.getElementById("gc-"+g.id);
     var chk=document.getElementById("gc-chk-"+g.id);
@@ -444,23 +488,88 @@ function selectGoal(id){
     if(tip) tip.style.display=active?"block":"none";
     if(title) title.style.color=active?g.color:"#f0f0f8";
   });
-  S.gl=id;
   var g=GOALS.filter(function(x){return x.id===id;})[0];
   setCSSVars(g);
+  // Show sub-options if available
+  var subContainer=document.getElementById("sub-goals-container");
+  if(subContainer){
+    var subs=SUB_GOALS[id];
+    if(subs){
+      var html="<div style='margin-top:8px;padding:12px 14px;background:"+g.color+"08;border:1px solid "+g.color+"22;border-radius:14px'>";
+      html+="<div style='font-size:11px;color:"+g.color+";font-weight:700;margin-bottom:10px'>ВЫБЕРИ РЕЖИМ:</div>";
+      subs.forEach(function(s){
+        html+="<div id='sub-"+s.id+"' onclick='selectSubGoal(""+id+"",""+s.id+"")' style='cursor:pointer;padding:10px 12px;border-radius:10px;border:1.5px solid rgba(255,255,255,.08);background:rgba(255,255,255,.03);margin-bottom:8px;transition:all .2s'>";
+        html+="<div style='display:flex;align-items:center;gap:10px'>";
+        html+="<span style='font-size:20px'>"+s.icon+"</span>";
+        html+="<div style='flex:1'><div style='font-weight:700;font-size:13px' id='sub-lbl-"+s.id+"'>"+s.label+"</div>";
+        html+="<div style='font-size:11px;color:rgba(255,255,255,.42);margin-top:2px'>"+s.desc+"</div></div>";
+        html+="<div id='sub-chk-"+s.id+"' style='display:none;width:18px;height:18px;border-radius:50%;background:"+s.color+";flex-shrink:0;align-items:center;justify-content:center;font-size:11px;font-weight:900;color:#000'>✓</div>";
+        html+="</div></div>";
+      });
+      html+="</div>";
+      subContainer.innerHTML=html;
+      subContainer.style.display="block";
+    } else {
+      subContainer.innerHTML="";
+      subContainer.style.display="none";
+      // No sub-goals needed, enable continue
+      var nb=document.getElementById("goal-next-btn");
+      if(nb){nb.style.background=g.color;nb.style.color="#000";}
+    }
+  }
+}
+
+function selectSubGoal(goalId,subId){
+  S.subGl=subId;
+  var g=GOALS.filter(function(x){return x.id===goalId;})[0];
+  var subs=SUB_GOALS[goalId]||[];
+  var sub=subs.filter(function(x){return x.id===subId;})[0];
+  if(!sub) return;
+  S.subGlData=sub;
+  // Update UI
+  subs.forEach(function(s){
+    var card=document.getElementById("sub-"+s.id);
+    var chk=document.getElementById("sub-chk-"+s.id);
+    var lbl=document.getElementById("sub-lbl-"+s.id);
+    var active=s.id===subId;
+    if(card){card.style.borderColor=active?s.color:"rgba(255,255,255,.08)";card.style.background=active?s.color+"15":"rgba(255,255,255,.03)";}
+    if(chk) chk.style.display=active?"flex":"none";
+    if(lbl) lbl.style.color=active?s.color:"#f0f0f8";
+  });
+  // Show tip
+  var tipEl=document.getElementById("sub-tip");
+  if(!tipEl){
+    tipEl=document.createElement("div");
+    tipEl.id="sub-tip";
+    tipEl.style.cssText="margin-top:8px;padding:10px 12px;background:"+sub.color+"10;border:1px solid "+sub.color+"25;border-radius:10px;font-size:12px;color:rgba(240,240,248,.75);line-height:1.6";
+    var sc=document.getElementById("sub-goals-container");
+    if(sc) sc.appendChild(tipEl);
+  }
+  tipEl.textContent="💡 "+sub.tip;
+  tipEl.style.display="block";
+  // Enable continue button
   var nb=document.getElementById("goal-next-btn");
-  if(nb){nb.style.background=g.color;nb.style.color="#000";}
+  if(nb){nb.style.background=sub.color||g.color;nb.style.color="#000";}
 }
 function goToData(){
   if(!S.gl) return;
+  // Check if sub-goal required but not selected
+  if(SUB_GOALS[S.gl]&&!S.subGl){
+    var sc=document.getElementById("sub-goals-container");
+    if(sc){sc.style.border="1px solid rgba(255,87,51,.5)";setTimeout(function(){sc.style.border="";},1500);}
+    return;
+  }
   var g=GOALS.filter(function(x){return x.id===S.gl;})[0];
   setCSSVars(g);
   var gr=document.getElementById("goal-reminder");
+  var _sub=S.subGlData;
   if(gr) gr.innerHTML=
     "<div style='display:flex;align-items:center;gap:10px'>" +
-      "<span style='font-size:22px'>"+g.icon+"</span>" +
+      "<span style='font-size:22px'>"+(_sub?_sub.icon:g.icon)+"</span>" +
       "<div><div style='font-size:11px;color:rgba(255,255,255,.42)'>Выбранная цель</div>" +
-      "<div style='font-weight:700;color:"+g.color+"'>"+g.title+" — "+g.sub+"</div></div>" +
-    "</div>";
+      "<div style='font-weight:700;color:"+(_sub?_sub.color:g.color)+"'>"+g.title+(_sub?" · "+_sub.label:"")+"</div>" +
+      (_sub?"<div style='font-size:11px;color:rgba(255,255,255,.42);margin-top:2px'>"+_sub.training+"</div>":"") +
+      "</div></div>";
   showScreen("data");
 }
 function setCSSVars(g){
@@ -484,10 +593,20 @@ function calcGoals(w,h,a,gender,activity,goal){
   var mults=[1.2,1.375,1.55,1.725,1.9];
   var bmr=gender==="female"?10*w+6.25*h-5*a-161:10*w+6.25*h-5*a+5;
   var tdee=bmr*(mults[Math.min(activity-1,4)]||1.55);
-  var calMap={loss:tdee*0.83,cutting:tdee*0.8,bulking:tdee*1.15,maint:tdee,sport:tdee*1.08,healthy:tdee};
-  var cal=Math.round(calMap[goal]||tdee);
-  var ppkg={loss:gender==="female"?1.6:1.8,cutting:gender==="female"?1.8:2.2,bulking:gender==="female"?1.6:2.0,maint:gender==="female"?1.3:1.6,sport:gender==="female"?1.5:1.8,healthy:gender==="female"?1.2:1.5};
-  var prot=Math.round(w*(ppkg[goal]||1.5));
+  // Use sub-goal params if available
+  var sub=S.subGlData;
+  var calFactor, protPerKg;
+  if(sub){
+    calFactor=sub.calFactor;
+    protPerKg=sub.proteinFactor;
+  } else {
+    var calMap={loss:0.83,cutting:0.8,bulking:1.15,maint:1.0,sport:1.08,healthy:1.0};
+    calFactor=calMap[goal]||1.0;
+    var ppkg={loss:gender==="female"?1.6:1.8,cutting:gender==="female"?1.8:2.2,bulking:gender==="female"?1.6:2.0,maint:gender==="female"?1.3:1.6,sport:gender==="female"?1.5:1.8,healthy:gender==="female"?1.2:1.5};
+    protPerKg=ppkg[goal]||1.5;
+  }
+  var cal=Math.round(calFactor*tdee);
+  var prot=Math.round(w*protPerKg);
   var fat=Math.max(Math.round(cal*0.27/9),35);
   var carbs=Math.max(Math.round((cal-prot*4-fat*9)/4),40);
   return {calories:cal,protein:prot,fat:fat,carbs:carbs,tdee:Math.round(tdee),bmr:Math.round(bmr)};
@@ -938,7 +1057,7 @@ function analyzePhoto(){
     "Ты профессиональный нутрициолог. Анализируй фото еды с максимальной точностью.\n"+
     "ОПРЕДЕЛИ ВСЕ продукты включая соусы и масло.\n"+
     "УЧИТЫВАЙ способ приготовления: жареное +30% калорий.\n"+
-    "Цель: "+GP[S.gl]+". Пол: "+(S.gender==="female"?"женский":"мужской")+". Вес: "+S.weight+"кг.\n"+
+    "Цель: "+getGoalPrompt()+". Пол: "+(S.gender==="female"?"женский":"мужской")+". Вес: "+S.weight+"кг.\n"+
     "Уже съел сегодня: "+mealsList+". Итого: "+S.st.calories+"/"+S.dg.calories+" ккал. Белок: "+S.st.protein+"/"+S.dg.protein+"г.\n"+
     "JSON: {dishes:[{name:string,weight:number,calories:number,protein:number,fat:number,carbs:number,cooking_method:string}],total:{calories:number,protein:number,fat:number,carbs:number,weight:number},notes:string}";
   fetch("/api/claude",{method:"POST",headers:{"Content-Type":"application/json"},
@@ -972,7 +1091,7 @@ function analyzeText(){
       system:"Ты AI нутрициолог. Верни ТОЛЬКО JSON без markdown.",
       messages:[{role:"user",content:
         "Проанализируй еду: \""+txt+"\". Учитывай типичные размеры порций.\n"+
-        "Цель: "+GP[S.gl]+". Уже съел: "+S.st.calories+"/"+S.dg.calories+" ккал.\n"+
+        "Цель: "+getGoalPrompt()+". Уже съел: "+S.st.calories+"/"+S.dg.calories+" ккал.\n"+
         "JSON: {dishes:[{name:string,weight:number,calories:number,protein:number,fat:number,carbs:number}],total:{calories:number,protein:number,fat:number,carbs:number,weight:number},notes:string}"
       }]})
   }).then(function(r){return r.json();}).then(function(d){
@@ -1002,7 +1121,7 @@ function finishAnalysis(a1){
       system:"Ты строгий AI нутрициолог. Давай КОНКРЕТНЫЕ РАЗНООБРАЗНЫЕ советы. Верни ТОЛЬКО JSON без markdown.",
       messages:[{role:"user",content:
         "Дай умный совет после приёма пищи. Будь конкретным и разнообразным — не повторяй стандартные советы.\n"+
-        "Цель: "+GP[S.gl]+". Пол: "+(S.gender==="female"?"женский":"мужской")+". Вес: "+S.weight+"кг.\n"+
+        "Цель: "+getGoalPrompt()+". Пол: "+(S.gender==="female"?"женский":"мужской")+". Вес: "+S.weight+"кг.\n"+
         "Только что съел: "+a1.dishes.map(function(d){return d.name;}).join(", ")+".\n"+
         "Уже ел сегодня: "+mealsList+".\n"+
         "Итого за день: "+nc+"/"+S.dg.calories+" ккал. Белок: "+np+"/"+S.dg.protein+"г. Жиры: "+nf+"/"+S.dg.fat+"г. Углеводы: "+nc2+"/"+S.dg.carbs+"г.\n"+
@@ -1111,9 +1230,9 @@ function showWeeklyPlan(){
       messages:[{role:"user",content:
         "Составь ПЕРСОНАЛЬНЫЙ план питания на 7 дней.\n"+
         "Пол: "+(S.gender==="female"?"женщина":"мужчина")+". Возраст: "+S.age+"лет. Вес: "+S.weight+"кг → "+S.targetWeight+"кг.\n"+
-        "Цель: "+GP[S.gl]+".\n"+
+        "Цель: "+getGoalPrompt()+".\n"+
         "Норма: "+S.dg.calories+" ккал/день, белок "+S.dg.protein+"г, жиры "+S.dg.fat+"г, углеводы "+S.dg.carbs+"г.\n"+
-        "Реальные блюда с точными граммами. РАЗНЫЕ блюда каждый день.\n"+
+        "Реальные блюда с точными граммами. РАЗНЫЕ блюда каждый день."+(S.subGlData?" Тренировки: "+S.subGlData.training+". Режим: "+S.subGlData.label:"")+"\n"+
         "JSON: {days:[{day:\"Понедельник\",breakfast:\"блюдо с граммами\",lunch:\"блюдо с граммами\",dinner:\"блюдо с граммами\",snack:\"перекус с граммами\",cal:number}]}"
       }]})
   }).then(function(r){return r.json();}).then(function(d){
@@ -1162,7 +1281,7 @@ function renderBodyScreen(){
   var cw=S.weight||70;
   var tw=S.targetWeight||(S.gl==="bulking"?cw+5:cw-5);
   var optMap={loss:-380,cutting:-500,bulking:280,maint:0,sport:-180,healthy:-120};
-  var optDiff=optMap[S.gl]||(-350);
+  var optDiff=S.subGlData?(S.subGlData.deficit>0?-S.subGlData.deficit:S.subGlData.deficit):(optMap[S.gl]||(-350));
   var optChg=(optDiff*30)/7700;
   var daysLeft=Math.round(Math.abs(cw-tw)*7700/Math.max(Math.abs(optDiff),50));
   var months=Math.round(daysLeft/30*10)/10;
@@ -1353,7 +1472,7 @@ function onBodyFile(e){
         messages:[{role:"user",content:[
           {type:"image",source:{type:"base64",media_type:f.type,data:b}},
           {type:"text",text:
-            "Детально проанализируй телосложение на фото. Цель: "+GP[S.gl]+". Вес: "+S.weight+"кг → "+S.targetWeight+"кг. Пол: "+(S.gender==="female"?"женский":"мужской")+".\n"+
+            "Детально проанализируй телосложение на фото. Цель: "+getGoalPrompt()+". Вес: "+S.weight+"кг → "+S.targetWeight+"кг. Пол: "+(S.gender==="female"?"женский":"мужской")+".\n"+
             "ОПРЕДЕЛИ ТОЧНО:\n"+
             "1. % жира тела (смотри на складки, рельеф мышц, живот, талию)\n"+
             "2. Уровень мышц 1-100 (видимость мышц, объём, симметрия)\n"+
