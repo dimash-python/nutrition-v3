@@ -238,7 +238,7 @@ textarea.inp{resize:none;line-height:1.6}
       <button class="nav-plus" onclick="openFood()">+</button>
       <span style="font-size:11px;color:rgba(255,255,255,.28);margin-top:3px" id="nav-food-label">Еда</span>
     </div>
-    <button class="nav-btn" id="nav-plan" onclick="showWeeklyPlan()">
+    <button class="nav-btn" id="nav-plan" onclick="openPlanTab()">
       <span class="nav-icon">📅</span>План
     </button>
     <button class="nav-btn" id="nav-body" onclick="switchTab('body')">
@@ -329,8 +329,9 @@ var S={
   barcodeReader:null,
   weightLog:(function(){try{return JSON.parse(localStorage.getItem("nc_wts")||"[]");}catch(e){return [];}}()),
   favorites:(function(){try{return JSON.parse(localStorage.getItem("nc_favs")||"[]");}catch(e){return [];}}()),
-  lastPlan:null,
+  lastPlan:(function(){try{return JSON.parse(localStorage.getItem("nc_plan")||"null");}catch(e){return null;}}()),
   workoutCal:0,
+  activity:3,
   favMode:false,
   subGl:null,
   subGlData:null,
@@ -596,7 +597,7 @@ function startMain(){
   if(!h||h<100||h>250){showFErr("Введи корректный рост (100-250 см)");return;}
   if(!a||a<10||a>100){showFErr("Введи возраст (10-100 лет)");return;}
   if(!tw||tw<30||tw>300){showFErr("Введи желаемый вес (30-300 кг)");return;}
-  S.name=name;S.weight=w;S.height=h;S.age=a;S.targetWeight=tw;
+  S.name=name;S.weight=w;S.height=h;S.age=a;S.targetWeight=tw;S.activity=act;
   S.dg=calcGoals(w,h,a,S.gender,act,S.gl);
   showScreen("main");
   renderDashboard();
@@ -1157,24 +1158,8 @@ function showWeeklyPlan(){
     var plan=JSON.parse(raw.slice(js,je));
     if(!plan.days||!plan.days.length) throw new Error("Дни не найдены");
     S.lastPlan=plan;
-    var html="<div style='display:flex;justify-content:space-between;align-items:center;margin-bottom:12px'><div style='font-family:Unbounded,sans-serif;font-size:16px;font-weight:700'>Твой план на 7 дней</div><button onclick='closePlanModal()' style='background:none;border:none;color:rgba(255,255,255,.4);cursor:pointer;font-size:24px'>×</button></div>";
-    html+="<div style='font-size:12px;color:rgba(255,255,255,.35);margin-bottom:12px;padding:8px 12px;background:rgba(255,255,255,.04);border-radius:8px'>"+(S.gender==="female"?"👩":"👨")+" "+S.weight+"кг → "+S.targetWeight+"кг · "+S.dg.calories+" ккал"+(S.subGlData?" · "+S.subGlData.label:"")+". </div>";
-    plan.days.forEach(function(day){
-      html+="<div class='card' style='margin-bottom:10px'><div style='font-weight:700;font-size:14px;color:"+g.color+";margin-bottom:10px'>"+day.day+" · "+(day.cal||"")+" ккал</div>";
-      var rows=[];
-      if(day.breakfast) rows.push(["🌅 Завтрак",day.breakfast]);
-      if(day.snack1) rows.push(["🥚 Перекус",day.snack1]);
-      if(day.lunch) rows.push(["🍽 Обед",day.lunch]);
-      if(day.snack2) rows.push(["🥛 Полдник",day.snack2]);
-      else if(day.snack&&!day.snack1) rows.push(["🍎 Перекус",day.snack]);
-      if(day.dinner) rows.push(["🌙 Ужин",day.dinner]);
-      rows.forEach(function(m,mi){
-        html+="<div style='padding:7px 0;"+(mi<rows.length-1?"border-bottom:1px solid rgba(255,255,255,.05)":"")+"'><div style='font-size:11px;color:rgba(255,255,255,.4);font-weight:600;margin-bottom:2px'>"+m[0]+"</div><div style='font-size:13px;color:rgba(240,240,248,.85)'>"+m[1]+"</div></div>";
-      });
-      html+="</div>";
-    });
-    html+="<button class='btn btn-primary' style='margin-top:4px' onclick='showShoppingList()'>🛒 Список покупок с ценами</button>";
-    sheet.innerHTML=html;
+    try{localStorage.setItem("nc_plan",JSON.stringify(plan));}catch(e){}
+    sheet.innerHTML=renderPlanHTML(plan);
   }).catch(function(e){
     sheet.innerHTML="<div style='text-align:center;padding:32px'><div style='font-size:36px;margin-bottom:12px'>❌</div><div style='font-weight:700;margin-bottom:6px'>Ошибка</div><div style='color:rgba(255,255,255,.4);font-size:12px;margin-bottom:16px'>"+e.message+"</div><button class='btn btn-primary' onclick='showWeeklyPlan()'>Попробовать снова</button></div>";
   });
@@ -1705,8 +1690,10 @@ function logWkt(){
   if(selWkt===null) return;
   var mins=+(document.getElementById("wkt-mins")||{value:60}).value||60;
   var burned=Math.round(WKTS[selWkt].cph*mins/60);
-  S.workoutCal+=burned; S.dg.calories+=burned;
-  closeModal("workout-modal"); addXP(30); renderCalRing();
+  S.workoutCal+=burned;
+  // Only add to norm if truly sedentary (activity level 1)
+  if((S.activity||3)===1) S.dg.calories+=burned;
+  closeModal("workout-modal"); addXP(30); renderCalRing(); renderWorkoutCard();
   var t=document.createElement("div");
   t.style.cssText="position:fixed;bottom:100px;left:50%;transform:translateX(-50%);background:rgba(0,232,122,.9);color:#000;padding:10px 20px;border-radius:20px;font-weight:700;font-size:14px;z-index:999";
   t.textContent="Тренировка: -"+burned+" ккал";
@@ -1717,23 +1704,43 @@ function logWkt(){
 function renderWorkoutCard(){
   var wc=document.getElementById("workout-card");
   if(!wc) return;
-  wc.innerHTML="<div style='display:flex;justify-content:space-between;align-items:center'>" +
-    "<div><div class='tag' style='background:rgba(255,148,50,.15);color:#ff9432;font-size:10px;margin-bottom:6px'>🏋️ ТРЕНИРОВКА</div>" +
-    "<div style='font-weight:600;font-size:14px;margin-bottom:2px'>"+(S.workoutCal>0?"Сожжено: "+S.workoutCal+" ккал":"Добавить тренировку")+"</div>" +
-    "<div class='text-muted' style='font-size:11px'>"+(S.workoutCal>0?"Калории пересчитаны":"Скорректирует норму на день")+"</div></div>" +
-    "<button onclick='showWorkoutModal()' style='padding:9px 16px;font-size:12px;font-weight:700;border-radius:10px;margin-left:12px;background:#ff9432;color:#000;border:none;cursor:pointer;font-family:inherit'>"+(S.workoutCal>0?"+ Ещё":"Добавить")+"</button>" +
-  "</div>";
+  var act=S.activity||3;
+  // Activity >= 3: workouts already in TDEE - hide card
+  if(act>=3){
+    wc.style.display="none";
+    return;
+  }
+  wc.style.display="block";
+  var isLight=(act===2);
+  var netBal=S.dg.calories+(isLight?0:S.workoutCal)-S.st.calories;
+  var subText="";
+  if(isLight){
+    subText="⚠️ Лёгкая активность: тренировки частично учтены в норме";
+  } else {
+    subText=S.workoutCal>0?"Норма "+S.dg.calories+" + "+S.workoutCal+" сожжённых = "+netBal+" доступно":"Сидячий режим: тренировки не учтены в норме";
+  }
+  wc.innerHTML=
+    "<div style='display:flex;justify-content:space-between;align-items:center'>" +
+      "<div style='flex:1'>" +
+        "<div class='tag' style='background:rgba(255,148,50,.15);color:#ff9432;font-size:10px;margin-bottom:6px'>🏋️ ТРЕНИРОВКА</div>" +
+        "<div style='font-weight:600;font-size:14px;margin-bottom:2px'>"+(S.workoutCal>0?"Сожжено: "+S.workoutCal+" ккал":"Добавить тренировку")+"</div>" +
+        "<div style='font-size:11px;color:"+(isLight?"#fbbf24":"rgba(255,255,255,.42)")+"'>"+subText+"</div>" +
+      "</div>" +
+      (isLight?"":
+        "<button onclick='showWorkoutModal()' style='padding:9px 16px;font-size:12px;font-weight:700;border-radius:10px;margin-left:12px;background:#ff9432;color:#000;border:none;cursor:pointer;font-family:inherit'>"+(S.workoutCal>0?"+ Ещё":"Добавить")+"</button>"
+      ) +
+    "</div>";
 }
 
 // SHOPPING LIST
 var PRKZT={
-  "яйц":110,"яйцо":110,"омлет":110,
-  "куриц":150,"бедр":150,"грудк":165,"куриная":150,"окорочк":145,
+  "яйц":110,"яйцо":110,"яиц":110,"омлет":110,"яица":110,
+  "куриц":150,"курин":150,"бедр":150,"бёдр":150,"грудк":165,"куриная":150,"куриные":150,"окорочк":145,
   "говяд":1400,"свинин":1100,"фарш":900,
   "гречк":35,"гречка":35,
   "рис":45,"рис ":45,
   "овсянк":35,"геркулес":35,"овсяная":35,
-  "творог":176,"творога":176,
+  "творог":176,"творога":176,"твор":176,
   "кефир":50,"молоко":45,
   "картоф":24,"картошк":24,"картофель":24,
   "капуст":18,"капуста":18,
@@ -1752,30 +1759,35 @@ var PRKZT={
 };
 
 function getPKZT(name){
-  var l=name.toLowerCase();
-  for(var k in PRKZT){if(l.indexOf(k)>=0) return PRKZT[k]/100;}
+  var l=name.toLowerCase().replace(/ё/g,"е").replace(/[^а-я\s]/g,"");
+  for(var k in PRKZT){
+    var kn=k.toLowerCase().replace(/ё/g,"е");
+    if(l.indexOf(kn)>=0) return PRKZT[k]/100;
+  }
   return 1.5;
 }
 
 function parseIngr(text){
   var res={};
   if(!text) return res;
-  // Pattern 1: "Куриные бёдра 200г" or "200г куриных бёдер"
-  var re1=/([а-яёА-ЯЁ][а-яёА-ЯЁ\s]{2,20})\s+(\d+)\s*г/g;
+  // Pre-process: remove "5%", normalize ё→е
+  var t=text.replace(/\d+%/g,"").replace(/ё/g,"е").replace(/\s+/g," ");
+  // Pattern: "Куриные бедра 200г", "гречка 150г"
+  var re1=/([а-яА-Я][а-яА-Я\s]{2,30})\s+(\d+)\s*г/g;
   var m1;
-  while((m1=re1.exec(text))!==null){
-    var name=m1[1].trim().toLowerCase().replace(/[^а-яё\s]/g,"").trim();
+  while((m1=re1.exec(t))!==null){
+    var name=m1[1].trim().toLowerCase().replace(/[^а-я\s]/g,"").replace(/\s+/g," ").trim();
     var g=+m1[2];
     if(name.length>2&&g>0&&g<2000){
       if(res[name]) res[name]+=g; else res[name]=g;
     }
   }
-  // Pattern 2: "3 яйца" or "2 яйца" - count as ~60г each
-  var re2=/(\d+)\s+(яйц[а-я]*|яйцо)/gi;
+  // Pattern 2: "3 яйца"
+  var re2=/(\d+)\s*(яиц|яйц)[а-я]*/gi;
   var m2;
-  while((m2=re2.exec(text))!==null){
+  while((m2=re2.exec(t))!==null){
     var cnt=+m2[1]; if(cnt<1||cnt>30) continue;
-    var n="яйца";
+    var n="яица";
     if(res[n]) res[n]+=cnt*60; else res[n]=cnt*60;
   }
   return res;
@@ -1802,7 +1814,7 @@ function showShoppingList(){
   });
   var total=0;
   var cats={prot:[],carb:[],veg:[],dairy:[],other:[]};
-  var pw=["куриц","бедр","грудк","яйц","говяд","свинин","рыб","тунец"];
+  var pw=["куриц","курин","бедр","грудк","яйц","говяд","свинин","рыб","тунец"];
   var cw=["гречк","рис","овсянк","картоф","хлеб","макарон","лаваш"];
   var vw=["капуст","морков","огурц","помидор","томат","лук","зелен","яблок","банан","перец"];
   var dw=["творог","кефир","молоко","йогурт","сыр"];
@@ -1859,6 +1871,103 @@ function obNext(){
   }
   var btn=document.getElementById("ob-next-btn");
   if(btn) btn.textContent=obCur===slides.length-1?"Выбрать цель →":"Дальше →";
+}
+
+// ─── PLAN RENDERING WITH EDIT ────────────────────────────────
+function renderPlanHTML(plan){
+  var g=GOALS.filter(function(x){return x.id===S.gl;})[0];
+  var html="<div style='display:flex;justify-content:space-between;align-items:center;margin-bottom:12px'><div style='font-family:Unbounded,sans-serif;font-size:16px;font-weight:700'>Твой план на 7 дней</div><button onclick='closePlanModal()' style='background:none;border:none;color:rgba(255,255,255,.4);cursor:pointer;font-size:24px'>×</button></div>";
+  html+="<div style='font-size:12px;color:rgba(255,255,255,.35);margin-bottom:12px;padding:8px 12px;background:rgba(255,255,255,.04);border-radius:8px'>"+(S.gender==="female"?"👩":"👨")+" "+S.weight+"кг → "+S.targetWeight+"кг · "+S.dg.calories+" ккал"+(S.subGlData?" · "+S.subGlData.label:"")+". </div>";
+  plan.days.forEach(function(day,di){
+    html+="<div class='card' style='margin-bottom:10px' id='plan-day-"+di+"'>";
+    html+=renderDayHTML(day,di,g);
+    html+="</div>";
+  });
+  html+="<button class='btn btn-primary' style='margin-top:4px' onclick='showShoppingList()'>🛒 Список покупок с ценами</button>";
+  return html;
+}
+
+function renderDayHTML(day,di,g){
+  var html="<div style='display:flex;justify-content:space-between;align-items:center;margin-bottom:10px'>";
+  html+="<div style='font-weight:700;font-size:14px;color:"+g.color+"'>"+day.day+" · "+(day.cal||"")+" ккал</div>";
+  html+="<button data-di='"+di+"' onclick='editPlanDay("+di+")' style='padding:5px 10px;font-size:11px;font-weight:600;border-radius:7px;border:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.05);color:rgba(240,240,248,.7);cursor:pointer;font-family:inherit'>✏️ Изменить</button>";
+  html+="</div>";
+  var rows=[];
+  if(day.breakfast) rows.push(["🌅 Завтрак",day.breakfast]);
+  if(day.snack1) rows.push(["🥚 Перекус",day.snack1]);
+  if(day.lunch) rows.push(["🍽 Обед",day.lunch]);
+  if(day.snack2) rows.push(["🥛 Полдник",day.snack2]);
+  else if(day.snack&&!day.snack1) rows.push(["🍎 Перекус",day.snack]);
+  if(day.dinner) rows.push(["🌙 Ужин",day.dinner]);
+  rows.forEach(function(m,mi){
+    html+="<div style='padding:7px 0;"+(mi<rows.length-1?"border-bottom:1px solid rgba(255,255,255,.05)":"")+"'><div style='font-size:11px;color:rgba(255,255,255,.4);font-weight:600;margin-bottom:2px'>"+m[0]+"</div><div style='font-size:13px;color:rgba(240,240,248,.85)'>"+m[1]+"</div></div>";
+  });
+  return html;
+}
+
+function editPlanDay(di){
+  if(!S.lastPlan||!S.lastPlan.days[di]) return;
+  var g=GOALS.filter(function(x){return x.id===S.gl;})[0];
+  var dayCard=document.getElementById("plan-day-"+di);
+  if(!dayCard) return;
+  var dayName=S.lastPlan.days[di].day;
+  // Show loading in this day card
+  dayCard.innerHTML="<div style='text-align:center;padding:20px'><div style='font-size:28px;margin-bottom:8px' class='pulse'>🤖</div><div style='font-size:13px;font-weight:600;color:rgba(240,240,248,.8)'>AI подбирает замену для "+dayName+"...</div></div>";
+  var isCut=(S.gl==="cutting"||S.gl==="loss");
+  var currentMeals=[];
+  S.lastPlan.days.forEach(function(d,i){if(i!==di)currentMeals.push(d.day+": "+[d.breakfast,d.lunch,d.dinner].filter(Boolean).join(", "));});
+  var prompt="Составь НОВЫЕ блюда для "+dayName+" (1 день). "+
+    (S.gender==="female"?"Женщина":"Мужчина")+", "+S.weight+"кг, цель: "+GP[S.gl]+". "+
+    "Норма: "+S.dg.calories+" ккал, белок "+S.dg.protein+"г. "+
+    "Приёмов: "+(isCut?"5":"4")+". "+
+    "Уже есть в плане: "+currentMeals.slice(0,3).join(" | ")+". "+
+    "Используй ДРУГИЕ блюда (не повторяй что уже есть). "+
+    "Только яйца, курица, гречка, рис, овсянка, творог, кефир, картофель, капуста, морковь, огурец, помидор, яблоко, банан. "+
+    "JSON: {day:\""+dayName+"\","+(isCut?"snack1:\"...\",":"")+"breakfast:\"...\",lunch:\"...\","+(isCut?"snack2:\"...\",":"snack:\"...\",")+"dinner:\"...\",cal:1800}";
+  fetch("/api/claude",{method:"POST",headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({model:"claude-haiku-4-5",max_tokens:800,
+      system:"Диетолог. Верни ТОЛЬКО JSON без markdown. Используй только бюджетные продукты.",
+      messages:[{role:"user",content:prompt}]
+    })
+  }).then(function(r){return r.json();})
+  .then(function(d){
+    if(d.error) throw new Error(d.error.message);
+    var raw=d.content[0].text.replace(/```json/g,"").replace(/```/g,"").trim();
+    var js=raw.indexOf("{"); var je=raw.lastIndexOf("}")+1;
+    if(js<0||je<=js) throw new Error("Неверный формат");
+    var newDay=JSON.parse(raw.slice(js,je));
+    // Replace day in plan
+    S.lastPlan.days[di]=newDay;
+    try{localStorage.setItem("nc_plan",JSON.stringify(S.lastPlan));}catch(e){}
+    // Re-render just this card
+    dayCard.innerHTML=renderDayHTML(newDay,di,g);
+    // Flash green border
+    dayCard.style.borderColor=g.color;
+    setTimeout(function(){dayCard.style.borderColor="";},1500);
+  }).catch(function(e){
+    dayCard.innerHTML=renderDayHTML(S.lastPlan.days[di],di,g);
+    var errDiv=document.createElement("div");
+    errDiv.style.cssText="font-size:11px;color:#ff5733;padding:8px 0";
+    errDiv.textContent="Ошибка: "+e.message;
+    dayCard.appendChild(errDiv);
+  });
+}
+
+
+function openPlanTab(){
+  var sheet=document.getElementById("plan-sheet");
+  if(S.lastPlan&&S.lastPlan.days&&S.lastPlan.days.length){
+    // Show saved plan with option to regenerate
+    sheet.innerHTML=renderPlanHTML(S.lastPlan);
+    var g=GOALS.filter(function(x){return x.id===S.gl;})[0];
+    var regen="<div style='margin-bottom:12px;padding:10px 12px;background:rgba(255,255,255,.04);border-radius:10px;display:flex;justify-content:space-between;align-items:center'>";
+    regen+="<div style='font-size:12px;color:rgba(255,255,255,.4)'>Сохранённый план</div>";
+    regen+="<button onclick='showWeeklyPlan()' style='padding:6px 12px;font-size:11px;font-weight:700;border-radius:7px;border:1px solid rgba(255,255,255,.2);background:transparent;color:rgba(240,240,248,.7);cursor:pointer;font-family:inherit'>🔄 Новый план</button></div>";
+    sheet.innerHTML=regen+sheet.innerHTML;
+    document.getElementById("plan-modal").style.display="flex";
+  } else {
+    showWeeklyPlan();
+  }
 }
 
 window.addEventListener("DOMContentLoaded",function(){
