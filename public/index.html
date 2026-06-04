@@ -1588,8 +1588,17 @@ function addWeightEntry(val){
 function renderWeightGraph(){
   var el=document.getElementById("weight-graph-area");
   if(!el) return;
-  if(!S.weightLog||S.weightLog.length<2){
-    el.innerHTML="<div style='text-align:center;padding:16px;color:rgba(255,255,255,.35);font-size:12px'>Добавь хотя бы 2 записи для графика</div>";
+  if(!S.weightLog||S.weightLog.length===0){
+    el.innerHTML="<div style='text-align:center;padding:16px;color:rgba(255,255,255,.35);font-size:12px'>Сохрани вес сегодня — график появится через несколько дней</div>";
+    return;
+  }
+  if(S.weightLog.length===1){
+    var g1=GOALS.filter(function(x){return x.id===S.gl;})[0];
+    el.innerHTML="<div style='text-align:center;padding:12px'>" +
+      "<div style='font-size:22px;font-weight:900;color:"+g1.color+"'>"+S.weightLog[0].weight+" кг</div>" +
+      "<div style='font-size:11px;color:rgba(255,255,255,.35);margin-top:4px'>Запись от "+S.weightLog[0].date.slice(5)+"</div>" +
+      "<div style='font-size:11px;color:rgba(255,255,255,.3);margin-top:6px'>График появится после 2+ записей в разные дни</div>" +
+    "</div>";
     return;
   }
   var g=GOALS.filter(function(x){return x.id===S.gl;})[0];
@@ -1729,7 +1738,30 @@ function renderWorkoutCard(){
 }
 
 // SHOPPING LIST
-var PRKZT={"яйц":70,"омлет":70,"яйцо":70,"куриц":380,"бедр":380,"грудк":320,"куриц":380,"гречк":90,"гречка":90,"рис":100,"рис ":100,"овсянк":70,"геркулес":70,"творог":220,"кефир":140,"молоко":120,"картоф":55,"картошк":55,"капуст":50,"морков":60,"огурец":130,"огурц":130,"помидор":180,"томат":180,"яблок":130,"банан":140,"хлеб":80,"лаваш":100,"лук":50,"перец":150,"свекл":70,"сыр":600,"йогурт":180,"говяд":550,"свинин":500,"тунец":400,"рыб":450,"масло":90,"оливк":200,"греч":90,"овощ":80,"фрукт":120};
+var PRKZT={
+  "яйц":110,"яйцо":110,"омлет":110,
+  "куриц":150,"бедр":150,"грудк":165,"куриная":150,"окорочк":145,
+  "говяд":1400,"свинин":1100,"фарш":900,
+  "гречк":35,"гречка":35,
+  "рис":45,"рис ":45,
+  "овсянк":35,"геркулес":35,"овсяная":35,
+  "творог":176,"творога":176,
+  "кефир":50,"молоко":45,
+  "картоф":24,"картошк":24,"картофель":24,
+  "капуст":18,"капуста":18,
+  "морков":20,"морковь":20,
+  "огурец":100,"огурц":100,
+  "помидор":120,"томат":120,
+  "яблок":60,"яблоко":60,
+  "банан":60,"бананы":60,
+  "хлеб":40,"лаваш":50,
+  "лук":9,"чеснок":80,"зелен":70,
+  "масло":45,"оливков":120,
+  "перец":90,"свекл":15,"кабачок":35,
+  "сыр":560,"йогурт":220,
+  "рыб":100,"тунец":95,"скумбрия":85,
+  "макарон":32,"вермишель":32
+};
 
 function getPKZT(name){
   var l=name.toLowerCase();
@@ -1740,23 +1772,32 @@ function getPKZT(name){
 function parseIngr(text){
   var res={};
   if(!text) return res;
-  var words=text.split(/\s+/);
-  for(var i=0;i<words.length;i++){
-    var m=words[i].match(/^(\d+)г$/i);
-    if(m&&i>0){
-      var name=words.slice(Math.max(0,i-2),i).join(" ").toLowerCase().replace(/[^а-яёa-z\s]/gi,"").trim();
-      if(name.length>1){
-        var g=+m[1];
-        if(res[name]) res[name]+=g; else res[name]=g;
-      }
+  // Pattern 1: "Куриные бёдра 200г" or "200г куриных бёдер"
+  var re1=/([а-яёА-ЯЁ][а-яёА-ЯЁ\s]{2,20})\s+(\d+)\s*г/g;
+  var m1;
+  while((m1=re1.exec(text))!==null){
+    var name=m1[1].trim().toLowerCase().replace(/[^а-яё\s]/g,"").trim();
+    var g=+m1[2];
+    if(name.length>2&&g>0&&g<2000){
+      if(res[name]) res[name]+=g; else res[name]=g;
     }
+  }
+  // Pattern 2: "3 яйца" or "2 яйца" - count as ~60г each
+  var re2=/(\d+)\s+(яйц[а-я]*|яйцо)/gi;
+  var m2;
+  while((m2=re2.exec(text))!==null){
+    var cnt=+m2[1]; if(cnt<1||cnt>30) continue;
+    var n="яйца";
+    if(res[n]) res[n]+=cnt*60; else res[n]=cnt*60;
   }
   return res;
 }
 
 function showShoppingList(){
   if(!S.lastPlan){
-    alert("Сначала сгенерируй план питания");
+    var ps=document.getElementById("plan-sheet");
+    if(ps) ps.innerHTML="<div style='text-align:center;padding:32px'><div style='font-size:36px;margin-bottom:12px'>📋</div><div style='font-weight:700'>Сначала сгенерируй план питания</div><div style='color:rgba(255,255,255,.4);font-size:13px;margin-top:8px'>Нажми кнопку в разделе План</div></div>";
+    document.getElementById("plan-modal").style.display="flex";
     return;
   }
   var all={};
