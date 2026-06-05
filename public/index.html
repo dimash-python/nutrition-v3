@@ -1202,7 +1202,7 @@ function renderBodyScreen(){
     html+="<div style='font-size:52px'>🪞</div>";
     html+="<div style='font-weight:700;font-size:17px'>Загрузи фото тела</div>";
     html+="<div class='text-muted' style='font-size:13px;line-height:1.65'>AI определит % жира · уровень мышц 1-100<br/>тип телосложения · проблемные зоны · план</div>";
-    html+="<div style='padding:11px 28px;background:var(--c);color:#000;border-radius:10px;font-size:14px;font-weight:700'>Выбрать фото</div>";
+    html+="<div style='padding:11px 28px;background:var(--c);color:#000;border-radius:10px;font-size:14px;font-weight:700'>"+(S_PREMIUM?"Выбрать фото":"🔒 Premium — 990₸/мес")+"</div>";
     html+="</div>";
   } else {
     // Photos timeline
@@ -1326,6 +1326,7 @@ function renderBodyScreen(){
 
 function onBodyFile(e){
   var f=e.target.files[0]; if(!f) return;
+  if(!S_PREMIUM){e.target.value="";showPaywall();return;}
   var url=URL.createObjectURL(f);
   S.bodyLoading=true; renderBodyScreen();
   var r=new FileReader();
@@ -1930,7 +1931,7 @@ function showPaywall(){
       "</div>" +
     "</div>" +
     "<div style='margin-bottom:12px'>" +
-      "<div style='font-size:12px;color:rgba(255,255,255,.5);margin-bottom:8px;text-align:center'>Оплати 990₸ на карту Kaspi:<br/><span style='color:#ff9432;font-weight:700;font-size:16px;letter-spacing:2px'>4400 4302 2870 5551</span><br/><span style='font-size:11px;color:rgba(255,255,255,.4)'>После оплаты напиши <a href='https://t.me/sakkkaiii' style='color:#ff9432;font-weight:700'>@sakkkaiii</a> в Telegram — ответим 24/7 и дадим промокод</span></div>" +
+      "<div style='font-size:12px;color:rgba(255,255,255,.5);margin-bottom:8px;text-align:center'>Оплати 990₸ на карту Kaspi:<br/><span style='color:#ff9432;font-weight:700;font-size:16px;letter-spacing:2px'>XXXX XXXX XXXX XXXX</span><br/><span style='font-size:11px;color:rgba(255,255,255,.4)'>После оплаты напиши <a href='https://t.me/sakkkaiii' style='color:#ff9432;font-weight:700'>@sakkkaiii</a> в Telegram — ответим 24/7 и дадим промокод</span></div>" +
       "<input id='promo-input' class='inp' placeholder='Введи промокод (AIN-XXXXX)' style='text-align:center;text-transform:uppercase;letter-spacing:2px'/>" +
       "<div id='promo-msg' style='text-align:center;font-size:12px;margin-top:6px;min-height:18px'></div>" +
     "</div>" +
@@ -1988,6 +1989,7 @@ function closePlanModal(){closeModal("plan-modal");}
 function saveNewWeight(){var el=document.getElementById("upd-wt");if(el)addWeightEntry(el.value);}
 
 function openPlanTab(){
+  if(!S_PREMIUM){showPaywall();return;}
   var sheet=document.getElementById("plan-sheet");
   if(S.lastPlan&&S.lastPlan.days&&S.lastPlan.days.length){
     sheet.innerHTML=renderPlanHTML(S.lastPlan);
