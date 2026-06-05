@@ -181,6 +181,7 @@ textarea.inp{resize:none;line-height:1.6}
     <div class="card" id="mission-card" style="margin-bottom:12px;background:rgba(0,232,122,.05);border:1px solid rgba(0,232,122,.18)"></div>
     <div style="margin-bottom:12px">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+        <div id="premium-banner" style="display:none;background:rgba(255,148,50,.08);border:1px solid rgba(255,148,50,.25);border-radius:12px;padding:10px 14px;margin-bottom:12px"></div>
         <div class="text-head">Сегодня</div>
         <div class="text-muted" style="font-size:12px" id="meals-count">0 приёмов</div>
       </div>
@@ -584,7 +585,7 @@ function renderDashboard(){
   setCSSVars(g);
   var gr=document.getElementById("greeting");
   if(gr) gr.textContent="Привет, "+S.name+" "+(S.gender==="female"?"👩":"👨");
-  renderXP();renderBodyState();renderCalRing();renderMacroBars();renderWater();renderMission();renderMeals();renderWorkoutCard();renderNotif();renderPremiumBadge();
+  renderXP();renderBodyState();renderCalRing();renderMacroBars();renderWater();renderMission();renderMeals();renderWorkoutCard();renderNotif();renderPremiumBadge();renderPremiumBanner();
 }
 function renderXP(){
   var cur=S.xp%XP_MAX;
@@ -2014,6 +2015,25 @@ function obNext(){
   }
   var btn=document.getElementById("ob-next-btn");
   if(btn) btn.textContent=obCur===slides.length-1?"Выбрать цель →":"Дальше →";
+}
+
+function renderPremiumBanner(){
+  var el=document.getElementById("premium-banner");
+  if(!el) return;
+  if(S_PREMIUM){
+    el.style.display="none";
+    return;
+  }
+  var left=3-getTodayAnalysisCount();
+  el.style.display="block";
+  el.innerHTML=
+    "<div style='display:flex;justify-content:space-between;align-items:center'>" +
+      "<div>" +
+        "<div style='font-size:12px;font-weight:700;color:#ff9432;margin-bottom:2px'>👑 AI Nutrition Premium</div>" +
+        "<div style='font-size:11px;color:rgba(255,255,255,.5)'>"+left+" из 3 бесплатных анализов сегодня</div>" +
+      "</div>" +
+      "<button onclick='showPaywall()' style='padding:7px 14px;font-size:12px;font-weight:700;border-radius:8px;background:linear-gradient(135deg,#ff9432,#fbbf24);color:#000;border:none;cursor:pointer;font-family:inherit;white-space:nowrap'>990₸/мес</button>" +
+    "</div>";
 }
 
 window.addEventListener("DOMContentLoaded",function(){
