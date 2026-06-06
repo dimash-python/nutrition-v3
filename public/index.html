@@ -77,6 +77,7 @@ textarea.inp{resize:none;line-height:1.6}
 </style>
 </head>
 <body>
+<button id="lang-btn" onclick="switchLang()" style="position:fixed;top:12px;right:12px;z-index:9999;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);color:rgba(240,240,248,.8);font-size:12px;font-weight:700;padding:5px 10px;border-radius:8px;cursor:pointer;font-family:inherit">🇰🇿 ҚАЗ</button>
 <div id="app">
 
   <!-- ONBOARDING -->
@@ -208,20 +209,20 @@ textarea.inp{resize:none;line-height:1.6}
   <!-- BOTTOM NAV -->
   <nav class="bnav" id="main-nav" style="display:none">
     <button class="nav-btn active" id="nav-main" onclick="switchTab('main')">
-      <span class="nav-icon">🏠</span>Главная
+      <span class="nav-icon">🏠</span><span class="nav-lbl-main">Главная</span>
     </button>
     <button class="nav-btn" id="nav-history" onclick="switchTab('history')">
-      <span class="nav-icon">📊</span>История
+      <span class="nav-icon">📊</span><span class="nav-lbl-hist">История</span>
     </button>
     <div class="nav-center">
       <button class="nav-plus" onclick="openFood()">+</button>
       <span style="font-size:11px;color:rgba(255,255,255,.28);margin-top:3px" id="nav-food-label">Еда</span>
     </div>
     <button class="nav-btn" id="nav-plan" onclick="openPlanTab()">
-      <span class="nav-icon">📅</span>План
+      <span class="nav-icon">📅</span><span class="nav-lbl-plan">План</span>
     </button>
     <button class="nav-btn" id="nav-body" onclick="switchTab('body')">
-      <span class="nav-icon">💪</span>Тело
+      <span class="nav-icon">💪</span><span class="nav-lbl-body">Тело</span>
     </button>
   </nav>
 
@@ -301,6 +302,7 @@ var S={
   foodImg:null,foodB64:null,foodMime:null,foodAna:null,foodAdv:null,
   loadingFood:false,manualMode:false,barcodeMode:false,currentTab:"main",
   weekHistory:(function(){try{return JSON.parse(localStorage.getItem("nc_week")||"{}");}catch(e){return {};}}()),
+  lang:(localStorage.getItem("nc_lang")||"ru"),
   barcodeReader:null,
   weightLog:(function(){try{return JSON.parse(localStorage.getItem("nc_wts")||"[]");}catch(e){return [];}}()),
   favorites:(function(){try{return JSON.parse(localStorage.getItem("nc_favs")||"[]");}catch(e){return [];}}()),
@@ -593,7 +595,7 @@ function renderDashboard(){
   setCSSVars(g);
   var gr=document.getElementById("greeting");
   if(gr) gr.textContent="Привет, "+S.name+" "+(S.gender==="female"?"👩":"👨");
-  renderXP();renderBodyState();renderCalRing();renderMacroBars();renderWater();renderMission();renderMeals();renderWorkoutCard();renderNotif();renderPremiumBadge();renderPremiumBanner();
+  renderXP();renderBodyState();renderCalRing();renderMacroBars();renderWater();renderMission();renderMeals();renderWorkoutCard();renderNotif();renderPremiumBadge();setTimeout(function(){applyTranslations();},30);renderPremiumBanner();
 }
 function renderXP(){
   var cur=S.xp%XP_MAX;
@@ -1939,7 +1941,7 @@ function showPaywall(){
       "</div>" +
     "</div>" +
     "<div style='margin-bottom:12px'>" +
-      "<div style='font-size:12px;color:rgba(255,255,255,.5);margin-bottom:8px;text-align:center'>Оплати 990₸ на карту Kaspi:<br/><span style='color:#ff9432;font-weight:700;font-size:16px;letter-spacing:2px'>XXXX XXXX XXXX XXXX</span><br/><span style='font-size:11px;color:rgba(255,255,255,.4)'>После оплаты напиши <a href='https://t.me/sakkkaiii' style='color:#ff9432;font-weight:700'>@sakkkaiii</a> в Telegram — ответим 24/7 и дадим промокод</span></div>" +
+      "<div style='font-size:12px;color:rgba(255,255,255,.5);margin-bottom:8px;text-align:center'>Оплати 990₸ на карту Kaspi:<br/><span style='color:#ff9432;font-weight:700;font-size:16px;letter-spacing:2px'>4400 4302 2870 5551</span><br/><span style='font-size:11px;color:rgba(255,255,255,.4)'>После оплаты напиши <a href='https://t.me/sakkkaiii' style='color:#ff9432;font-weight:700'>@sakkkaiii</a> в Telegram — ответим 24/7 и дадим промокод</span></div>" +
       "<input id='promo-input' class='inp' placeholder='Введи промокод (AIN-XXXXX)' style='text-align:center;text-transform:uppercase;letter-spacing:2px'/>" +
       "<div id='promo-msg' style='text-align:center;font-size:12px;margin-top:6px;min-height:18px'></div>" +
     "</div>" +
@@ -2046,8 +2048,118 @@ function renderPremiumBanner(){
     "</div>";
 }
 
+// ═══════════════════════════════════════════════════════════════
+// LANGUAGE SYSTEM
+// ═══════════════════════════════════════════════════════════════
+var LANG={
+  ru:{
+    main:"Главная",history:"История",food:"Еда",plan:"План",body:"Тело",
+    calories:"ккал",protein:"Белок",fat:"Жиры",carbs:"Углеводы",water:"Вода",
+    goal:"Цель",remaining:"Остаток",today:"Сегодня",meals:"приёмов",
+    mission:"МИССИЯ ДНЯ",done:"Выполнил",level:"Level",streak:"Streak",
+    analyze:"Анализировать",photo:"Фото",text:"Текст",barcode:"Штрихкод",favs:"Избранное",
+    bodyTwin:"BODY TWIN — AI АНАЛИЗ ТЕЛА",scenarios:"ДВА СЦЕНАРИЯ — 30 ДНЕЙ",
+    noPlan:"БЕЗ ПЛАНА",withPlan:"ПО ПЛАНУ",
+    save:"Сохранить",add:"Добавить",back:"↩ Назад",
+    premium:"Премиум",free:"Бесплатно",activate:"Активировать",
+    hello:"Привет",drink:"Пей больше воды"
+  },
+  kz:{
+    main:"Басты",history:"Тарих",food:"Тамақ",plan:"Жоспар",body:"Дене",
+    calories:"ккал",protein:"Белок",fat:"Майлар",carbs:"Көмірсулар",water:"Су",
+    goal:"Мақсат",remaining:"Қалдық",today:"Бүгін",meals:"тамақ",
+    mission:"КҮНДІК ТАПСЫРМА",done:"Орындадым",level:"Деңгей",streak:"Жолақ",
+    analyze:"Талдау",photo:"Фото",text:"Мәтін",barcode:"Штрихкод",favs:"Таңдаулы",
+    bodyTwin:"ДЕНЕ ТАЛДАУЫ — AI",scenarios:"ЕКІ СЦЕНАРИЙ — 30 КҮН",
+    noPlan:"ЖОСПАРСЫЗ",withPlan:"ЖОСПАР БОЙЫНША",
+    save:"Сақтау",add:"Қосу",back:"↩ Артқа",
+    premium:"Премиум",free:"Тегін",activate:"Белсендіру",
+    hello:"Сәлем",drink:"Көбірек су іш"
+  }
+};
+
+function t(key){
+  var lang=S.lang||"ru";
+  return (LANG[lang]&&LANG[lang][key])||LANG.ru[key]||key;
+}
+
+function switchLang(){
+  S.lang=S.lang==="ru"?"kz":"ru";
+  try{localStorage.setItem("nc_lang",S.lang);}catch(e){}
+  renderLangBtn();
+  if(S.currentTab==="main") renderDashboard();
+  else if(S.currentTab==="body") renderBodyScreen();
+  else if(S.currentTab==="history") renderHistoryScreen();
+  else if(S.currentTab==="food") renderFoodScreen();
+  setTimeout(function(){applyTranslations();},50);
+}
+
+function renderLangBtn(){
+  var btn=document.getElementById("lang-btn");
+  if(!btn) return;
+  btn.textContent=S.lang==="ru"?"🇰🇿 ҚАЗ":"🇷🇺 РУС";
+  // Update nav labels
+  var labels={
+    "nav-lbl-main":t("main"),"nav-lbl-hist":t("history"),
+    "nav-lbl-plan":t("plan"),"nav-lbl-body":t("body")
+  };
+  for(var id in labels){
+    var el=document.getElementById(id);
+    if(el) el.textContent=labels[id];
+  }
+}
+
+function applyTranslations(){
+  if(S.lang==="ru") return; // Russian is default, no changes needed
+  var map={
+    "Главная":"Басты","История":"Тарих","Еда":"Тамақ","План":"Жоспар","Тело":"Дене",
+    "Белок":"Белок","Жиры":"Майлар","Углеводы":"Көмірсулар","Вода":"Су",
+    "Цель:":"Мақсат:","Остаток:":"Қалдық:","Сегодня":"Бүгін",
+    "приёмов":"тамақ","приём":"тамақ",
+    "МИССИЯ ДНЯ":"КҮНДІК ТАПСЫРМА","Выполнил":"Орындадым",
+    "ДВА СЦЕНАРИЯ — 30 ДНЕЙ":"ЕКІ СЦЕНАРИЙ — 30 КҮН",
+    "БЕЗ ПЛАНА":"ЖОСПАРСЫЗ","ПО ПЛАНУ":"ЖОСПАР БОЙЫНША",
+    "BODY TWIN — AI АНАЛИЗ ТЕЛА":"ДЕНЕ ТАЛДАУЫ — AI",
+    "ВЕС — ИСТОРИЯ":"ШЕУ — ТАРИХ",
+    "Сохранить":"Сақтау","Добавить":"Қосу",
+    "Пей больше воды":"Көбірек су іш",
+    "Норма выполнена":"Норма орындалды",
+    "Хорошо, добавь ещё":"Жақсы, тағы қос",
+    "КАЛОРИИ ЗА 7 ДНЕЙ":"7 КҮНДЕГІ КАЛОРИЯ",
+    "Эта неделя:":"Осы апта:",
+    "Поделиться":"Бөлісу","Карточка прогресса":"Прогресс картасы",
+    "Скачать PNG":"PNG жүктеу",
+    "Level":"Деңгей","Streak:":"Жолақ:",
+    "до Level":"Деңгейге дейін",
+    "Жир горит":"Май жанады","Мышцы растут":"Бұлшықет өседі",
+    "Идеальный день":"Тамаша күн","Недобор":"Жетпеді",
+    "ТРЕНИРОВКА":"ЖАТТЫҒУ","Добавить тренировку":"Жаттығу қосу",
+    "сожжено":"жандырылды","Остаток":"Қалдық",
+    "ВОДА":"СУ","Норма":"Норма",
+    "Обновить вес":"Салмақ жаңарту"
+  };
+  // Apply to main content areas
+  var areas=["main-content","history-content","body-content","food-content","macro-bars","water-card","mission-card","meals-list","notif-card","workout-card","greeting","level-label","xp-label","xp-next","streak-tag","cal-sub","body-state-pill","premium-banner"];
+  areas.forEach(function(id){
+    var el=document.getElementById(id);
+    if(!el) return;
+    var html=el.innerHTML;
+    for(var ru in map){
+      html=html.split(ru).join(map[ru]);
+    }
+    el.innerHTML=html;
+  });
+  // Nav labels
+  var navMap={"nav-lbl-main":"Басты","nav-lbl-hist":"Тарих","nav-lbl-plan":"Жоспар","nav-lbl-body":"Дене"};
+  for(var id in navMap){
+    var el=document.getElementById(id);
+    if(el) el.textContent=navMap[id];
+  }
+}
+
 window.addEventListener("DOMContentLoaded",function(){
   try{renderGoals();}catch(e){}
+  renderLangBtn();
   // Try to restore saved profile
   try{
     var saved=JSON.parse(localStorage.getItem("nc_profile")||"null");
