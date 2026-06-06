@@ -917,7 +917,7 @@ function onFoodFile(e){
     var img=new Image();
     img.onload=function(){
       var canvas=document.createElement("canvas");
-      var MAX=800;
+      var MAX=1500;
       var w=img.width,h=img.height;
       if(w>MAX||h>MAX){
         if(w>h){h=Math.round(h*MAX/w);w=MAX;}
@@ -925,7 +925,7 @@ function onFoodFile(e){
       }
       canvas.width=w;canvas.height=h;
       canvas.getContext("2d").drawImage(img,0,0,w,h);
-      var resized=canvas.toDataURL("image/jpeg",0.82);
+      var resized=canvas.toDataURL("image/jpeg",0.90);
       S.foodB64=resized.split(",")[1];
       S.foodImg=resized;
     };
