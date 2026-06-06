@@ -573,6 +573,14 @@ function startMain(){
   if(!tw||tw<30||tw>300){showFErr("Введи желаемый вес (30-300 кг)");return;}
   S.name=name;S.weight=w;S.height=h;S.age=a;S.targetWeight=tw;
   S.dg=calcGoals(w,h,a,S.gender,act,S.gl);
+  // Save user profile to localStorage
+  try{
+    localStorage.setItem("nc_profile",JSON.stringify({
+      name:S.name,weight:S.weight,height:S.height,age:S.age,
+      targetWeight:S.targetWeight,gender:S.gender,activity:act,
+      gl:S.gl,subGl:S.subGl,subGlData:S.subGlData,dg:S.dg
+    }));
+  }catch(e){}
   showScreen("main");
   renderDashboard();
 }
@@ -2040,6 +2048,20 @@ function renderPremiumBanner(){
 
 window.addEventListener("DOMContentLoaded",function(){
   try{renderGoals();}catch(e){}
+  // Try to restore saved profile
+  try{
+    var saved=JSON.parse(localStorage.getItem("nc_profile")||"null");
+    if(saved&&saved.name&&saved.weight&&saved.gl){
+      S.name=saved.name; S.weight=saved.weight; S.height=saved.height;
+      S.age=saved.age; S.targetWeight=saved.targetWeight;
+      S.gender=saved.gender; S.activity=saved.activity||3;
+      S.gl=saved.gl; S.subGl=saved.subGl||null;
+      S.subGlData=saved.subGlData||null; S.dg=saved.dg;
+      showScreen("main");
+      renderDashboard();
+      return;
+    }
+  }catch(e){}
   showScreen("onboard");
 });
 </script>
