@@ -15,78 +15,100 @@
 <script src="https://unpkg.com/@zxing/library@0.19.1/umd/index.min.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-html,body{height:100%;background:#f0f2f8;overflow:hidden;position:fixed;width:100%;top:0;left:0}
-body{font-family:'Plus Jakarta Sans',-apple-system,sans-serif;color:#1e293b;display:flex;justify-content:center}
-#app{width:100%;max-width:390px;height:100%;position:relative;background:#f0f2f8;overflow:hidden}
-.screen{position:absolute;inset:0;overflow-y:scroll;padding-bottom:90px;scrollbar-width:none;-webkit-overflow-scrolling:touch;transition:opacity .3s,transform .3s;touch-action:pan-y;overscroll-behavior:none}
+html,body{height:100%;background:#07070e;overflow:hidden;position:fixed;width:100%;top:0;left:0}
+body{font-family:'Plus Jakarta Sans',-apple-system,sans-serif;color:#f0f0f8;display:flex;justify-content:center}
+#app{width:100%;max-width:390px;height:100%;position:relative;background:#07070e;overflow:hidden}
+.screen{position:absolute;inset:0;overflow-y:scroll;padding-bottom:90px;scrollbar-width:none;-webkit-overflow-scrolling:touch;transition:opacity .3s,transform .3s;touch-action:pan-y;overscroll-behavior:contain}
 .screen::-webkit-scrollbar{display:none}
-.hidden{opacity:0;pointer-events:none;transform:translateY(16px)}
-.fade-in{animation:fadeIn .35s cubic-bezier(.22,1,.36,1) both}
-@keyframes fadeIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
-.pulse{animation:pulse 1.5s infinite}
-.card{background:#ffffff;border-radius:20px;padding:16px;margin-bottom:12px;box-shadow:0 2px 12px rgba(0,0,0,.06);border:1px solid rgba(0,0,0,.04)}
-.tag{display:inline-flex;align-items:center;padding:3px 10px;border-radius:20px;font-size:10px;font-weight:700;letter-spacing:.05em;margin-bottom:8px}
-.text-head{font-size:11px;font-weight:700;letter-spacing:.06em;color:#94a3b8;margin-bottom:10px}
-.text-muted{color:#64748b;font-size:13px}
-.btn{display:block;width:100%;padding:15px;border-radius:16px;font-size:15px;font-weight:700;text-align:center;cursor:pointer;border:none;font-family:inherit;transition:opacity .15s,transform .1s}
-.btn:active{transform:scale(.98)}
-.btn-primary{background:#f97316;color:#fff;box-shadow:0 4px 12px rgba(249,115,22,.3)}
-.btn-secondary{background:#f1f5f9;color:#475569;border:1px solid #e2e8f0}
-.inp{width:100%;padding:14px 16px;border-radius:14px;border:1.5px solid #e2e8f0;background:#f8fafc;font-size:15px;font-family:inherit;color:#1e293b;outline:none;transition:border-color .2s,box-shadow .2s}
-.inp:focus{border-color:#f97316;box-shadow:0 0 0 3px rgba(249,115,22,.1)}
-.inp::placeholder{color:#cbd5e1}
-.sel-card{padding:14px 16px;border-radius:16px;border:2px solid #e8edf3;cursor:pointer;transition:all .2s;margin-bottom:8px;background:#fff}
-.sel-card.selected{border-color:var(--c);background:var(--cbg)}
-.meal-row{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid #f1f5f9}
+.screen.hidden{opacity:0;pointer-events:none;transform:translateY(16px)}
+.fade-in{animation:fadeIn .35s cubic-bezier(.25,.46,.45,.94)}
+@keyframes fadeIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+.pulse{animation:pulse 1.8s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+.tip-slide{animation:tipSlide .25s ease}
+@keyframes tipSlide{from{opacity:0;max-height:0}to{opacity:1;max-height:200px}}
+.card{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:16px;padding:16px}
+.card-goal{border-width:1.5px;cursor:pointer;padding:14px 16px;transition:all .2s;border-color:transparent;background:rgba(255,255,255,.03)}
+.card-goal.selected{border-color:var(--c);background:var(--cb)}
+.btn{width:100%;padding:14px;border-radius:12px;border:none;font-weight:700;font-size:15px;cursor:pointer;font-family:inherit;transition:all .2s}
+.btn-primary{background:var(--c);color:#000}
+.btn-ghost{background:rgba(255,255,255,.05);color:rgba(255,255,255,.55);border:none}
+.btn-sm{padding:8px 14px;border-radius:10px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.06);color:#f0f0f8}
+.inp{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:10px;padding:12px 14px;color:#f0f0f8;font-size:15px;width:100%;outline:none;font-family:inherit}
+.inp::placeholder{color:rgba(255,255,255,.28)}
+select.inp option{background:#111120}
+textarea.inp{resize:none;line-height:1.6}
+.tag{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700}
+.pbar{height:5px;border-radius:3px;background:rgba(255,255,255,.08);overflow:hidden;margin-top:3px}
+.pbar-fill{height:100%;border-radius:3px;transition:width 1s cubic-bezier(.22,1,.36,1)}
+.xpbar{height:3px;background:rgba(255,255,255,.07);border-radius:2px;overflow:hidden}
+.xpbar-fill{height:100%;background:linear-gradient(90deg,#00e87a,#4a9eff);border-radius:2px;transition:width .8s}
+.bnav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:390px;background:rgba(7,7,14,.97);backdrop-filter:blur(20px);border-top:1px solid rgba(255,255,255,.07);display:flex;z-index:100}
+.nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:10px 0 16px;background:none;border:none;cursor:pointer;color:rgba(255,255,255,.28);font-size:11px;transition:color .2s;font-family:inherit}
+.nav-btn.active{color:var(--c)}
+.nav-icon{font-size:20px;line-height:1;display:block}
+.nav-center{flex:1;display:flex;flex-direction:column;align-items:center;padding:0 0 14px}
+.nav-plus{margin-top:-22px;width:52px;height:52px;border-radius:50%;background:var(--c);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:26px;font-weight:900;color:#000;box-shadow:0 0 20px rgba(255,148,50,.44);font-family:inherit;transition:transform .15s}
+.nav-plus:hover{transform:scale(1.08)}
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.82);backdrop-filter:blur(10px);display:flex;align-items:flex-end;justify-content:center;z-index:200;animation:fadeIn .2s}
+.sheet{background:#111120;border-radius:20px 20px 0 0;width:100%;max-width:390px;padding:28px 20px 40px;animation:sheetUp .32s cubic-bezier(.25,.46,.45,.94);max-height:90vh;overflow-y:auto}
+@keyframes sheetUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.meal-row{display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid rgba(255,255,255,.05)}
 .meal-row:last-child{border-bottom:none}
-.mode-btn{padding:8px 14px;border-radius:10px;border:1.5px solid #e8edf3;background:#fff;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;color:#64748b;transition:all .15s;white-space:nowrap}
-.mode-btn.sel{background:#fff7ed;border-color:#f97316;color:#f97316}
-.overlay{display:none;position:fixed;inset:0;background:rgba(15,23,42,.5);z-index:100;align-items:flex-end;justify-content:center;backdrop-filter:blur(2px)}
-.sheet{background:#fff;border-radius:28px 28px 0 0;padding:24px 20px 40px;width:100%;max-width:390px;box-shadow:0 -4px 24px rgba(0,0,0,.08)}
-#main-nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:390px;background:#fff;border-top:1px solid #f1f5f9;display:none;justify-content:space-around;align-items:center;padding:10px 0 24px;z-index:50;box-shadow:0 -2px 16px rgba(0,0,0,.06)}
-.nav-btn{background:none;border:none;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px;padding:0 12px;font-family:inherit}
-.nav-icon{font-size:22px}
-.nav-btn span:last-child{font-size:10px;font-weight:600;color:#cbd5e1}
-.nav-btn.active span:last-child{color:#f97316}
-.nav-add{width:52px;height:52px;border-radius:50%;background:#f97316;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:26px;color:#fff;box-shadow:0 4px 16px rgba(249,115,22,.4)}
-.progress-bar{height:6px;background:#f1f5f9;border-radius:3px;overflow:hidden;margin-top:6px}
-.progress-fill{height:100%;border-radius:3px;transition:width .5s ease}
+.text-muted{color:rgba(240,240,248,.42);font-size:13px}
+.text-head{font-family:'Unbounded',sans-serif;font-weight:700;text-transform:uppercase;font-size:12px;letter-spacing:.04em}
+.h1{font-family:'Unbounded',sans-serif;font-size:28px;font-weight:900;line-height:1.2}
+.h2{font-family:'Unbounded',sans-serif;font-size:20px;font-weight:800}
+.gender-btn{flex:1;padding:12px;border-radius:10px;font-weight:600;font-size:14px;cursor:pointer;transition:all .2s;font-family:inherit;border:1.5px solid rgba(255,255,255,.1);background:rgba(255,255,255,.04);color:rgba(240,240,248,.6)}
+.gender-btn.sel{border-color:var(--c);background:var(--cb);color:var(--c)}
+.dz{border:2px dashed rgba(255,255,255,.12);border-radius:20px;padding:40px 20px;display:flex;flex-direction:column;align-items:center;gap:12px;cursor:pointer;background:rgba(255,255,255,.02);text-align:center}
+.mode-btn{flex:1;padding:11px;border-radius:10px;font-weight:600;font-size:14px;cursor:pointer;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.04);color:rgba(240,240,248,.6);font-family:inherit;transition:all .2s}
+.mode-btn.sel{border-color:rgba(255,148,50,.6);background:rgba(255,148,50,.15);color:var(--c)}
+/* Onboarding */
+.ob-slide{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 28px;text-align:center;transition:opacity .4s,transform .4s}
+.ob-slide.hidden{opacity:0;pointer-events:none;transform:translateX(40px)}
+.ob-icon{font-size:80px;margin-bottom:24px;line-height:1}
+.ob-dots{display:flex;gap:8px;margin-top:32px}
+.ob-dot{width:8px;height:8px;border-radius:4px;background:rgba(255,255,255,.2);transition:all .3s}
+.ob-dot.active{width:24px;background:var(--c)}
+/* Barcode */
+#barcode-video{width:100%;border-radius:12px;display:block}
+:root{--c:#ff9432;--cb:rgba(255,148,50,0.14)}
 </style>
 </head>
 <body>
-<button id="lang-btn" onclick="switchLang()" style="position:fixed;top:12px;right:12px;z-index:9999;background:#f1f5f9;border:1px solid rgba(255,255,255,.15);color:#334155;font-size:12px;font-weight:700;padding:5px 10px;border-radius:8px;cursor:pointer;font-family:inherit">🇰🇿 ҚАЗ</button>
+<button id="lang-btn" onclick="switchLang()" style="position:fixed;top:12px;right:12px;z-index:9999;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);color:rgba(240,240,248,.8);font-size:12px;font-weight:700;padding:5px 10px;border-radius:8px;cursor:pointer;font-family:inherit">🇰🇿 ҚАЗ</button>
 <div id="app">
 
   <!-- ONBOARDING -->
   <div id="scr-onboard" class="screen fade-in" style="padding:0;overflow:hidden">
-    <div style="height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 28px;text-align:center;background:linear-gradient(180deg,#ffffff 0%,#f0f2f8 100%)">
+    <div style="height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 28px;text-align:center;background:linear-gradient(180deg,#0d0d1a 0%,#07070e 100%)">
       <div id="ob-slide-wrap" style="max-width:320px;width:100%">
-        <div id="ob-s0"><div style="font-size:80px;margin-bottom:24px;line-height:1">🤖</div><div style="font-family:Unbounded,sans-serif;font-size:26px;font-weight:900;line-height:1.2;margin-bottom:16px;color:#1e293b">AI Nutrition<br/>Coach</div><div style="color:#64748b;font-size:15px;line-height:1.7">Фото еды → AI считает калории и говорит что съесть дальше</div></div>
-        <div id="ob-s1" style="display:none"><div style="font-size:80px;margin-bottom:24px;line-height:1">📸</div><div style="font-family:Unbounded,sans-serif;font-size:24px;font-weight:900;line-height:1.2;margin-bottom:16px;color:#1e293b">Фото → КБЖУ<br/>за 5 секунд</div><div style="color:#64748b;font-size:15px;line-height:1.7">AI видит все продукты и считает каждый грамм отдельно</div></div>
-        <div id="ob-s2" style="display:none"><div style="font-size:80px;margin-bottom:24px;line-height:1">🧠</div><div style="font-family:Unbounded,sans-serif;font-size:24px;font-weight:900;line-height:1.2;margin-bottom:16px;color:#1e293b">Умный совет<br/>после каждой еды</div><div style="color:#64748b;font-size:15px;line-height:1.7">Говорит что съесть дальше под твою цель</div></div>
-        <div id="ob-s3" style="display:none"><div style="font-size:80px;margin-bottom:24px;line-height:1">🪞</div><div style="font-family:Unbounded,sans-serif;font-size:24px;font-weight:900;line-height:1.2;margin-bottom:16px;color:#1e293b">Body Twin AI</div><div style="color:#64748b;font-size:15px;line-height:1.7">Загрузи фото тела — AI оценит % жира и даст план</div></div>
+        <div id="ob-s0"><div style="font-size:80px;margin-bottom:24px;line-height:1">🤖</div><div style="font-family:Unbounded,sans-serif;font-size:26px;font-weight:900;line-height:1.2;margin-bottom:16px">AI Nutrition<br/>Coach</div><div style="color:rgba(240,240,248,.42);font-size:15px;line-height:1.7">Фото еды → AI считает калории и говорит что съесть дальше</div></div>
+        <div id="ob-s1" style="display:none"><div style="font-size:80px;margin-bottom:24px;line-height:1">📸</div><div style="font-family:Unbounded,sans-serif;font-size:24px;font-weight:900;line-height:1.2;margin-bottom:16px">Фото → КБЖУ<br/>за 5 секунд</div><div style="color:rgba(240,240,248,.42);font-size:15px;line-height:1.7">AI видит все продукты и считает каждый грамм отдельно</div></div>
+        <div id="ob-s2" style="display:none"><div style="font-size:80px;margin-bottom:24px;line-height:1">🧠</div><div style="font-family:Unbounded,sans-serif;font-size:24px;font-weight:900;line-height:1.2;margin-bottom:16px">Умный совет<br/>после каждой еды</div><div style="color:rgba(240,240,248,.42);font-size:15px;line-height:1.7">Говорит что съесть дальше под твою цель</div></div>
+        <div id="ob-s3" style="display:none"><div style="font-size:80px;margin-bottom:24px;line-height:1">🪞</div><div style="font-family:Unbounded,sans-serif;font-size:24px;font-weight:900;line-height:1.2;margin-bottom:16px">Body Twin AI</div><div style="color:rgba(240,240,248,.42);font-size:15px;line-height:1.7">Загрузи фото тела — AI оценит % жира и даст план</div></div>
       </div>
       <div style="display:flex;gap:8px;margin-top:28px"><div id="dot0" style="height:8px;width:24px;border-radius:4px;background:var(--c)"></div><div id="dot1" style="height:8px;width:8px;border-radius:4px;background:rgba(255,255,255,.2)"></div><div id="dot2" style="height:8px;width:8px;border-radius:4px;background:rgba(255,255,255,.2)"></div><div id="dot3" style="height:8px;width:8px;border-radius:4px;background:rgba(255,255,255,.2)"></div></div>
       <button id="ob-next-btn" class="btn btn-primary" style="margin-top:24px;width:100%;max-width:300px" onclick="obNext()">Начать</button>
-      <button onclick="showScreen('goal')" style="margin-top:10px;background:none;border:none;color:#cbd5e1;font-size:13px;cursor:pointer;font-family:inherit;padding:8px 16px">Пропустить</button>
+      <button onclick="showScreen('goal')" style="margin-top:10px;background:none;border:none;color:rgba(255,255,255,.25);font-size:13px;cursor:pointer;font-family:inherit;padding:8px 16px">Пропустить</button>
     </div>
   </div>
 
 <!-- GOAL -->
   <div id="scr-goal" class="screen hidden" style="padding:48px 20px 32px">
-    <div class="tag" style="background:#f0fdf4;color:#16a34a;margin-bottom:24px">✦ AI Nutrition Coach</div>
+    <div class="tag" style="background:rgba(0,232,122,.1);color:#00e87a;margin-bottom:24px">✦ AI Nutrition Coach</div>
     <div class="h1" style="margin-bottom:8px">Выбери<br/>свою цель</div>
     <p class="text-muted" style="margin-bottom:24px">AI подберёт план под твой пол, тело и режим</p>
     <div id="goals-list" style="display:flex;flex-direction:column;gap:8px"></div>
     <div id="sub-goals-container" style="display:none"></div>
-    <button class="btn" id="goal-next-btn" style="margin-top:20px;background:#f8fafc;color:#e2e8f0" onclick="goToData()">Продолжить →</button>
+    <button class="btn" id="goal-next-btn" style="margin-top:20px;background:rgba(255,255,255,.06);color:rgba(255,255,255,.2)" onclick="goToData()">Продолжить →</button>
   </div>
 
   <!-- DATA -->
   <div id="scr-data" class="screen hidden" style="padding:40px 20px 120px">
     <div style="display:flex;align-items:center;gap:14px;margin-bottom:24px">
-      <button onclick="showScreen('goal')" style="background:none;border:none;color:#94a3b8;cursor:pointer;font-size:20px;padding:0">←</button>
+      <button onclick="showScreen('goal')" style="background:none;border:none;color:rgba(255,255,255,.4);cursor:pointer;font-size:20px;padding:0">←</button>
       <div class="h2">Твои данные</div>
     </div>
     <div id="goal-reminder" class="card" style="margin-bottom:20px;padding:12px 16px"></div>
@@ -97,7 +119,7 @@ body{font-family:'Plus Jakarta Sans',-apple-system,sans-serif;color:#1e293b;disp
           <button class="gender-btn" id="gbtn-male" onclick="setGender('male')">Мужской</button>
           <button class="gender-btn" id="gbtn-female" onclick="setGender('female')">Женский</button>
         </div>
-        <div id="bmr-hint" style="font-size:11px;color:#94a3b8;margin-top:5px"></div>
+        <div id="bmr-hint" style="font-size:11px;color:rgba(255,255,255,.3);margin-top:5px"></div>
       </div>
       <div><div style="font-size:12px;color:rgba(255,255,255,.38);margin-bottom:6px">Имя</div><input id="ud-name" class="inp" type="text" placeholder="Алекс"/></div>
       <div><div style="font-size:12px;color:rgba(255,255,255,.38);margin-bottom:6px">Вес (кг)</div><input id="ud-weight" class="inp" type="number" placeholder="70" oninput="updatePreview()"/></div>
@@ -126,7 +148,7 @@ body{font-family:'Plus Jakarta Sans',-apple-system,sans-serif;color:#1e293b;disp
         <div class="text-muted" style="font-size:12px;margin-bottom:2px" id="greeting">Привет!</div>
         <div style="font-family:'Unbounded',sans-serif;font-size:17px;font-weight:700" id="level-label">Level 1</div>
       </div>
-      <div class="tag" style="background:#fff1ee;color:#dc2626" id="streak-tag">Streak: 0 д.</div>
+      <div class="tag" style="background:rgba(255,87,51,.15);color:#ff5733" id="streak-tag">Streak: 0 д.</div>
     </div>
     <div style="margin-bottom:14px">
       <div style="display:flex;justify-content:space-between;margin-bottom:4px">
@@ -160,7 +182,7 @@ body{font-family:'Plus Jakarta Sans',-apple-system,sans-serif;color:#1e293b;disp
     <div class="card" id="mission-card" style="margin-bottom:12px;background:rgba(0,232,122,.05);border:1px solid rgba(0,232,122,.18)"></div>
     <div style="margin-bottom:12px">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
-        <div id="premium-banner" style="display:none;background:#fff7ed;border:1px solid rgba(255,148,50,.25);border-radius:12px;padding:10px 14px;margin-bottom:12px"></div>
+        <div id="premium-banner" style="display:none;background:rgba(255,148,50,.08);border:1px solid rgba(255,148,50,.25);border-radius:12px;padding:10px 14px;margin-bottom:12px"></div>
         <div class="text-head">Сегодня</div>
         <div class="text-muted" style="font-size:12px" id="meals-count">0 приёмов</div>
       </div>
@@ -225,7 +247,7 @@ body{font-family:'Plus Jakarta Sans',-apple-system,sans-serif;color:#1e293b;disp
   <div class="sheet">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
       <div style="font-family:'Unbounded',sans-serif;font-size:16px;font-weight:700">Сканирование штрихкода</div>
-      <button onclick="stopBarcode()" style="background:none;border:none;color:#94a3b8;cursor:pointer;font-size:22px">×</button>
+      <button onclick="stopBarcode()" style="background:none;border:none;color:rgba(255,255,255,.4);cursor:pointer;font-size:22px">×</button>
     </div>
     <video id="barcode-video" autoplay playsinline></video>
     <div id="barcode-status" class="text-muted" style="text-align:center;margin-top:12px;font-size:13px">Наведи камеру на штрихкод</div>
@@ -309,7 +331,7 @@ function renderOb(){
   el.innerHTML=
     "<div style='font-size:72px;margin-bottom:24px;line-height:1'>"+s.icon+"</div>"+
     "<div style='font-family:Unbounded,sans-serif;font-size:24px;font-weight:900;line-height:1.2;margin-bottom:16px'>"+s.title+"</div>"+
-    "<div style='color:#64748b;font-size:15px;line-height:1.7'>"+s.sub+"</div>";
+    "<div style='color:rgba(240,240,248,.42);font-size:15px;line-height:1.7'>"+s.sub+"</div>";
   document.getElementById("ob-btn").textContent=s.btn;
   var dots=document.getElementById("ob-dots");
   if(!dots) return;
@@ -422,7 +444,7 @@ function goToData(){
   if(gr) gr.innerHTML=
     "<div style='display:flex;align-items:center;gap:10px'>" +
       "<span style='font-size:22px'>"+(sub?sub.icon:g.icon)+"</span>" +
-      "<div><div style='font-size:11px;color:#64748b'>Выбранная цель</div>" +
+      "<div><div style='font-size:11px;color:rgba(255,255,255,.42)'>Выбранная цель</div>" +
       "<div style='font-weight:700;color:"+(sub?sub.color:g.color)+"'>"+g.title+(sub?" — "+sub.label:"")+"</div>" +
       (sub?"<div style='font-size:11px;color:rgba(255,255,255,.38);margin-top:2px'>"+sub.training+"</div>":"") +
       "</div></div>";
@@ -496,26 +518,26 @@ function updatePreview(){
   pp.style.background="rgba(0,232,122,.05)";
   pp.style.border="1px solid rgba(0,232,122,.2)";
 
-  var html="<div style='font-size:11px;color:#16a34a;font-weight:700;margin-bottom:8px'>ТВОЙ ПЕРСОНАЛЬНЫЙ ПЛАН</div>";
+  var html="<div style='font-size:11px;color:#00e87a;font-weight:700;margin-bottom:8px'>ТВОЙ ПЕРСОНАЛЬНЫЙ ПЛАН</div>";
   html+="<div style='display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:"+(tl?"10px":"0")+"'>";
   [[p.calories+" ккал","Калорий"],[p.protein+"г","Белок"],[p.fat+"г","Жиры"],[p.carbs+"г","Углеводы"]].forEach(function(item){
-    html+="<div style='background:#f0fdf4;border-radius:8px;padding:8px 10px'>" +
-      "<div style='font-weight:700;font-size:15px;color:#16a34a'>"+item[0]+"</div>" +
-      "<div style='font-size:11px;color:#94a3b8'>"+item[1]+"</div>" +
+    html+="<div style='background:rgba(0,232,122,.08);border-radius:8px;padding:8px 10px'>" +
+      "<div style='font-weight:700;font-size:15px;color:#00e87a'>"+item[0]+"</div>" +
+      "<div style='font-size:11px;color:rgba(255,255,255,.4)'>"+item[1]+"</div>" +
     "</div>";
   });
   html+="</div>";
-  html+="<div style='font-size:11px;color:#94a3b8;margin-bottom:"+(tl?"8px":"0")+"'>BMR: "+p.bmr+" · TDEE: "+p.tdee+" ккал</div>";
+  html+="<div style='font-size:11px;color:rgba(255,255,255,.35);margin-bottom:"+(tl?"8px":"0")+"'>BMR: "+p.bmr+" · TDEE: "+p.tdee+" ккал</div>";
 
   if(tl){
     html+="<div style='background:"+g.color+"15;border-radius:10px;padding:10px 12px'>";
-    html+="<div style='font-size:11px;color:#64748b;margin-bottom:6px'>"+w+"кг → "+tw+"кг · "+tl.kgPerMonth+" кг/мес</div>";
+    html+="<div style='font-size:11px;color:rgba(255,255,255,.45);margin-bottom:6px'>"+w+"кг → "+tw+"кг · "+tl.kgPerMonth+" кг/мес</div>";
     html+="<div style='display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px'>";
     [["Реалистично",tl.realistic,"rgba(255,255,255,.6)"],["Оптимально",tl.optimal,g.color],["Агрессивно",tl.aggressive,"#ff5733"]].forEach(function(s){
-      html+="<div style='background:#ffffff;border-radius:8px;padding:7px;text-align:center'>" +
-        "<div style='font-size:10px;color:#94a3b8;margin-bottom:3px'>"+s[0]+"</div>" +
+      html+="<div style='background:rgba(255,255,255,.04);border-radius:8px;padding:7px;text-align:center'>" +
+        "<div style='font-size:10px;color:rgba(255,255,255,.35);margin-bottom:3px'>"+s[0]+"</div>" +
         "<div style='font-weight:700;font-size:13px;color:"+s[2]+"'>"+s[1]+"д</div>" +
-        "<div style='font-size:10px;color:#94a3b8'>"+Math.round(s[1]/30)+" мес</div>" +
+        "<div style='font-size:10px;color:rgba(255,255,255,.3)'>"+Math.round(s[1]/30)+" мес</div>" +
       "</div>";
     });
     html+="</div></div>";
@@ -555,6 +577,7 @@ function startMain(){
   S.activity=act;
   S.dg=calcGoals(w,h,a,S.gender,act,S.gl);
   // Save user profile to localStorage
+  S.activity=act;
   try{
     localStorage.setItem("nc_profile",JSON.stringify({
       name:S.name,weight:S.weight,height:S.height,age:S.age,
@@ -614,7 +637,7 @@ function renderMacroBars(){
     return "<div style='margin-bottom:8px'>" +
       "<div style='display:flex;justify-content:space-between;margin-bottom:3px'>" +
         "<span class='text-muted' style='font-size:11px'>"+m[0]+"</span>" +
-        "<span style='font-size:11px;color:"+m[3]+";font-weight:600'>"+m[1]+"<span style='color:#cbd5e1'> / "+m[2]+"г</span></span>" +
+        "<span style='font-size:11px;color:"+m[3]+";font-weight:600'>"+m[1]+"<span style='color:rgba(255,255,255,.22)'> / "+m[2]+"г</span></span>" +
       "</div>" +
       "<div class='pbar'><div class='pbar-fill' style='width:"+pct+"%;background:"+m[3]+"'></div></div>" +
     "</div>";
@@ -662,7 +685,7 @@ function renderMission(){
   mc.innerHTML=
     "<div style='display:flex;justify-content:space-between;align-items:center'>" +
       "<div style='flex:1'>" +
-        "<div class='tag' style='background:#fff7ed;color:#ea580c;font-size:10px;margin-bottom:8px'>⚡ МИССИЯ ДНЯ</div>" +
+        "<div class='tag' style='background:rgba(0,232,122,.15);color:#00e87a;font-size:10px;margin-bottom:8px'>⚡ МИССИЯ ДНЯ</div>" +
         "<div style='font-weight:700;font-size:14px;margin-bottom:3px'>"+text+"</div>" +
         "<div class='text-muted' style='font-size:11px'>+"+xp+" XP за выполнение</div>" +
       "</div>" +
@@ -683,7 +706,7 @@ function renderMeals(){
   }
   list.innerHTML=S.meals.map(function(m){
     return "<div class='meal-row'>" +
-      "<div style='width:36px;height:36px;border-radius:10px;background:#fff7ed;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:16px'>🍽</div>" +
+      "<div style='width:36px;height:36px;border-radius:10px;background:"+g.bg+";display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:16px'>🍽</div>" +
       "<div style='flex:1;min-width:0'>" +
         "<div style='font-weight:600;font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap'>"+m.name+"</div>" +
         "<div class='text-muted' style='font-size:11px;margin-top:2px'>"+m.time+" · Б"+m.protein+" Ж"+m.fat+" У"+m.carbs+"</div>" +
@@ -699,7 +722,7 @@ function renderNotif(){
   nc.innerHTML=
     "<div style='display:flex;justify-content:space-between;align-items:center'>" +
       "<div>" +
-        "<div class='tag' style='background:#f5f3ff;color:#a855f7;font-size:10px;margin-bottom:6px'>🔔 НАПОМИНАНИЯ</div>" +
+        "<div class='tag' style='background:rgba(168,85,247,.15);color:#a855f7;font-size:10px;margin-bottom:6px'>🔔 НАПОМИНАНИЯ</div>" +
         "<div style='font-weight:600;font-size:14px;margin-bottom:2px'>"+(S.notifOn?"Каждые 3-4 часа":"Напоминать о еде?")+"</div>" +
         "<div class='text-muted' style='font-size:11px'>"+(S.notifOn?"Уведомлю о приёме пищи":"Уведомление в браузере")+"</div>" +
       "</div>" +
@@ -774,7 +797,7 @@ function renderHistoryScreen(){
     html+="<div class='text-head' style='margin-bottom:10px'>СРАВНЕНИЕ НЕДЕЛЬ</div>";
     html+="<div class='card' style='margin-bottom:14px'><div style='display:flex;gap:10px'>";
     [["Эта неделя",Math.round(thisWeekCal/7)+" ккал/д",g.color],["Прошлая",Math.round(lastWeekCal/7)+" ккал/д","rgba(255,255,255,.5)"],["Разница",(thisWeekCal<lastWeekCal?"↓":"↑")+Math.abs(Math.round((thisWeekCal-lastWeekCal)/7))+" ккал",thisWeekCal<lastWeekCal?"#00e87a":"#ff5733"]].forEach(function(s){
-      html+="<div style='flex:1;background:#ffffff;border-radius:10px;padding:10px 8px;text-align:center'>" +
+      html+="<div style='flex:1;background:rgba(255,255,255,.04);border-radius:10px;padding:10px 8px;text-align:center'>" +
         "<div class='text-muted' style='font-size:10px;margin-bottom:4px'>"+s[0]+"</div>" +
         "<div style='font-weight:700;font-size:14px;color:"+s[2]+"'>"+s[1]+"</div>" +
       "</div>";
@@ -1056,14 +1079,14 @@ function renderFoodResults(fc,g){
   var html="<div class='text-head' style='margin-bottom:10px'>ОБНАРУЖЕНО</div>";
   html+="<div class='card' style='margin-bottom:12px'>";
   a1.dishes.forEach(function(d,i){
-    html+="<div style='display:flex;justify-content:space-between;align-items:center;padding:10px 0;"+(i<a1.dishes.length-1?"border-bottom:1px solid #f1f5f9":"")+"'>" +
+    html+="<div style='display:flex;justify-content:space-between;align-items:center;padding:10px 0;"+(i<a1.dishes.length-1?"border-bottom:1px solid rgba(255,255,255,.05)":"")+"'>" +
       "<div><div style='font-weight:600;font-size:14px'>"+d.name+"</div>" +
         "<div class='text-muted' style='font-size:11px;margin-top:2px'>≈"+d.weight+"г"+(d.cooking_method?" · "+d.cooking_method:"")+"</div></div>" +
       "<div style='text-align:right'><div style='font-weight:800;font-size:15px;color:"+g.color+"'>"+d.calories+" ккал</div>" +
         "<div class='text-muted' style='font-size:11px'>Б"+d.protein+" Ж"+d.fat+" У"+d.carbs+"</div></div>" +
     "</div>";
   });
-  html+="<div style='padding:10px 0 0;border-top:1px solid #e8edf3;display:flex;justify-content:space-between;align-items:center'>" +
+  html+="<div style='padding:10px 0 0;border-top:1px solid rgba(255,255,255,.08);display:flex;justify-content:space-between;align-items:center'>" +
     "<span style='font-weight:700'>Итого</span>" +
     "<div style='text-align:right'><div style='font-weight:900;font-size:18px;color:"+g.color+"'>"+a1.total.calories+" ккал</div>" +
       "<div class='text-muted' style='font-size:11px'>Б"+a1.total.protein+" Ж"+a1.total.fat+" У"+a1.total.carbs+"</div></div>" +
@@ -1074,12 +1097,12 @@ function renderFoodResults(fc,g){
     html+="<div class='text-head' style='margin-bottom:10px'>УМНЫЙ СОВЕТ AI</div>";
     html+="<div class='card' style='background:"+g.color+"0e;border:1px solid "+g.color+"28;margin-bottom:10px'>" +
       "<div style='display:flex;gap:10px'><span style='font-size:22px;flex-shrink:0'>🧠</span>" +
-        "<div style='font-size:14px;font-weight:600;line-height:1.6;color:#1e293b'>"+a2.mainAdvice+"</div></div></div>";
+        "<div style='font-size:14px;font-weight:600;line-height:1.6;color:rgba(240,240,248,.9)'>"+a2.mainAdvice+"</div></div></div>";
     if(a2.warning) html+="<div class='card' style='background:rgba(255,87,51,.07);border:1px solid rgba(255,87,51,.2);margin-bottom:10px'><div style='display:flex;gap:10px'><span style='font-size:18px;flex-shrink:0'>⚠️</span><div style='font-size:13px;color:#ff7755;line-height:1.55'>"+a2.warning+"</div></div></div>";
     if(a2.replacement) html+="<div class='card' style='background:rgba(74,158,255,.07);border:1px solid rgba(74,158,255,.2);margin-bottom:10px'><div style='display:flex;gap:10px'><span style='font-size:18px;flex-shrink:0'>💡</span><div><div style='font-size:11px;color:#4a9eff;font-weight:700;margin-bottom:3px'>ЗАМЕНА ДЛЯ УЛУЧШЕНИЯ</div><div style='font-size:13px;color:rgba(240,240,248,.82);line-height:1.55'>"+a2.replacement+"</div></div></div></div>";
     html+="<div class='card' style='background:rgba(0,232,122,.06);border:1px solid rgba(0,232,122,.2);margin-bottom:14px'>" +
       "<div style='display:flex;gap:10px'><span style='font-size:18px;flex-shrink:0'>⏰</span>" +
-        "<div><div style='font-size:11px;color:#16a34a;font-weight:700;margin-bottom:3px'>СЛЕДУЮЩИЙ ПРИЁМ</div>" +
+        "<div><div style='font-size:11px;color:#00e87a;font-weight:700;margin-bottom:3px'>СЛЕДУЮЩИЙ ПРИЁМ</div>" +
           "<div style='font-size:13px;color:rgba(240,240,248,.82);line-height:1.55'>"+(a2.nextMeal||"")+"</div></div></div></div>";
   }
   html+="<button class='btn btn-primary' onclick='resetFood()'>↩ Новый приём пищи</button>";
@@ -1099,7 +1122,7 @@ function showWeeklyPlan(){
   if(!sheet) return;
   var isCut=(S.gl==="cutting"||S.gl==="loss");
   var subInfo=S.subGlData?" Режим: "+S.subGlData.label+".":"";
-  sheet.innerHTML="<div style='text-align:center;padding:32px 0'><div style='font-size:48px;margin-bottom:14px' class='pulse'>🤖</div><div style='font-weight:700;font-size:15px;margin-bottom:6px'>AI составляет план...</div><div style='color:#94a3b8;font-size:12px'>15-20 секунд</div></div>";
+  sheet.innerHTML="<div style='text-align:center;padding:32px 0'><div style='font-size:48px;margin-bottom:14px' class='pulse'>🤖</div><div style='font-weight:700;font-size:15px;margin-bottom:6px'>AI составляет план...</div><div style='color:rgba(255,255,255,.35);font-size:12px'>15-20 секунд</div></div>";
   document.getElementById("plan-modal").style.display="flex";
   var meals5=isCut?"5 (завтрак+перекус+обед+полдник+ужин)":"4 (завтрак+обед+перекус+ужин)";
   var cutTip=isCut?"Углеводы до 17:00, ужин — белок и овощи. ":"";
@@ -1119,8 +1142,8 @@ function showWeeklyPlan(){
     var plan=JSON.parse(raw.slice(js,je));
     if(!plan.days||!plan.days.length) throw new Error("Дни не найдены");
     S.lastPlan=plan;
-    var html="<div style='display:flex;justify-content:space-between;align-items:center;margin-bottom:12px'><div style='font-family:Unbounded,sans-serif;font-size:16px;font-weight:700;color:#1e293b'>Твой план на 7 дней</div><button onclick='closePlanModal()' style='background:none;border:none;color:#94a3b8;cursor:pointer;font-size:24px'>×</button></div>";
-    html+="<div style='font-size:12px;color:#94a3b8;margin-bottom:12px;padding:8px 12px;background:#ffffff;border-radius:8px'>"+(S.gender==="female"?"👩":"👨")+" "+S.weight+"кг → "+S.targetWeight+"кг · "+S.dg.calories+" ккал"+(S.subGlData?" · "+S.subGlData.label:"")+". </div>";
+    var html="<div style='display:flex;justify-content:space-between;align-items:center;margin-bottom:12px'><div style='font-family:Unbounded,sans-serif;font-size:16px;font-weight:700'>Твой план на 7 дней</div><button onclick='closePlanModal()' style='background:none;border:none;color:rgba(255,255,255,.4);cursor:pointer;font-size:24px'>×</button></div>";
+    html+="<div style='font-size:12px;color:rgba(255,255,255,.35);margin-bottom:12px;padding:8px 12px;background:rgba(255,255,255,.04);border-radius:8px'>"+(S.gender==="female"?"👩":"👨")+" "+S.weight+"кг → "+S.targetWeight+"кг · "+S.dg.calories+" ккал"+(S.subGlData?" · "+S.subGlData.label:"")+". </div>";
     plan.days.forEach(function(day){
       html+="<div class='card' style='margin-bottom:10px'><div style='font-weight:700;font-size:14px;color:"+g.color+";margin-bottom:10px'>"+day.day+" · "+(day.cal||"")+" ккал</div>";
       var rows=[];
@@ -1131,14 +1154,14 @@ function showWeeklyPlan(){
       else if(day.snack&&!day.snack1) rows.push(["🍎 Перекус",day.snack]);
       if(day.dinner) rows.push(["🌙 Ужин",day.dinner]);
       rows.forEach(function(m,mi){
-        html+="<div style='padding:7px 0;"+(mi<rows.length-1?"border-bottom:1px solid #f1f5f9":"")+"'><div style='font-size:11px;color:#94a3b8;font-weight:600;margin-bottom:2px'>"+m[0]+"</div><div style='font-size:13px;color:#1e293b'>"+m[1]+"</div></div>";
+        html+="<div style='padding:7px 0;"+(mi<rows.length-1?"border-bottom:1px solid rgba(255,255,255,.05)":"")+"'><div style='font-size:11px;color:rgba(255,255,255,.4);font-weight:600;margin-bottom:2px'>"+m[0]+"</div><div style='font-size:13px;color:rgba(240,240,248,.85)'>"+m[1]+"</div></div>";
       });
       html+="</div>";
     });
     html+="<button class='btn btn-primary' style='margin-top:4px' onclick='showShoppingList()'>🛒 Список покупок с ценами</button>";
     sheet.innerHTML=html;
   }).catch(function(e){
-    sheet.innerHTML="<div style='text-align:center;padding:32px'><div style='font-size:36px;margin-bottom:12px'>❌</div><div style='font-weight:700;margin-bottom:6px'>Ошибка</div><div style='color:#94a3b8;font-size:12px;margin-bottom:16px'>"+e.message+"</div><button class='btn btn-primary' onclick='showWeeklyPlan()'>Попробовать снова</button></div>";
+    sheet.innerHTML="<div style='text-align:center;padding:32px'><div style='font-size:36px;margin-bottom:12px'>❌</div><div style='font-weight:700;margin-bottom:6px'>Ошибка</div><div style='color:rgba(255,255,255,.4);font-size:12px;margin-bottom:16px'>"+e.message+"</div><button class='btn btn-primary' onclick='showWeeklyPlan()'>Попробовать снова</button></div>";
   });
 }
 
@@ -1169,28 +1192,28 @@ function renderBodyScreen(){
   html+="<div class='text-head' style='margin-bottom:10px'>ДВА СЦЕНАРИЯ — 30 ДНЕЙ</div>";
   html+="<div style='display:flex;gap:10px;margin-bottom:10px'>";
   html+="<div class='card' style='flex:1;background:rgba(255,87,51,.07);border:1px solid rgba(255,87,51,.25)'>";
-  html+="<div class='tag' style='background:#fff1ee;color:#dc2626;font-size:10px;margin-bottom:8px'>БЕЗ ПЛАНА</div>";
-  html+="<div style='font-size:24px;font-weight:900;color:#1e293b'>"+cw.toFixed(1)+"<span style='font-size:12px;color:#94a3b8'> кг</span></div>";
-  html+="<div style='font-size:12px;color:#94a3b8;margin-top:4px'>вес не изменится</div>";
-  html+="<div style='font-size:11px;color:#94a3b8;margin-top:3px'>"+tdee+" ккал/день (TDEE)</div>";
+  html+="<div class='tag' style='background:rgba(255,87,51,.15);color:#ff5733;font-size:10px;margin-bottom:8px'>БЕЗ ПЛАНА</div>";
+  html+="<div style='font-size:24px;font-weight:900;color:#f0f0f8'>"+cw.toFixed(1)+"<span style='font-size:12px;color:rgba(255,255,255,.4)'> кг</span></div>";
+  html+="<div style='font-size:12px;color:rgba(255,255,255,.4);margin-top:4px'>вес не изменится</div>";
+  html+="<div style='font-size:11px;color:rgba(255,255,255,.3);margin-top:3px'>"+tdee+" ккал/день (TDEE)</div>";
   html+="</div>";
   html+="<div class='card' style='flex:1;background:"+g.color+"0a;border:1px solid "+g.color+"28'>";
   html+="<div class='tag' style='background:"+g.color+"20;color:"+g.color+";font-size:10px;margin-bottom:8px'>ПО ПЛАНУ</div>";
-  html+="<div style='font-size:24px;font-weight:900;color:"+g.color+"'>"+(cw+optChg).toFixed(1)+"<span style='font-size:12px;color:#94a3b8'> кг</span></div>";
+  html+="<div style='font-size:24px;font-weight:900;color:"+g.color+"'>"+(cw+optChg).toFixed(1)+"<span style='font-size:12px;color:rgba(255,255,255,.4)'> кг</span></div>";
   html+="<div style='font-size:12px;color:"+g.color+";font-weight:600;margin-top:4px'>"+(optChg>0?"+":"")+optChg.toFixed(1)+" кг</div>";
-  html+="<div style='font-size:11px;color:#94a3b8;margin-top:3px'>"+S.dg.calories+" ккал/день</div>";
+  html+="<div style='font-size:11px;color:rgba(255,255,255,.3);margin-top:3px'>"+S.dg.calories+" ккал/день</div>";
   html+="</div></div>";
 
   // ── Progress to goal ──
   html+="<div class='card' style='background:rgba(0,232,122,.05);border:1px solid rgba(0,232,122,.18);margin-bottom:14px'>";
   html+="<div style='display:flex;gap:12px;align-items:center'><span style='font-size:24px'>🎯</span>";
   html+="<div style='flex:1'>";
-  html+="<div style='font-size:11px;color:#94a3b8;margin-bottom:4px'>Цель: "+tw+"кг при соблюдении плана</div>";
+  html+="<div style='font-size:11px;color:rgba(255,255,255,.4);margin-bottom:4px'>Цель: "+tw+"кг при соблюдении плана</div>";
   html+="<div style='font-weight:700;font-size:16px;margin-bottom:4px'>через ~"+daysLeft+" дней ("+months+" мес)</div>";
   html+="<div style='display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-top:6px'>";
   [["В день",Math.abs(optDiff)+" ккал","#4a9eff"],["В неделю",kgPerWeek+" кг","var(--c)"],["В месяц",kgPerMonth+" кг","#00e87a"]].forEach(function(s){
-    html+="<div style='background:#ffffff;border-radius:8px;padding:6px;text-align:center'>" +
-      "<div style='font-size:10px;color:#94a3b8;margin-bottom:2px'>"+s[0]+"</div>" +
+    html+="<div style='background:rgba(255,255,255,.04);border-radius:8px;padding:6px;text-align:center'>" +
+      "<div style='font-size:10px;color:rgba(255,255,255,.35);margin-bottom:2px'>"+s[0]+"</div>" +
       "<div style='font-weight:700;font-size:12px;color:"+s[2]+"'>"+s[1]+"</div>" +
     "</div>";
   });
@@ -1226,14 +1249,14 @@ function renderBodyScreen(){
       if(p.an){
         // Fitness rating bar
         var rating=p.an.fitnessRating||Math.round((100-p.an.fatPercent*2+p.an.muscleLevel)/2);
-        html+="<div style='background:#f8fafc;border-radius:8px;padding:8px;margin-bottom:6px'>";
+        html+="<div style='background:rgba(255,255,255,.05);border-radius:8px;padding:8px;margin-bottom:6px'>";
         html+="<div style='display:flex;justify-content:space-between;margin-bottom:4px'>";
-        html+="<span style='font-size:10px;color:#94a3b8'>Фитнес-рейтинг</span>";
+        html+="<span style='font-size:10px;color:rgba(255,255,255,.4)'>Фитнес-рейтинг</span>";
         html+="<span style='font-size:11px;font-weight:700;color:"+g.color+"'>"+rating+"/100</span></div>";
-        html+="<div style='height:4px;background:#f1f5f9;border-radius:2px'><div style='height:100%;width:"+Math.min(100,rating)+"%%;border-radius:2px;background:"+g.color+"'></div></div>";
+        html+="<div style='height:4px;background:rgba(255,255,255,.08);border-radius:2px'><div style='height:100%;width:"+Math.min(100,rating)+"%%;border-radius:2px;background:"+g.color+"'></div></div>";
         html+="</div>";
-        html+="<div style='font-size:11px;color:#64748b;margin-bottom:3px'>Жир: ~"+p.an.fatPercent+"% · Мышцы: "+p.an.muscleLevel+"/100</div>";
-        if(p.an.bodyType) html+="<div style='font-size:11px;color:#64748b;margin-bottom:4px'>"+p.an.bodyType+"</div>";
+        html+="<div style='font-size:11px;color:rgba(240,240,248,.42);margin-bottom:3px'>Жир: ~"+p.an.fatPercent+"% · Мышцы: "+p.an.muscleLevel+"/100</div>";
+        if(p.an.bodyType) html+="<div style='font-size:11px;color:rgba(240,240,248,.42);margin-bottom:4px'>"+p.an.bodyType+"</div>";
         html+="<div style='font-size:11px;color:rgba(240,240,248,.75);line-height:1.5;margin-bottom:6px'>"+p.an.note+"</div>";
         if(p.an.nextStep) html+="<div class='tag' style='background:"+g.color+"15;color:"+g.color+";font-size:10px;white-space:normal;line-height:1.4;display:block'>→ "+p.an.nextStep.slice(0,65)+"</div>";
       }
@@ -1252,43 +1275,43 @@ function renderBodyScreen(){
       // Key metrics
       html+="<div style='display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px'>";
       [[an.fatPercent+"%","% Жира","#ff5733"],[an.muscleLevel+"/100","Мышцы","#00e87a"],[an.bodyType||"—","Тип","#4a9eff"],[(an.fitnessRating||"—")+"/100","Рейтинг",g.color]].forEach(function(s){
-        html+="<div style='background:#f8fafc;border-radius:10px;padding:10px'>" +
+        html+="<div style='background:rgba(255,255,255,.05);border-radius:10px;padding:10px'>" +
           "<div style='font-weight:700;font-size:16px;color:"+s[2]+";margin-bottom:2px'>"+s[0]+"</div>" +
-          "<div style='font-size:11px;color:#94a3b8'>"+s[1]+"</div>" +
+          "<div style='font-size:11px;color:rgba(255,255,255,.4)'>"+s[1]+"</div>" +
         "</div>";
       });
       html+="</div>";
       if(an.problemZones&&an.problemZones.length){
         html+="<div style='margin-bottom:8px'>";
-        html+="<div style='font-size:11px;color:#dc2626;font-weight:600;margin-bottom:4px'>⚠️ СЛАБЫЕ ЗОНЫ</div>";
-        html+="<div style='font-size:12px;color:#475569'>"+an.problemZones.join(" · ")+"</div></div>";
+        html+="<div style='font-size:11px;color:#ff5733;font-weight:600;margin-bottom:4px'>⚠️ СЛАБЫЕ ЗОНЫ</div>";
+        html+="<div style='font-size:12px;color:rgba(240,240,248,.7)'>"+an.problemZones.join(" · ")+"</div></div>";
       }
       if(an.strengths&&an.strengths.length){
         html+="<div style='margin-bottom:8px'>";
-        html+="<div style='font-size:11px;color:#16a34a;font-weight:600;margin-bottom:4px'>✅ СИЛЬНЫЕ СТОРОНЫ</div>";
-        html+="<div style='font-size:12px;color:#475569'>"+an.strengths.join(" · ")+"</div></div>";
+        html+="<div style='font-size:11px;color:#00e87a;font-weight:600;margin-bottom:4px'>✅ СИЛЬНЫЕ СТОРОНЫ</div>";
+        html+="<div style='font-size:12px;color:rgba(240,240,248,.7)'>"+an.strengths.join(" · ")+"</div></div>";
       }
       if(an.strategy){
-        html+="<div style='background:#ffffff;border-radius:8px;padding:10px;margin-bottom:8px'>";
+        html+="<div style='background:rgba(255,255,255,.04);border-radius:8px;padding:10px;margin-bottom:8px'>";
         html+="<div style='font-size:11px;color:"+g.color+";font-weight:600;margin-bottom:3px'>🎯 РЕКОМЕНДУЕМАЯ СТРАТЕГИЯ</div>";
-        html+="<div style='font-size:13px;color:#1e293b'>"+an.strategy+"</div></div>";
+        html+="<div style='font-size:13px;color:rgba(240,240,248,.85)'>"+an.strategy+"</div></div>";
       }
       if(an.weeklyGoal){
-        html+="<div style='background:#f0fdf4;border-radius:8px;padding:10px'>";
-        html+="<div style='font-size:11px;color:#16a34a;font-weight:600;margin-bottom:3px'>📅 ЦЕЛЬ НА ЭТУ НЕДЕЛЮ</div>";
-        html+="<div style='font-size:13px;color:#1e293b'>"+an.weeklyGoal+"</div></div>";
+        html+="<div style='background:rgba(0,232,122,.08);border-radius:8px;padding:10px'>";
+        html+="<div style='font-size:11px;color:#00e87a;font-weight:600;margin-bottom:3px'>📅 ЦЕЛЬ НА ЭТУ НЕДЕЛЮ</div>";
+        html+="<div style='font-size:13px;color:rgba(240,240,248,.85)'>"+an.weeklyGoal+"</div></div>";
       }
       html+="</div>";
 
       // Projections
       if(an.projections){
         html+="<div class='card' style='margin-bottom:12px'>";
-        html+="<div style='font-size:12px;color:#64748b;font-weight:600;margin-bottom:10px'>📈 ПРОГНОЗ РЕЗУЛЬТАТОВ</div>";
+        html+="<div style='font-size:12px;color:rgba(255,255,255,.6);font-weight:600;margin-bottom:10px'>📈 ПРОГНОЗ РЕЗУЛЬТАТОВ</div>";
         html+="<div style='display:grid;grid-template-columns:1fr 1fr;gap:8px'>";
         [["1 месяц",an.projections.month1||"—"],["3 месяца",an.projections.month3||"—"],["6 месяцев",an.projections.month6||"—"],["12 месяцев",an.projections.month12||"—"]].forEach(function(s,i){
           var colors=["#4a9eff",g.color,"#00e87a","#a855f7"];
-          html+="<div style='background:#ffffff;border-radius:10px;padding:10px'>" +
-            "<div style='font-size:10px;color:#94a3b8;margin-bottom:3px'>"+s[0]+"</div>" +
+          html+="<div style='background:rgba(255,255,255,.04);border-radius:10px;padding:10px'>" +
+            "<div style='font-size:10px;color:rgba(255,255,255,.35);margin-bottom:3px'>"+s[0]+"</div>" +
             "<div style='font-size:12px;font-weight:600;color:"+colors[i]+"'>"+s[1]+"</div>" +
           "</div>";
         });
@@ -1297,7 +1320,7 @@ function renderBodyScreen(){
 
       // Confidence
       if(an.confidence){
-        html+="<div style='font-size:11px;color:#94a3b8;text-align:center;margin-bottom:12px'>";
+        html+="<div style='font-size:11px;color:rgba(255,255,255,.3);text-align:center;margin-bottom:12px'>";
         html+="Уверенность анализа: "+an.confidence+"% · Не является медицинским диагнозом</div>";
       }
     }
@@ -1309,11 +1332,11 @@ function renderBodyScreen(){
       var fatDiff=(last2.fatPercent-first.fatPercent).toFixed(1);
       var muscleDiff=(last2.muscleLevel-first.muscleLevel);
       html+="<div class='card' style='background:rgba(0,232,122,.06);border:1px solid rgba(0,232,122,.2);margin-bottom:12px'>";
-      html+="<div style='font-size:12px;color:#16a34a;font-weight:700;margin-bottom:8px'>📊 ПРОГРЕСС · "+S.bodyPics.length+" фото</div>";
+      html+="<div style='font-size:12px;color:#00e87a;font-weight:700;margin-bottom:8px'>📊 ПРОГРЕСС · "+S.bodyPics.length+" фото</div>";
       html+="<div style='display:grid;grid-template-columns:1fr 1fr;gap:8px'>";
       [["% Жира",first.fatPercent+"% → "+last2.fatPercent+"%",(fatDiff<0?"#00e87a":"#ff5733")],["Мышцы",first.muscleLevel+" → "+last2.muscleLevel+"/100",(muscleDiff>0?"#00e87a":"#4a9eff")]].forEach(function(s){
-        html+="<div style='background:#ffffff;border-radius:8px;padding:8px'>" +
-          "<div style='font-size:10px;color:#94a3b8;margin-bottom:3px'>"+s[0]+"</div>" +
+        html+="<div style='background:rgba(255,255,255,.04);border-radius:8px;padding:8px'>" +
+          "<div style='font-size:10px;color:rgba(255,255,255,.35);margin-bottom:3px'>"+s[0]+"</div>" +
           "<div style='font-size:12px;font-weight:600;color:"+s[2]+"'>"+s[1]+"</div>" +
         "</div>";
       });
@@ -1323,7 +1346,7 @@ function renderBodyScreen(){
 
   // Share card
   html+="<div class='card' style='margin-bottom:20px'>";
-  html+="<div class='tag' style='background:#fff1ee;color:#dc2626;margin-bottom:10px'>🔥 ПОДЕЛИТЬСЯ</div>";
+  html+="<div class='tag' style='background:rgba(255,87,51,.15);color:#ff5733;margin-bottom:10px'>🔥 ПОДЕЛИТЬСЯ</div>";
   html+="<div style='font-weight:700;font-size:15px;margin-bottom:6px'>Карточка прогресса</div>";
   html+="<div class='text-muted' style='font-size:13px;margin-bottom:14px'>Скачай PNG и отправь друзьям как вызов</div>";
   html+="<button class='btn btn-primary' onclick='downloadCard()'>⬇ Скачать PNG</button></div>";
@@ -1334,9 +1357,11 @@ function renderBodyScreen(){
 function onBodyFile(e){
   var f=e.target.files[0]; if(!f) return;
   if(!S_PREMIUM){e.target.value="";showPaywall();return;}
-  if(!canBodyTwin()){e.target.value="";
-    var _d=new Date();var dl=new Date(_d.getFullYear(),_d.getMonth()+1,0).getDate()-_d.getDate();
-    alert("Лимит Body Twin на этот месяц (6/6)\nОсталось "+dl+" дней до обновления");
+  if(!canBodyTwin()){
+    e.target.value="";
+    var _d=new Date();
+    var daysLeft=new Date(_d.getFullYear(),_d.getMonth()+1,0).getDate()-_d.getDate();
+    alert("Лимит Body Twin на этот месяц исчерпан (6/6)\nОсталось "+daysLeft+" дней до нового месяца");
     return;
   }
   incrementBodyTwin();
@@ -1472,16 +1497,16 @@ function renderSubGoals(goalId){
     if(nb&&g){nb.style.background=g.color;nb.style.color="#000";}
     return;
   }
-  var h="<div style='margin-top:6px;padding:14px;background:"+g.color+"15;border:1.5px solid "g.color+"28;border-radius:14px'>";
+  var h="<div style='margin-top:6px;padding:14px;background:"+g.color+"0a;border:1.5px solid "+g.color+"28;border-radius:14px'>";
   h+="<div style='font-size:11px;color:"+g.color+";font-weight:700;margin-bottom:10px'>ВЫБЕРИ РЕЖИМ:</div>";
   for(var si=0;si<subs.length;si++){
     var s=subs[si];
     h+="<div id='sub-"+s.id+"' data-goal='"+goalId+"' data-sub='"+s.id+"' onclick='onSubClick(this)' ";
-    h+="style='cursor:pointer;padding:12px;border-radius:10px;border:1.5px solid #e8edf3;background:#f8fafc;margin-bottom:"+(si<subs.length-1?"8":"0")+"px'>";
+    h+="style='cursor:pointer;padding:12px;border-radius:10px;border:1.5px solid rgba(255,255,255,.08);background:rgba(255,255,255,.03);margin-bottom:"+(si<subs.length-1?"8":"0")+"px'>";
     h+="<div style='display:flex;align-items:center;gap:10px'>";
     h+="<span style='font-size:22px'>"+s.icon+"</span>";
-    h+="<div style='flex:1'><div style='font-weight:700;font-size:13px;color:#1e293b' id='sub-lbl-"+s.id+"'>"+s.label+"</div>";
-    h+="<div style='font-size:11px;color:#64748b;margin-top:2px'>"+s.desc+"</div></div>";
+    h+="<div style='flex:1'><div style='font-weight:700;font-size:13px;color:#f0f0f8' id='sub-lbl-"+s.id+"'>"+s.label+"</div>";
+    h+="<div style='font-size:11px;color:rgba(255,255,255,.42);margin-top:2px'>"+s.desc+"</div></div>";
     h+="<div id='sub-chk-"+s.id+"' style='display:none;width:18px;height:18px;border-radius:50%;background:"+s.color+";flex-shrink:0;align-items:center;justify-content:center;font-size:10px;font-weight:900;color:#000'>v</div>";
     h+="</div></div>";
   }
@@ -1535,7 +1560,7 @@ function renderWeightGraph(){
   var el=document.getElementById("weight-graph-area");
   if(!el) return;
   if(!S.weightLog||S.weightLog.length<2){
-    el.innerHTML="<div style='text-align:center;padding:16px;color:#94a3b8;font-size:12px'>Добавь хотя бы 2 записи для графика</div>";
+    el.innerHTML="<div style='text-align:center;padding:16px;color:rgba(255,255,255,.35);font-size:12px'>Добавь хотя бы 2 записи для графика</div>";
     return;
   }
   var g=GOALS.filter(function(x){return x.id===S.gl;})[0];
@@ -1570,8 +1595,8 @@ function renderWeightGraph(){
   }
   html+="</svg>";
   html+="<div style='display:flex;justify-content:space-between;margin-top:3px'>";
-  html+="<span style='font-size:10px;color:#94a3b8'>"+pts[0].date.slice(5)+"</span>";
-  html+="<span style='font-size:10px;color:#94a3b8'>"+pts[pts.length-1].date.slice(5)+"</span></div>";
+  html+="<span style='font-size:10px;color:rgba(255,255,255,.3)'>"+pts[0].date.slice(5)+"</span>";
+  html+="<span style='font-size:10px;color:rgba(255,255,255,.3)'>"+pts[pts.length-1].date.slice(5)+"</span></div>";
   el.innerHTML=html;
 }
 
@@ -1623,17 +1648,17 @@ function showWorkoutModal(){
   if(!wm||!ws) return;
   selWkt=null;
   var h="<div style='display:flex;justify-content:space-between;align-items:center;margin-bottom:16px'>";
-  h+="<div style='font-family:Unbounded,sans-serif;font-size:16px;font-weight:700;color:#1e293b'>Тренировка</div>";
-  h+="<button onclick='closeModal(\"workout-modal\")' style='background:none;border:none;color:#94a3b8;cursor:pointer;font-size:24px'>x</button></div>";
+  h+="<div style='font-family:Unbounded,sans-serif;font-size:16px;font-weight:700'>Тренировка</div>";
+  h+="<button onclick='closeModal(\"workout-modal\")' style='background:none;border:none;color:rgba(255,255,255,.4);cursor:pointer;font-size:24px'>x</button></div>";
   for(var i=0;i<WKTS.length;i++){
     var w=WKTS[i];
-    h+="<div id='wk"+i+"' data-i='"+i+"' onclick='pickWkt(this)' style='cursor:pointer;padding:10px 12px;border-radius:10px;border:1px solid #e8edf3;background:#f8fafc;margin-bottom:6px;display:flex;align-items:center;gap:10px'>";
+    h+="<div id='wk"+i+"' data-i='"+i+"' onclick='pickWkt(this)' style='cursor:pointer;padding:10px 12px;border-radius:10px;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.03);margin-bottom:6px;display:flex;align-items:center;gap:10px'>";
     h+="<span style='font-size:20px'>"+w.icon+"</span><span style='font-size:13px;font-weight:600;flex:1'>"+w.name+"</span>";
-    h+="<span style='font-size:11px;color:#94a3b8'>~"+w.cph+" ккал/ч</span></div>";
+    h+="<span style='font-size:11px;color:rgba(255,255,255,.4)'>~"+w.cph+" ккал/ч</span></div>";
   }
-  h+="<div style='margin:12px 0 6px'><div style='font-size:12px;color:#64748b;margin-bottom:6px'>Длительность (мин)</div>";
+  h+="<div style='margin:12px 0 6px'><div style='font-size:12px;color:rgba(255,255,255,.42);margin-bottom:6px'>Длительность (мин)</div>";
   h+="<input id='wkt-mins' class='inp' type='number' value='60' min='5' max='300'/></div>";
-  h+="<div id='wkt-res' style='display:none;background:#f0fdf4;border:1px solid rgba(0,232,122,.2);border-radius:10px;padding:12px;margin-bottom:12px;text-align:center'></div>";
+  h+="<div id='wkt-res' style='display:none;background:rgba(0,232,122,.08);border:1px solid rgba(0,232,122,.2);border-radius:10px;padding:12px;margin-bottom:12px;text-align:center'></div>";
   h+="<button class='btn btn-primary' onclick='logWkt()'>Добавить тренировку</button>";
   ws.innerHTML=h; wm.style.display="flex";
 }
@@ -1647,7 +1672,7 @@ function pickWkt(el){
   var mins=+(document.getElementById("wkt-mins")||{value:60}).value||60;
   var burned=Math.round(WKTS[selWkt].cph*mins/60);
   var res=document.getElementById("wkt-res");
-  if(res){res.style.display="block";res.innerHTML="<span style='font-size:18px;font-weight:900;color:#16a34a'>-"+burned+" ккал</span><br><span style='font-size:12px;color:#64748b'>Остаток: "+(S.dg.calories-S.st.calories+burned)+" ккал</span>";}
+  if(res){res.style.display="block";res.innerHTML="<span style='font-size:18px;font-weight:900;color:#00e87a'>-"+burned+" ккал</span><br><span style='font-size:12px;color:rgba(255,255,255,.42)'>Остаток: "+(S.dg.calories-S.st.calories+burned)+" ккал</span>";}
 }
 
 function logWkt(){
@@ -1669,12 +1694,13 @@ function renderWorkoutCard(){
   var act=S.activity||3;
   if(act>=3){wc.style.display="none";return;}
   wc.style.display="block";
+  var isLight=(act===2);
   wc.innerHTML="<div style='display:flex;justify-content:space-between;align-items:center'>" +
-    "<div style='flex:1'><div class='tag' style='background:#fff7ed;color:#ea580c;font-size:10px;margin-bottom:6px'>🏋️ ТРЕНИРОВКА</div>" +
-    "<div style='font-weight:600;font-size:14px;margin-bottom:2px;color:#1e293b'>"+(S.workoutCal>0?"Сожжено: "+S.workoutCal+" ккал":"Добавить тренировку")+"</div>" +
-    "<div style='font-size:11px;color:#64748b'>"+(act===2?"⚠️ Тренировки частично учтены":S.workoutCal>0?"Норма "+S.dg.calories+" ккал":"Добавь — скорректирует норму")+"</div></div>" +
-    (act===2?"":
-      "<button onclick='showWorkoutModal()' style='padding:9px 16px;font-size:12px;font-weight:700;border-radius:10px;margin-left:12px;background:#f97316;color:#fff;border:none;cursor:pointer;font-family:inherit;flex-shrink:0'>"+(S.workoutCal>0?"+ Ещё":"Добавить")+"</button>"
+    "<div style='flex:1'><div class='tag' style='background:rgba(255,148,50,.15);color:#ff9432;font-size:10px;margin-bottom:6px'>🏋️ ТРЕНИРОВКА</div>" +
+    "<div style='font-weight:600;font-size:14px;margin-bottom:2px'>"+(S.workoutCal>0?"Сожжено: "+S.workoutCal+" ккал":"Добавить тренировку")+"</div>" +
+    "<div class='text-muted' style='font-size:11px'>"+(isLight?"⚠️ Тренировки частично учтены в норме":S.workoutCal>0?"Норма "+S.dg.calories+" ккал":"Сидячий режим: добавь тренировку")+"</div></div>" +
+    (isLight?"":
+      "<button onclick='showWorkoutModal()' style='padding:9px 16px;font-size:12px;font-weight:700;border-radius:10px;margin-left:12px;background:#ff9432;color:#000;border:none;cursor:pointer;font-family:inherit;flex-shrink:0'>"+(S.workoutCal>0?"+ Ещё":"Добавить")+"</button>"
     ) +
   "</div>";
 }
@@ -1739,12 +1765,12 @@ function showShoppingList(){
   }
   var sheet=document.getElementById("plan-sheet");
   var h="<div style='display:flex;justify-content:space-between;align-items:center;margin-bottom:16px'>";
-  h+="<div style='font-family:Unbounded,sans-serif;font-size:16px;font-weight:700;color:#1e293b'>Список покупок</div>";
-  h+="<button onclick='closeModal(\"plan-modal\")' style='background:none;border:none;color:#94a3b8;cursor:pointer;font-size:24px'>x</button></div>";
-  h+="<div style='background:#f0fdf4;border:1px solid rgba(0,232,122,.2);border-radius:12px;padding:12px 16px;margin-bottom:14px;display:flex;justify-content:space-between;align-items:center'>";
-  h+="<div><div style='font-size:11px;color:#16a34a;font-weight:700'>СТОИМОСТЬ НА НЕДЕЛЮ</div>";
-  h+="<div style='font-size:22px;font-weight:900;color:#16a34a'>~"+total.toLocaleString()+" ₸</div></div>";
-  h+="<div style='font-size:11px;color:#94a3b8;text-align:right'>Цены<br/>Алматы/Астана</div></div>";
+  h+="<div style='font-family:Unbounded,sans-serif;font-size:16px;font-weight:700'>Список покупок</div>";
+  h+="<button onclick='closeModal(\"plan-modal\")' style='background:none;border:none;color:rgba(255,255,255,.4);cursor:pointer;font-size:24px'>x</button></div>";
+  h+="<div style='background:rgba(0,232,122,.08);border:1px solid rgba(0,232,122,.2);border-radius:12px;padding:12px 16px;margin-bottom:14px;display:flex;justify-content:space-between;align-items:center'>";
+  h+="<div><div style='font-size:11px;color:#00e87a;font-weight:700'>СТОИМОСТЬ НА НЕДЕЛЮ</div>";
+  h+="<div style='font-size:22px;font-weight:900;color:#00e87a'>~"+total.toLocaleString()+" ₸</div></div>";
+  h+="<div style='font-size:11px;color:rgba(255,255,255,.35);text-align:right'>Цены<br/>Алматы/Астана</div></div>";
   var catDefs=[{k:"prot",l:"🍗 Белок",c:"#ff9432"},{k:"carb",l:"🌾 Крупы",c:"#fbbf24"},{k:"veg",l:"🥦 Овощи и фрукты",c:"#00e87a"},{k:"dairy",l:"🥛 Молочное",c:"#4a9eff"},{k:"other",l:"🛒 Прочее",c:"rgba(255,255,255,.6)"}];
   catDefs.forEach(function(cat){
     var items=cats[cat.k];
@@ -1753,15 +1779,15 @@ function showShoppingList(){
     h+="<div style='font-size:11px;color:"+cat.c+";font-weight:700;margin-bottom:6px'>"+cat.l+"</div>";
     items.forEach(function(item){
       var dn=item.n.charAt(0).toUpperCase()+item.n.slice(1);
-      h+="<div style='display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid #f1f5f9'>";
+      h+="<div style='display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid rgba(255,255,255,.05)'>";
       h+="<span style='font-size:13px'>"+dn+"</span>";
       h+="<div style='display:flex;gap:12px;flex-shrink:0'>";
-      h+="<span style='font-size:12px;color:#64748b'>"+item.g+"г</span>";
+      h+="<span style='font-size:12px;color:rgba(255,255,255,.42)'>"+item.g+"г</span>";
       h+="<span style='font-size:12px;font-weight:700;color:"+cat.c+"'>~"+item.p+" ₸</span></div></div>";
     });
     h+="</div>";
   });
-  h+="<div style='margin-top:4px;padding:8px;background:#ffffff;border-radius:8px;font-size:11px;color:#94a3b8;text-align:center'>Цены усреднены. Могут отличаться в зависимости от магазина</div>";
+  h+="<div style='margin-top:4px;padding:8px;background:rgba(255,255,255,.04);border-radius:8px;font-size:11px;color:rgba(255,255,255,.35);text-align:center'>Цены усреднены. Могут отличаться в зависимости от магазина</div>";
   sheet.innerHTML=h;
   document.getElementById("plan-modal").style.display="flex";
 }
@@ -1771,8 +1797,8 @@ function showShoppingList(){
 // ─── PLAN RENDERING WITH EDIT ────────────────────────────────
 function renderPlanHTML(plan){
   var g=GOALS.filter(function(x){return x.id===S.gl;})[0];
-  var html="<div style='display:flex;justify-content:space-between;align-items:center;margin-bottom:12px'><div style='font-family:Unbounded,sans-serif;font-size:16px;font-weight:700;color:#1e293b'>Твой план на 7 дней</div><button onclick='closePlanModal()' style='background:none;border:none;color:#94a3b8;cursor:pointer;font-size:24px'>×</button></div>";
-  html+="<div style='font-size:12px;color:#94a3b8;margin-bottom:12px;padding:8px 12px;background:#ffffff;border-radius:8px'>"+(S.gender==="female"?"👩":"👨")+" "+S.weight+"кг → "+S.targetWeight+"кг · "+S.dg.calories+" ккал"+(S.subGlData?" · "+S.subGlData.label:"")+". </div>";
+  var html="<div style='display:flex;justify-content:space-between;align-items:center;margin-bottom:12px'><div style='font-family:Unbounded,sans-serif;font-size:16px;font-weight:700'>Твой план на 7 дней</div><button onclick='closePlanModal()' style='background:none;border:none;color:rgba(255,255,255,.4);cursor:pointer;font-size:24px'>×</button></div>";
+  html+="<div style='font-size:12px;color:rgba(255,255,255,.35);margin-bottom:12px;padding:8px 12px;background:rgba(255,255,255,.04);border-radius:8px'>"+(S.gender==="female"?"👩":"👨")+" "+S.weight+"кг → "+S.targetWeight+"кг · "+S.dg.calories+" ккал"+(S.subGlData?" · "+S.subGlData.label:"")+". </div>";
   plan.days.forEach(function(day,di){
     html+="<div class='card' style='margin-bottom:10px' id='plan-day-"+di+"'>";
     html+=renderDayHTML(day,di,g);
@@ -1785,7 +1811,7 @@ function renderPlanHTML(plan){
 function renderDayHTML(day,di,g){
   var html="<div style='display:flex;justify-content:space-between;align-items:center;margin-bottom:10px'>";
   html+="<div style='font-weight:700;font-size:14px;color:"+g.color+"'>"+day.day+" · "+(day.cal||"")+" ккал</div>";
-  html+="<button data-di='"+di+"' onclick='editPlanDay("+di+")' style='padding:5px 10px;font-size:11px;font-weight:600;border-radius:7px;border:1px solid rgba(255,255,255,.15);background:#f8fafc;color:#475569;cursor:pointer;font-family:inherit'>✏️ Изменить</button>";
+  html+="<button data-di='"+di+"' onclick='editPlanDay("+di+")' style='padding:5px 10px;font-size:11px;font-weight:600;border-radius:7px;border:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.05);color:rgba(240,240,248,.7);cursor:pointer;font-family:inherit'>✏️ Изменить</button>";
   html+="</div>";
   var rows=[];
   if(day.breakfast) rows.push(["🌅 Завтрак",day.breakfast]);
@@ -1795,7 +1821,7 @@ function renderDayHTML(day,di,g){
   else if(day.snack&&!day.snack1) rows.push(["🍎 Перекус",day.snack]);
   if(day.dinner) rows.push(["🌙 Ужин",day.dinner]);
   rows.forEach(function(m,mi){
-    html+="<div style='padding:7px 0;"+(mi<rows.length-1?"border-bottom:1px solid #f1f5f9":"")+"'><div style='font-size:11px;color:#94a3b8;font-weight:600;margin-bottom:2px'>"+m[0]+"</div><div style='font-size:13px;color:#1e293b'>"+m[1]+"</div></div>";
+    html+="<div style='padding:7px 0;"+(mi<rows.length-1?"border-bottom:1px solid rgba(255,255,255,.05)":"")+"'><div style='font-size:11px;color:rgba(255,255,255,.4);font-weight:600;margin-bottom:2px'>"+m[0]+"</div><div style='font-size:13px;color:rgba(240,240,248,.85)'>"+m[1]+"</div></div>";
   });
   return html;
 }
@@ -1807,7 +1833,7 @@ function editPlanDay(di){
   if(!dayCard) return;
   var dayName=S.lastPlan.days[di].day;
   // Show loading in this day card
-  dayCard.innerHTML="<div style='text-align:center;padding:20px'><div style='font-size:28px;margin-bottom:8px' class='pulse'>🤖</div><div style='font-size:13px;font-weight:600;color:#334155'>AI подбирает замену для "+dayName+"...</div></div>";
+  dayCard.innerHTML="<div style='text-align:center;padding:20px'><div style='font-size:28px;margin-bottom:8px' class='pulse'>🤖</div><div style='font-size:13px;font-weight:600;color:rgba(240,240,248,.8)'>AI подбирает замену для "+dayName+"...</div></div>";
   var isCut=(S.gl==="cutting"||S.gl==="loss");
   var currentMeals=[];
   S.lastPlan.days.forEach(function(d,i){if(i!==di)currentMeals.push(d.day+": "+[d.breakfast,d.lunch,d.dinner].filter(Boolean).join(", "));});
@@ -1842,7 +1868,7 @@ function editPlanDay(di){
   }).catch(function(e){
     dayCard.innerHTML=renderDayHTML(S.lastPlan.days[di],di,g);
     var errDiv=document.createElement("div");
-    errDiv.style.cssText="font-size:11px;color:#dc2626;padding:8px 0";
+    errDiv.style.cssText="font-size:11px;color:#ff5733;padding:8px 0";
     errDiv.textContent="Ошибка: "+e.message;
     dayCard.appendChild(errDiv);
   });
@@ -1903,13 +1929,16 @@ function getBodyTwinMonthCount(){
     return data.month===month?(data.count||0):0;
   }catch(e){return 0;}
 }
+
 function incrementBodyTwin(){
   try{
     var _d=new Date();
     var month=_d.getFullYear()+"-"+String(_d.getMonth()+1).padStart(2,"0");
-    localStorage.setItem("nc_bt",JSON.stringify({month:month,count:getBodyTwinMonthCount()+1}));
+    var count=getBodyTwinMonthCount()+1;
+    localStorage.setItem("nc_bt",JSON.stringify({month:month,count:count}));
   }catch(e){}
 }
+
 function canBodyTwin(){
   if(!S_PREMIUM) return false;
   return getBodyTwinMonthCount()<6;
@@ -1946,27 +1975,27 @@ function showPaywall(){
     "<div style='text-align:center;margin-bottom:20px'>" +
       "<div style='font-size:48px;margin-bottom:10px'>👑</div>" +
       "<div style='font-family:Unbounded,sans-serif;font-size:20px;font-weight:900;margin-bottom:8px'>AI Nutrition Premium</div>" +
-      "<div style='font-size:13px;color:#64748b'>"+(left<=0?"Дневной лимит исчерпан":"Осталось "+left+" из 3 бесплатных анализов")+(getPremiumDaysLeft()>0?" · Premium ещё "+getPremiumDaysLeft()+"д":"")+"</div>" +
+      "<div style='font-size:13px;color:rgba(255,255,255,.5)'>"+(left<=0?"Бесплатные анализы закончились":"Осталось "+(3-getTodayAnalysisCount())+" из 3 бесплатных")+(getPremiumDaysLeft()>0?" · Premium ещё "+getPremiumDaysLeft()+"д":"")+"</div>" +
     "</div>" +
-    "<div style='background:#ffffff;border-radius:14px;padding:16px;margin-bottom:16px'>" +
+    "<div style='background:rgba(255,255,255,.04);border-radius:14px;padding:16px;margin-bottom:16px'>" +
       "<div style='display:grid;grid-template-columns:1fr 1fr;gap:0'>" +
         "<div style='padding:12px;border-right:1px solid rgba(255,255,255,.08)'>" +
-          "<div style='font-size:11px;color:#94a3b8;font-weight:700;margin-bottom:10px'>БЕСПЛАТНО</div>" +
-          "<div style='font-size:12px;color:#64748b;line-height:2'>✓ 3 анализа/день<br/>✗ Недельный план<br/>✗ Body Twin AI<br/>✗ Список покупок<br/>✗ Безлимит анализов</div>" +
+          "<div style='font-size:11px;color:rgba(255,255,255,.4);font-weight:700;margin-bottom:10px'>БЕСПЛАТНО</div>" +
+          "<div style='font-size:12px;color:rgba(255,255,255,.5);line-height:2'>✓ 3 анализа/день<br/>✗ Недельный план<br/>✗ Body Twin AI<br/>✗ Список покупок<br/>✗ Безлимит анализов</div>" +
         "</div>" +
         "<div style='padding:12px'>" +
           "<div style='font-size:11px;color:#ff9432;font-weight:700;margin-bottom:10px'>PREMIUM 990₸/МЕС</div>" +
-          "<div style='font-size:12px;color:#1e293b;line-height:2'>✓ 3 анализа/день<br/>✓ Недельный план<br/>✓ Body Twin AI<br/>✓ Список покупок<br/>✓ Безлимит анализов</div>" +
+          "<div style='font-size:12px;color:rgba(240,240,248,.85);line-height:2'>✓ 3 анализа/день<br/>✓ Недельный план<br/>✓ Body Twin AI<br/>✓ Список покупок<br/>✓ Безлимит анализов</div>" +
         "</div>" +
       "</div>" +
     "</div>" +
     "<div style='margin-bottom:12px'>" +
-      "<div style='font-size:12px;color:#64748b;margin-bottom:8px;text-align:center'>Оплати 990₸ на карту Kaspi:<br/><span style='color:#ff9432;font-weight:700;font-size:16px;letter-spacing:2px'>XXXX XXXX XXXX XXXX</span><br/><span style='font-size:11px;color:#94a3b8'>После оплаты напиши <a href='https://t.me/sakkkaiii' style='color:#ff9432;font-weight:700'>@sakkkaiii</a> в Telegram — ответим 24/7 и дадим промокод</span></div>" +
+      "<div style='font-size:12px;color:rgba(255,255,255,.5);margin-bottom:8px;text-align:center'>Оплати 990₸ на карту Kaspi:<br/><span style='color:#ff9432;font-weight:700;font-size:16px;letter-spacing:2px'>XXXX XXXX XXXX XXXX</span><br/><span style='font-size:11px;color:rgba(255,255,255,.4)'>После оплаты напиши <a href='https://t.me/sakkkaiii' style='color:#ff9432;font-weight:700'>@sakkkaiii</a> в Telegram — ответим 24/7 и дадим промокод</span></div>" +
       "<input id='promo-input' class='inp' placeholder='Введи промокод (AIN-XXXXX)' style='text-align:center;text-transform:uppercase;letter-spacing:2px'/>" +
       "<div id='promo-msg' style='text-align:center;font-size:12px;margin-top:6px;min-height:18px'></div>" +
     "</div>" +
     "<button class='btn btn-primary' onclick='submitPromo()' style='margin-bottom:10px'>Активировать</button>" +
-    "<button onclick='closeModal(\"paywall-modal\")' style='width:100%;padding:12px;background:none;border:none;color:#94a3b8;font-size:13px;cursor:pointer;font-family:inherit'>Продолжить бесплатно</button>";
+    "<button onclick='closeModal(\"paywall-modal\")' style='width:100%;padding:12px;background:none;border:none;color:rgba(255,255,255,.3);font-size:13px;cursor:pointer;font-family:inherit'>Продолжить бесплатно</button>";
 }
 
 function submitPromo(){
@@ -1998,7 +2027,7 @@ function renderPremiumBadge(){
     if(!existing){
       var badge=document.createElement("span");
       badge.id="premium-badge";
-      badge.style.cssText="background:#f97316;color:#fff;font-size:9px;font-weight:900;padding:2px 6px;border-radius:4px;margin-left:8px;vertical-align:middle;cursor:pointer";
+      badge.style.cssText="background:linear-gradient(135deg,#ff9432,#fbbf24);color:#000;font-size:9px;font-weight:900;padding:2px 6px;border-radius:4px;margin-left:8px;vertical-align:middle;cursor:pointer";
       badge.onclick=function(){showPremiumStatus();};
       gr.appendChild(badge);
       existing=badge;
@@ -2023,9 +2052,9 @@ function openPlanTab(){
   var sheet=document.getElementById("plan-sheet");
   if(S.lastPlan&&S.lastPlan.days&&S.lastPlan.days.length){
     sheet.innerHTML=renderPlanHTML(S.lastPlan);
-    var regen="<div style='margin-bottom:12px;padding:10px 12px;background:#ffffff;border-radius:10px;display:flex;justify-content:space-between;align-items:center'>";
-    regen+="<div style='font-size:12px;color:#94a3b8'>Сохранённый план</div>";
-    regen+="<button onclick='showWeeklyPlan()' style='padding:6px 12px;font-size:11px;font-weight:700;border-radius:7px;border:1px solid rgba(255,255,255,.2);background:transparent;color:#475569;cursor:pointer;font-family:inherit'>🔄 Новый план</button></div>";
+    var regen="<div style='margin-bottom:12px;padding:10px 12px;background:rgba(255,255,255,.04);border-radius:10px;display:flex;justify-content:space-between;align-items:center'>";
+    regen+="<div style='font-size:12px;color:rgba(255,255,255,.4)'>Сохранённый план</div>";
+    regen+="<button onclick='showWeeklyPlan()' style='padding:6px 12px;font-size:11px;font-weight:700;border-radius:7px;border:1px solid rgba(255,255,255,.2);background:transparent;color:rgba(240,240,248,.7);cursor:pointer;font-family:inherit'>🔄 Новый план</button></div>";
     sheet.innerHTML=regen+sheet.innerHTML;
     document.getElementById("plan-modal").style.display="flex";
   } else {
@@ -2058,19 +2087,20 @@ function renderPremiumBanner(){
   el.style.display="block";
   var dots="";
   for(var i=0;i<3;i++){
-    dots+="<div style='width:8px;height:8px;border-radius:50%;background:"+(i<used?"#f97316":"#fed7aa")+"'></div>";
+    var filled=i<used;
+    dots+="<div style='width:8px;height:8px;border-radius:50%;background:"+(filled?"#ff9432":"rgba(255,148,50,.25)")+"'></div>";
   }
   el.innerHTML=
     "<div style='display:flex;align-items:center;gap:12px'>" +
       "<div style='flex:1'>" +
-        "<div style='font-size:12px;font-weight:700;color:#f97316;margin-bottom:4px'>🎁 Попробуй бесплатно</div>" +
-        "<div style='display:flex;align-items:center;gap:5px;margin-bottom:3px'>" +
+        "<div style='font-size:12px;font-weight:700;color:#ff9432;margin-bottom:4px'>🎁 Попробуй бесплатно</div>" +
+        "<div style='display:flex;align-items:center;gap:6px;margin-bottom:4px'>" +
           dots +
-          "<span style='font-size:11px;color:#94a3b8;margin-left:3px'>"+(left>0?left+" из 3 осталось":"анализы закончились")+"</span>" +
+          "<span style='font-size:11px;color:rgba(255,255,255,.5);margin-left:2px'>"+(left>0?left+" из 3 осталось":"анализы закончились")+"</span>" +
         "</div>" +
-        "<div style='font-size:10px;color:#94a3b8'>Безлимит — 990₸/мес</div>" +
+        "<div style='font-size:10px;color:rgba(255,255,255,.35)'>Безлимит — 990₸/мес</div>" +
       "</div>" +
-      "<button onclick='showPaywall()' style='padding:10px 16px;font-size:12px;font-weight:700;border-radius:12px;background:#f97316;color:#fff;border:none;cursor:pointer;font-family:inherit;white-space:nowrap;flex-shrink:0;box-shadow:0 2px 8px rgba(249,115,22,.3)'>Купить</button>" +
+      "<button onclick='showPaywall()' style='padding:10px 16px;font-size:12px;font-weight:700;border-radius:10px;background:#ff9432;color:#000;border:none;cursor:pointer;font-family:inherit;white-space:nowrap;flex-shrink:0'>"+(left>0?"Купить":"Купить →")+"</button>" +
     "</div>";
 }
 
@@ -2195,6 +2225,7 @@ window.addEventListener("DOMContentLoaded",function(){
       S.gender=saved.gender; S.activity=saved.activity||3;
       S.gl=saved.gl; S.subGl=saved.subGl||null;
       S.subGlData=saved.subGlData||null; S.dg=saved.dg;
+      S.activity=saved.activity||3;
       showScreen("main");
       renderDashboard();
       return;
