@@ -1448,7 +1448,7 @@ function downloadCard(){
 // CLAUDE API
 // ═══════════════════════════════════════════════════════════════
 function callClaude(messages,system){
-  return fetch("/api/claude",{method:"POST",headers:{"Content-Type":"application/json"},
+  return fetch("/api/claude",{method:"POST",headers:{"Content-Type":"application/json","X-User-Name":encodeURIComponent(S.name||"unknown")},
     body:(function(){var _o={model:"claude-haiku-4-5",max_tokens:1000,messages:messages};if(system)_o.system=system;return JSON.stringify(_o);}())
   }).then(function(r){return r.json();}).then(function(d){
     if(d.error) throw new Error(d.error.message||JSON.stringify(d.error));
