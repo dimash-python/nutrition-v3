@@ -60,84 +60,150 @@ body{font-family:'Plus Jakarta Sans',-apple-system,sans-serif;color:#1e293b;disp
 
   <!-- ONBOARDING -->
   <div id="scr-onboard" class="screen fade-in" style="padding:0;overflow:hidden">
-    <div style="position:fixed;inset:0;z-index:999">
-      <style>
-*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-body{font-family:-apple-system,BlinkMacSystemFont,sans-serif;background:#f0f9f0;color:#1a1a1a;height:100vh;overflow:hidden}
-.app{max-width:390px;height:100vh;margin:0 auto;background:#fff;display:flex;flex-direction:column;position:relative;overflow:hidden}
-.topbar{padding:16px 20px 0;display:flex;align-items:center;gap:12px;flex-shrink:0;min-height:56px}
-.back-btn{width:38px;height:38px;border-radius:50%;border:none;background:#f0f7ec;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:18px;color:#4CAF50}
-.prog-track{flex:1;height:5px;background:#e8f5e1;border-radius:99px;overflow:hidden}
-.prog-fill{height:100%;background:#4CAF50;border-radius:99px;transition:width .4s cubic-bezier(.4,0,.2,1)}
-.prog-label{font-size:13px;color:#888;font-weight:500;white-space:nowrap;min-width:56px;text-align:right}
-.content{flex:1;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch}
-.screen{display:none;padding:20px 24px 8px;animation:slideIn .3s ease}
-.screen.active{display:block}
+    <style>
+
+#scr-onboard {box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+
+#scr-onboard {font-family:-apple-system,BlinkMacSystemFont,sans-serif;background:#f0f9f0;color:#1a1a1a;height:100vh;overflow:hidden}
+
+#scr-onboard .app {max-width:390px;height:100vh;margin:0 auto;background:#fff;display:flex;flex-direction:column;position:relative;overflow:hidden}
+
+#scr-onboard .topbar {padding:16px 20px 0;display:flex;align-items:center;gap:12px;flex-shrink:0;min-height:56px}
+
+#scr-onboard .back-btn {width:38px;height:38px;border-radius:50%;border:none;background:#f0f7ec;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:18px;color:#4CAF50}
+
+#scr-onboard .prog-track {flex:1;height:5px;background:#e8f5e1;border-radius:99px;overflow:hidden}
+
+#scr-onboard .prog-fill {height:100%;background:#4CAF50;border-radius:99px;transition:width .4s cubic-bezier(.4,0,.2,1)}
+
+#scr-onboard .prog-label {font-size:13px;color:#888;font-weight:500;white-space:nowrap;min-width:56px;text-align:right}
+
+#scr-onboard .content {flex:1;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch}
+
+#scr-onboard .screen {display:none;padding:20px 24px 8px;animation:slideIn .3s ease}
+
+#scr-onboard .screen.active {display:block}
+
 @keyframes slideIn{from{opacity:0;transform:translateX(30px)}to{opacity:1;transform:none}}
-.emoji{font-size:52px;margin-bottom:16px;display:block}
-.title{font-size:26px;font-weight:800;line-height:1.2;margin-bottom:8px}
-.sub{font-size:16px;color:#666;line-height:1.5;margin-bottom:24px}
-input[type=text]{width:100%;padding:16px 18px;border:2px solid #e0e0e0;border-radius:16px;font-size:18px;font-family:inherit;outline:none;background:#fafafa;color:#1a1a1a;transition:border-color .2s}
-input[type=text]:focus{border-color:#4CAF50;background:#fff}
-.cards{display:flex;flex-direction:column;gap:10px}
-.card{padding:16px 18px;border:2px solid #e8e8e8;border-radius:18px;cursor:pointer;display:flex;align-items:center;gap:12px;background:#fafafa;transition:all .15s;user-select:none}
-.card:active{transform:scale(.98)}
-.card.sel{border-color:#4CAF50;background:#f0f9f0}
-.card-icon{font-size:22px;width:36px;text-align:center;flex-shrink:0}
-.card-text{flex:1;font-size:16px;font-weight:500}
-.card-sub{font-size:12px;color:#888;margin-top:2px}
-.card-check{width:24px;height:24px;border-radius:50%;border:2px solid #ddd;flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all .2s;font-size:12px}
-.card.sel .card-check{background:#4CAF50;border-color:#4CAF50;color:#fff}
-.slider-val{font-size:52px;font-weight:800;color:#4CAF50;text-align:center;margin:8px 0 4px}
-.slider-unit{font-size:16px;color:#888;text-align:center;margin-bottom:28px}
-input[type=range]{-webkit-appearance:none;width:100%;height:6px;border-radius:99px;background:#e0e0e0;outline:none;cursor:pointer;margin:0}
-input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:30px;height:30px;border-radius:50%;background:#4CAF50;cursor:pointer;box-shadow:0 2px 8px rgba(76,175,80,.35)}
-.range-row{display:flex;justify-content:space-between;margin-top:10px;font-size:13px;color:#bbb}
-.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.chip{padding:14px 8px;border:2px solid #e8e8e8;border-radius:14px;cursor:pointer;text-align:center;font-size:13px;font-weight:500;color:#555;background:#fafafa;transition:all .15s;user-select:none;line-height:1.3}
-.chip:active{transform:scale(.97)}
-.chip.sel{border-color:#4CAF50;background:#f0f9f0;color:#2e7d32}
-.meals-row{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
-.meal-n{padding:16px 4px;border:2px solid #e8e8e8;border-radius:14px;cursor:pointer;text-align:center;font-size:20px;font-weight:800;color:#555;background:#fafafa;transition:all .15s}
-.meal-n.sel{border-color:#4CAF50;background:#f0f9f0;color:#2e7d32}
-.wheel-wrap{display:flex;justify-content:center;margin:8px 0}
-.wheel{height:220px;width:130px;overflow:hidden;position:relative;border-radius:20px;background:#f5f5f5;cursor:grab;user-select:none}
-.wheel-center{position:absolute;top:50%;left:8px;right:8px;height:50px;transform:translateY(-50%);border-top:2px solid #4CAF50;border-bottom:2px solid #4CAF50;z-index:2;pointer-events:none;border-radius:8px}
-.wheel-fade-top{position:absolute;top:0;left:0;right:0;height:80px;background:linear-gradient(#f5f5f5,transparent);z-index:1;pointer-events:none}
-.wheel-fade-bot{position:absolute;bottom:0;left:0;right:0;height:80px;background:linear-gradient(transparent,#f5f5f5);z-index:1;pointer-events:none}
-.wheel-inner{padding:85px 0;display:flex;flex-direction:column}
-.wheel-item{height:50px;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:500;color:#ccc;transition:color .1s,font-size .1s,font-weight .1s;flex-shrink:0}
-.wheel-item.sel-item{color:#1a1a1a;font-size:26px;font-weight:800}
-.wheel-unit{font-size:13px;color:#888;text-align:center;margin-top:6px}
-.welcome{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:40px 28px;min-height:100vh;background:linear-gradient(160deg,#f0f9f0,#e8f5e9)}
-.w-logo{width:88px;height:88px;background:#4CAF50;border-radius:28px;display:flex;align-items:center;justify-content:center;margin:0 auto 28px;font-size:42px}
-.w-title{font-size:30px;font-weight:800;margin-bottom:12px}
-.w-sub{font-size:16px;color:#555;line-height:1.65;max-width:280px;margin:0 auto 36px}
-.feats{display:flex;flex-direction:column;gap:12px;width:100%;max-width:300px;margin:0 auto 44px;text-align:left}
-.feat{display:flex;align-items:center;gap:10px;font-size:15px;color:#444}
-.feat-dot{width:8px;height:8px;border-radius:50%;background:#4CAF50;flex-shrink:0}
-.result-wrap{text-align:center;padding:8px 0}
-.spin{width:56px;height:56px;border:4px solid #e8f5e9;border-top-color:#4CAF50;border-radius:50%;margin:0 auto 20px;animation:spin 1s linear infinite}
+#scr-onboard .emoji {font-size:52px;margin-bottom:16px;display:block}
+
+#scr-onboard .title {font-size:26px;font-weight:800;line-height:1.2;margin-bottom:8px}
+
+#scr-onboard .sub {font-size:16px;color:#666;line-height:1.5;margin-bottom:24px}
+
+#scr-onboard input[type=text] {width:100%;padding:16px 18px;border:2px solid #e0e0e0;border-radius:16px;font-size:18px;font-family:inherit;outline:none;background:#fafafa;color:#1a1a1a;transition:border-color .2s}
+
+#scr-onboard input[type=text]:focus {border-color:#4CAF50;background:#fff}
+
+#scr-onboard .cards {display:flex;flex-direction:column;gap:10px}
+
+#scr-onboard .card {padding:16px 18px;border:2px solid #e8e8e8;border-radius:18px;cursor:pointer;display:flex;align-items:center;gap:12px;background:#fafafa;transition:all .15s;user-select:none}
+
+#scr-onboard .card:active {transform:scale(.98)}
+
+#scr-onboard .card.sel {border-color:#4CAF50;background:#f0f9f0}
+
+#scr-onboard .card-icon {font-size:22px;width:36px;text-align:center;flex-shrink:0}
+
+#scr-onboard .card-text {flex:1;font-size:16px;font-weight:500}
+
+#scr-onboard .card-sub {font-size:12px;color:#888;margin-top:2px}
+
+#scr-onboard .card-check {width:24px;height:24px;border-radius:50%;border:2px solid #ddd;flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all .2s;font-size:12px}
+
+#scr-onboard .card.sel .card-check {background:#4CAF50;border-color:#4CAF50;color:#fff}
+
+#scr-onboard .slider-val {font-size:52px;font-weight:800;color:#4CAF50;text-align:center;margin:8px 0 4px}
+
+#scr-onboard .slider-unit {font-size:16px;color:#888;text-align:center;margin-bottom:28px}
+
+#scr-onboard input[type=range] {-webkit-appearance:none;width:100%;height:6px;border-radius:99px;background:#e0e0e0;outline:none;cursor:pointer;margin:0}
+
+#scr-onboard input[type=range]::-webkit-slider-thumb {-webkit-appearance:none;width:30px;height:30px;border-radius:50%;background:#4CAF50;cursor:pointer;box-shadow:0 2px 8px rgba(76,175,80,.35)}
+
+#scr-onboard .range-row {display:flex;justify-content:space-between;margin-top:10px;font-size:13px;color:#bbb}
+
+#scr-onboard .grid2 {display:grid;grid-template-columns:1fr 1fr;gap:10px}
+
+#scr-onboard .chip {padding:14px 8px;border:2px solid #e8e8e8;border-radius:14px;cursor:pointer;text-align:center;font-size:13px;font-weight:500;color:#555;background:#fafafa;transition:all .15s;user-select:none;line-height:1.3}
+
+#scr-onboard .chip:active {transform:scale(.97)}
+
+#scr-onboard .chip.sel {border-color:#4CAF50;background:#f0f9f0;color:#2e7d32}
+
+#scr-onboard .meals-row {display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
+
+#scr-onboard .meal-n {padding:16px 4px;border:2px solid #e8e8e8;border-radius:14px;cursor:pointer;text-align:center;font-size:20px;font-weight:800;color:#555;background:#fafafa;transition:all .15s}
+
+#scr-onboard .meal-n.sel {border-color:#4CAF50;background:#f0f9f0;color:#2e7d32}
+
+#scr-onboard .wheel-wrap {display:flex;justify-content:center;margin:8px 0}
+
+#scr-onboard .wheel {height:220px;width:130px;overflow:hidden;position:relative;border-radius:20px;background:#f5f5f5;cursor:grab;user-select:none}
+
+#scr-onboard .wheel-center {position:absolute;top:50%;left:8px;right:8px;height:50px;transform:translateY(-50%);border-top:2px solid #4CAF50;border-bottom:2px solid #4CAF50;z-index:2;pointer-events:none;border-radius:8px}
+
+#scr-onboard .wheel-fade-top {position:absolute;top:0;left:0;right:0;height:80px;background:linear-gradient(#f5f5f5,transparent);z-index:1;pointer-events:none}
+
+#scr-onboard .wheel-fade-bot {position:absolute;bottom:0;left:0;right:0;height:80px;background:linear-gradient(transparent,#f5f5f5);z-index:1;pointer-events:none}
+
+#scr-onboard .wheel-inner {padding:85px 0;display:flex;flex-direction:column}
+
+#scr-onboard .wheel-item {height:50px;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:500;color:#ccc;transition:color .1s,font-size .1s,font-weight .1s;flex-shrink:0}
+
+#scr-onboard .wheel-item.sel-item {color:#1a1a1a;font-size:26px;font-weight:800}
+
+#scr-onboard .wheel-unit {font-size:13px;color:#888;text-align:center;margin-top:6px}
+
+#scr-onboard .welcome {display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:40px 28px;min-height:100vh;background:linear-gradient(160deg,#f0f9f0,#e8f5e9)}
+
+#scr-onboard .w-logo {width:88px;height:88px;background:#4CAF50;border-radius:28px;display:flex;align-items:center;justify-content:center;margin:0 auto 28px;font-size:42px}
+
+#scr-onboard .w-title {font-size:30px;font-weight:800;margin-bottom:12px}
+
+#scr-onboard .w-sub {font-size:16px;color:#555;line-height:1.65;max-width:280px;margin:0 auto 36px}
+
+#scr-onboard .feats {display:flex;flex-direction:column;gap:12px;width:100%;max-width:300px;margin:0 auto 44px;text-align:left}
+
+#scr-onboard .feat {display:flex;align-items:center;gap:10px;font-size:15px;color:#444}
+
+#scr-onboard .feat-dot {width:8px;height:8px;border-radius:50%;background:#4CAF50;flex-shrink:0}
+
+#scr-onboard .result-wrap {text-align:center;padding:8px 0}
+
+#scr-onboard .spin {width:56px;height:56px;border:4px solid #e8f5e9;border-top-color:#4CAF50;border-radius:50%;margin:0 auto 20px;animation:spin 1s linear infinite}
+
 @keyframes spin{to{transform:rotate(360deg)}}
-.res-cal{font-size:60px;font-weight:900;color:#4CAF50;line-height:1}
-.res-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin:20px 0}
-.res-card{background:#f0f9f0;border-radius:16px;padding:14px 8px;text-align:center}
-.res-val{font-size:22px;font-weight:800;color:#2e7d32;margin-bottom:2px}
-.res-lbl{font-size:11px;color:#888}
-.res-msg{background:#f0f9f0;border-radius:16px;padding:16px;font-size:14px;color:#444;line-height:1.6;text-align:left;margin:16px 0}
-.bottom{padding:16px 24px 32px;flex-shrink:0}
-.btn{display:block;width:100%;padding:17px;border-radius:18px;border:none;background:#4CAF50;color:#fff;font-size:17px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .15s}
-.btn:active{transform:scale(.98);background:#43a047}
-.btn:disabled{background:#c8e6c9;cursor:not-allowed}
-</style>
-      <div class="app">
-  <div class="topbar" id="topbar" style="display:none">
-    <button class="back-btn" onclick="back()">‹</button>
-    <div class="prog-track"><div class="prog-fill" id="pf" style="width:0%"></div></div>
-    <span class="prog-label" id="pl">1 / 15</span>
+#scr-onboard .res-cal {font-size:60px;font-weight:900;color:#4CAF50;line-height:1}
+
+#scr-onboard .res-grid {display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin:20px 0}
+
+#scr-onboard .res-card {background:#f0f9f0;border-radius:16px;padding:14px 8px;text-align:center}
+
+#scr-onboard .res-val {font-size:22px;font-weight:800;color:#2e7d32;margin-bottom:2px}
+
+#scr-onboard .res-lbl {font-size:11px;color:#888}
+
+#scr-onboard .res-msg {background:#f0f9f0;border-radius:16px;padding:16px;font-size:14px;color:#444;line-height:1.6;text-align:left;margin:16px 0}
+
+#scr-onboard .bottom {padding:16px 24px 32px;flex-shrink:0}
+
+#scr-onboard .btn {display:block;width:100%;padding:17px;border-radius:18px;border:none;background:#4CAF50;color:#fff;font-size:17px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .15s}
+
+#scr-onboard .btn:active {transform:scale(.98);background:#43a047}
+
+#scr-onboard .btn:disabled {background:#c8e6c9;cursor:not-allowed}
+
+
+    </style>
+<div class="app">
+  <div class="topbar" id="ob_topbar" style="display:none">
+    <button class="back-btn" onclick="obBack()">‹</button>
+    <div class="prog-track"><div class="prog-fill" id="ob_pf" style="width:0%"></div></div>
+    <span class="prog-label" id="ob_pl">1 / 15</span>
   </div>
 
-  <div class="content" id="content">
+  <div class="content" id="ob_content">
 
     <!-- 0: Welcome -->
     <div class="screen active" id="sc0">
@@ -150,7 +216,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:30px;heigh
           <div class="feat"><div class="feat-dot"></div>Персональный план питания</div>
           <div class="feat"><div class="feat-dot"></div>Body Twin — AI оценка тела</div>
         </div>
-        <button class="btn" style="max-width:300px;width:100%" onclick="next()">Начать</button>
+        <button class="btn" style="max-width:300px;width:100%" onclick="obNext()">Начать</button>
       </div>
     </div>
 
@@ -159,7 +225,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:30px;heigh
       <span class="emoji">👋</span>
       <div class="title">Как вас зовут?</div>
       <div class="sub">Мы будем обращаться к вам по имени</div>
-      <input type="text" id="inp_name" placeholder="Ваше имя" oninput="checkBtn()" autocomplete="off"/>
+      <input type="text" id="inp_name" placeholder="Ваше имя" oninput="obCheckBtn()" autocomplete="off"/>
     </div>
 
     <!-- 2: Gender -->
@@ -168,9 +234,9 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:30px;heigh
       <div class="title">Ваш пол</div>
       <div class="sub">Влияет на расчёт нормы</div>
       <div class="cards" id="g_gender">
-        <div class="card" onclick="pick('gender','male',this)"><div class="card-icon">👨</div><div class="card-text">Мужской</div><div class="card-check">✓</div></div>
-        <div class="card" onclick="pick('gender','female',this)"><div class="card-icon">👩</div><div class="card-text">Женский</div><div class="card-check">✓</div></div>
-        <div class="card" onclick="pick('gender','other',this)"><div class="card-icon">🌟</div><div class="card-text">Предпочитаю не указывать</div><div class="card-check">✓</div></div>
+        <div class="card" onclick="obPick('gender','male',this)"><div class="card-icon">👨</div><div class="card-text">Мужской</div><div class="card-check">✓</div></div>
+        <div class="card" onclick="obPick('gender','female',this)"><div class="card-icon">👩</div><div class="card-text">Женский</div><div class="card-check">✓</div></div>
+        <div class="card" onclick="obPick('gender','other',this)"><div class="card-icon">🌟</div><div class="card-text">Предпочитаю не указывать</div><div class="card-check">✓</div></div>
       </div>
     </div>
 
@@ -181,12 +247,12 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:30px;heigh
       <div class="sub">Введите или выберите ползунком</div>
       <div style="text-align:center;margin:12px 0">
         <div style="display:flex;align-items:center;justify-content:center;gap:16px;margin-bottom:24px">
-          <button onclick="changeAge(-1)" style="width:52px;height:52px;border-radius:50%;border:2px solid #4CAF50;background:#f0f9f0;font-size:28px;color:#4CAF50;cursor:pointer;display:flex;align-items:center;justify-content:center;font-weight:300">−</button>
+          <button onclick="obChangeAge(-1)" style="width:52px;height:52px;border-radius:50%;border:2px solid #4CAF50;background:#f0f9f0;font-size:28px;color:#4CAF50;cursor:pointer;display:flex;align-items:center;justify-content:center;font-weight:300">−</button>
           <div style="font-size:72px;font-weight:900;color:#4CAF50;min-width:100px;text-align:center;line-height:1" id="age_disp">25</div>
-          <button onclick="changeAge(1)" style="width:52px;height:52px;border-radius:50%;border:2px solid #4CAF50;background:#f0f9f0;font-size:28px;color:#4CAF50;cursor:pointer;display:flex;align-items:center;justify-content:center;font-weight:300">+</button>
+          <button onclick="obChangeAge(1)" style="width:52px;height:52px;border-radius:50%;border:2px solid #4CAF50;background:#f0f9f0;font-size:28px;color:#4CAF50;cursor:pointer;display:flex;align-items:center;justify-content:center;font-weight:300">+</button>
         </div>
         <div style="font-size:16px;color:#888;margin-bottom:24px">лет</div>
-        <input type="range" min="10" max="80" value="25" step="1" id="age_slider" oninput="setAge(+this.value)" style="width:100%"/>
+        <input type="range" min="10" max="80" value="25" step="1" id="age_slider" oninput="obSetAge(+this.value)" style="width:100%"/>
         <div style="display:flex;justify-content:space-between;margin-top:8px;font-size:13px;color:#bbb"><span>10</span><span>80</span></div>
       </div>
     </div>
@@ -198,7 +264,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:30px;heigh
       <div class="sub">Сдвиньте ползунок</div>
       <div class="slider-val" id="v_h">170</div>
       <div class="slider-unit">см</div>
-      <input type="range" min="120" max="230" value="170" step="1" oninput="document.getElementById('v_h').textContent=this.value;D.height=+this.value"/>
+      <input type="range" min="120" max="230" value="170" step="1" oninput="document.getElementById('v_h').textContent=this.value;OB_D.height=+this.value"/>
       <div class="range-row"><span>120 см</span><span>230 см</span></div>
     </div>
 
@@ -209,7 +275,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:30px;heigh
       <div class="sub">Ваш вес прямо сейчас</div>
       <div class="slider-val" id="v_w">70</div>
       <div class="slider-unit">кг</div>
-      <input type="range" min="30" max="200" value="70" step="1" oninput="document.getElementById('v_w').textContent=this.value;D.weight=+this.value"/>
+      <input type="range" min="30" max="200" value="70" step="1" oninput="document.getElementById('v_w').textContent=this.value;OB_D.weight=+this.value"/>
       <div class="range-row"><span>30 кг</span><span>200 кг</span></div>
     </div>
 
@@ -220,7 +286,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:30px;heigh
       <div class="sub">К какому весу хотите прийти?</div>
       <div class="slider-val" id="v_t">60</div>
       <div class="slider-unit">кг</div>
-      <input type="range" min="30" max="200" value="60" step="1" oninput="document.getElementById('v_t').textContent=this.value;D.target=+this.value"/>
+      <input type="range" min="30" max="200" value="60" step="1" oninput="document.getElementById('v_t').textContent=this.value;OB_D.target=+this.value"/>
       <div class="range-row"><span>30 кг</span><span>200 кг</span></div>
     </div>
 
@@ -230,12 +296,12 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:30px;heigh
       <div class="title">Ваша цель</div>
       <div class="sub">Выберите главную задачу</div>
       <div class="cards" id="g_goal">
-        <div class="card" onclick="pick('goal','loss',this)"><div class="card-icon">⚖️</div><div class="card-text">Похудеть</div><div class="card-sub">Снизить вес, улучшить форму</div><div class="card-check">✓</div></div>
-        <div class="card" onclick="pick('goal','cut',this)"><div class="card-icon">🔥</div><div class="card-text">Сушка</div><div class="card-sub">Сжечь жир, сохранить мышцы</div><div class="card-check">✓</div></div>
-        <div class="card" onclick="pick('goal','maint',this)"><div class="card-icon">🎯</div><div class="card-text">Поддерживать вес</div><div class="card-sub">Держать текущую форму</div><div class="card-check">✓</div></div>
-        <div class="card" onclick="pick('goal','bulk',this)"><div class="card-icon">💪</div><div class="card-text">Набрать массу</div><div class="card-sub">Рост мышц и силы</div><div class="card-check">✓</div></div>
-        <div class="card" onclick="pick('goal','health',this)"><div class="card-icon">🌿</div><div class="card-text">Улучшить здоровье</div><div class="card-sub">Правильное питание</div><div class="card-check">✓</div></div>
-        <div class="card" onclick="pick('goal','protein',this)"><div class="card-icon">🥩</div><div class="card-text">Больше белка</div><div class="card-sub">Для роста и восстановления</div><div class="card-check">✓</div></div>
+        <div class="card" onclick="obPick('goal','loss',this)"><div class="card-icon">⚖️</div><div class="card-text">Похудеть</div><div class="card-sub">Снизить вес, улучшить форму</div><div class="card-check">✓</div></div>
+        <div class="card" onclick="obPick('goal','cut',this)"><div class="card-icon">🔥</div><div class="card-text">Сушка</div><div class="card-sub">Сжечь жир, сохранить мышцы</div><div class="card-check">✓</div></div>
+        <div class="card" onclick="obPick('goal','maint',this)"><div class="card-icon">🎯</div><div class="card-text">Поддерживать вес</div><div class="card-sub">Держать текущую форму</div><div class="card-check">✓</div></div>
+        <div class="card" onclick="obPick('goal','bulk',this)"><div class="card-icon">💪</div><div class="card-text">Набрать массу</div><div class="card-sub">Рост мышц и силы</div><div class="card-check">✓</div></div>
+        <div class="card" onclick="obPick('goal','health',this)"><div class="card-icon">🌿</div><div class="card-text">Улучшить здоровье</div><div class="card-sub">Правильное питание</div><div class="card-check">✓</div></div>
+        <div class="card" onclick="obPick('goal','protein',this)"><div class="card-icon">🥩</div><div class="card-text">Больше белка</div><div class="card-sub">Для роста и восстановления</div><div class="card-check">✓</div></div>
       </div>
     </div>
 
@@ -253,11 +319,11 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:30px;heigh
       <div class="title">Уровень активности</div>
       <div class="sub">Сколько вы двигаетесь?</div>
       <div class="cards" id="g_act">
-        <div class="card" onclick="pick('act','1',this)"><div class="card-icon">🛋️</div><div class="card-text">Практически нет активности</div><div class="card-check">✓</div></div>
-        <div class="card" onclick="pick('act','2',this)"><div class="card-icon">🚶</div><div class="card-text">Лёгкая (1–2 тренировки)</div><div class="card-check">✓</div></div>
-        <div class="card" onclick="pick('act','3',this)"><div class="card-icon">🚴</div><div class="card-text">Средняя (3–4)</div><div class="card-check">✓</div></div>
-        <div class="card" onclick="pick('act','4',this)"><div class="card-icon">🏋️</div><div class="card-text">Высокая (5+)</div><div class="card-check">✓</div></div>
-        <div class="card" onclick="pick('act','5',this)"><div class="card-icon">🏅</div><div class="card-text">Профессиональный спорт</div><div class="card-check">✓</div></div>
+        <div class="card" onclick="obPick('act','1',this)"><div class="card-icon">🛋️</div><div class="card-text">Практически нет активности</div><div class="card-check">✓</div></div>
+        <div class="card" onclick="obPick('act','2',this)"><div class="card-icon">🚶</div><div class="card-text">Лёгкая (1–2 тренировки)</div><div class="card-check">✓</div></div>
+        <div class="card" onclick="obPick('act','3',this)"><div class="card-icon">🚴</div><div class="card-text">Средняя (3–4)</div><div class="card-check">✓</div></div>
+        <div class="card" onclick="obPick('act','4',this)"><div class="card-icon">🏋️</div><div class="card-text">Высокая (5+)</div><div class="card-check">✓</div></div>
+        <div class="card" onclick="obPick('act','5',this)"><div class="card-icon">🏅</div><div class="card-text">Профессиональный спорт</div><div class="card-check">✓</div></div>
       </div>
     </div>
 
@@ -268,7 +334,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:30px;heigh
       <div class="sub">В среднем за день</div>
       <div class="slider-val" id="v_wt">2.0</div>
       <div class="slider-unit">литра в день</div>
-      <input type="range" min="5" max="50" value="20" step="1" oninput="document.getElementById('v_wt').textContent=(this.value/10).toFixed(1);D.water=this.value/10"/>
+      <input type="range" min="5" max="50" value="20" step="1" oninput="document.getElementById('v_wt').textContent=(this.value/10).toFixed(1);OB_D.water=this.value/10"/>
       <div class="range-row"><span>0.5 л</span><span>5 л</span></div>
     </div>
 
@@ -278,13 +344,13 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:30px;heigh
       <div class="title">Особенности питания</div>
       <div class="sub">Можно выбрать несколько</div>
       <div class="grid2">
-        <div class="chip sel" onclick="toggleChip(this,'diet','none')">🙅 Нет ограничений</div>
-        <div class="chip" onclick="toggleChip(this,'diet','veg')">🥦 Вегетарианство</div>
-        <div class="chip" onclick="toggleChip(this,'diet','vegan')">🌱 Веганство</div>
-        <div class="chip" onclick="toggleChip(this,'diet','halal')">🌙 Халяль</div>
-        <div class="chip" onclick="toggleChip(this,'diet','nolac')">🥛 Безлактозное</div>
-        <div class="chip" onclick="toggleChip(this,'diet','noglu')">🌾 Безглютеновое</div>
-        <div class="chip" onclick="toggleChip(this,'diet','lowc')">🥩 Низкоуглеводное</div>
+        <div class="chip sel" onclick="obToggleChip(this,'diet','none')">🙅 Нет ограничений</div>
+        <div class="chip" onclick="obToggleChip(this,'diet','veg')">🥦 Вегетарианство</div>
+        <div class="chip" onclick="obToggleChip(this,'diet','vegan')">🌱 Веганство</div>
+        <div class="chip" onclick="obToggleChip(this,'diet','halal')">🌙 Халяль</div>
+        <div class="chip" onclick="obToggleChip(this,'diet','nolac')">🥛 Безлактозное</div>
+        <div class="chip" onclick="obToggleChip(this,'diet','noglu')">🌾 Безглютеновое</div>
+        <div class="chip" onclick="obToggleChip(this,'diet','lowc')">🥩 Низкоуглеводное</div>
       </div>
     </div>
 
@@ -294,13 +360,13 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:30px;heigh
       <div class="title">Аллергии</div>
       <div class="sub">Отметьте если есть</div>
       <div class="grid2">
-        <div class="chip sel" onclick="toggleChip(this,'allergy','none')">✅ Нет</div>
-        <div class="chip" onclick="toggleChip(this,'allergy','nuts')">🥜 Орехи</div>
-        <div class="chip" onclick="toggleChip(this,'allergy','dairy')">🧀 Молочные</div>
-        <div class="chip" onclick="toggleChip(this,'allergy','eggs')">🥚 Яйца</div>
-        <div class="chip" onclick="toggleChip(this,'allergy','fish')">🐟 Рыба</div>
-        <div class="chip" onclick="toggleChip(this,'allergy','sea')">🦐 Морепродукты</div>
-        <div class="chip" onclick="toggleChip(this,'allergy','soy')">🫘 Соя</div>
+        <div class="chip sel" onclick="obToggleChip(this,'allergy','none')">✅ Нет</div>
+        <div class="chip" onclick="obToggleChip(this,'allergy','nuts')">🥜 Орехи</div>
+        <div class="chip" onclick="obToggleChip(this,'allergy','dairy')">🧀 Молочные</div>
+        <div class="chip" onclick="obToggleChip(this,'allergy','eggs')">🥚 Яйца</div>
+        <div class="chip" onclick="obToggleChip(this,'allergy','fish')">🐟 Рыба</div>
+        <div class="chip" onclick="obToggleChip(this,'allergy','sea')">🦐 Морепродукты</div>
+        <div class="chip" onclick="obToggleChip(this,'allergy','soy')">🫘 Соя</div>
       </div>
     </div>
 
@@ -310,12 +376,12 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:30px;heigh
       <div class="title">Состояние здоровья</div>
       <div class="sub">Учтём в рекомендациях</div>
       <div class="grid2">
-        <div class="chip sel" onclick="toggleChip(this,'health','none')">✅ Нет</div>
-        <div class="chip" onclick="toggleChip(this,'health','diab')">🩸 Диабет</div>
-        <div class="chip" onclick="toggleChip(this,'health','bp')">💊 Давление</div>
-        <div class="chip" onclick="toggleChip(this,'health','gut')">🫀 ЖКТ</div>
-        <div class="chip" onclick="toggleChip(this,'health','thy')">🦋 Щитовидная</div>
-        <div class="chip" onclick="toggleChip(this,'health','kid')">🫘 Почки</div>
+        <div class="chip sel" onclick="obToggleChip(this,'health','none')">✅ Нет</div>
+        <div class="chip" onclick="obToggleChip(this,'health','diab')">🩸 Диабет</div>
+        <div class="chip" onclick="obToggleChip(this,'health','bp')">💊 Давление</div>
+        <div class="chip" onclick="obToggleChip(this,'health','gut')">🫀 ЖКТ</div>
+        <div class="chip" onclick="obToggleChip(this,'health','thy')">🦋 Щитовидная</div>
+        <div class="chip" onclick="obToggleChip(this,'health','kid')">🫘 Почки</div>
       </div>
     </div>
 
@@ -325,11 +391,11 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:30px;heigh
       <div class="title">Приёмов пищи в день</div>
       <div class="sub">Ваш привычный режим</div>
       <div class="meals-row" id="g_meals">
-        <div class="meal-n" onclick="pick('meals','2',this)">2</div>
-        <div class="meal-n" onclick="pick('meals','3',this)">3</div>
-        <div class="meal-n" onclick="pick('meals','4',this)">4</div>
-        <div class="meal-n" onclick="pick('meals','5',this)">5</div>
-        <div class="meal-n" onclick="pick('meals','6',this)">6+</div>
+        <div class="meal-n" onclick="obPick('meals','2',this)">2</div>
+        <div class="meal-n" onclick="obPick('meals','3',this)">3</div>
+        <div class="meal-n" onclick="obPick('meals','4',this)">4</div>
+        <div class="meal-n" onclick="obPick('meals','5',this)">5</div>
+        <div class="meal-n" onclick="obPick('meals','6',this)">6+</div>
       </div>
     </div>
 
@@ -339,14 +405,14 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:30px;heigh
       <div class="title">Любимая кухня</div>
       <div class="sub">Выберите несколько</div>
       <div class="grid2">
-        <div class="chip sel" onclick="toggleChip(this,'cuisine','kz')">🇰🇿 Казахская</div>
-        <div class="chip" onclick="toggleChip(this,'cuisine','eu')">🇪🇺 Европейская</div>
-        <div class="chip" onclick="toggleChip(this,'cuisine','asia')">🍜 Азиатская</div>
-        <div class="chip" onclick="toggleChip(this,'cuisine','fast')">🍔 Фастфуд</div>
-        <div class="chip" onclick="toggleChip(this,'cuisine','home')">🏠 Домашняя</div>
-        <div class="chip" onclick="toggleChip(this,'cuisine','meat')">🥩 Мясные</div>
-        <div class="chip" onclick="toggleChip(this,'cuisine','fish')">🐟 Рыба</div>
-        <div class="chip" onclick="toggleChip(this,'cuisine','sw')">🍰 Десерты</div>
+        <div class="chip sel" onclick="obToggleChip(this,'cuisine','kz')">🇰🇿 Казахская</div>
+        <div class="chip" onclick="obToggleChip(this,'cuisine','eu')">🇪🇺 Европейская</div>
+        <div class="chip" onclick="obToggleChip(this,'cuisine','asia')">🍜 Азиатская</div>
+        <div class="chip" onclick="obToggleChip(this,'cuisine','fast')">🍔 Фастфуд</div>
+        <div class="chip" onclick="obToggleChip(this,'cuisine','home')">🏠 Домашняя</div>
+        <div class="chip" onclick="obToggleChip(this,'cuisine','meat')">🥩 Мясные</div>
+        <div class="chip" onclick="obToggleChip(this,'cuisine','fish')">🐟 Рыба</div>
+        <div class="chip" onclick="obToggleChip(this,'cuisine','sw')">🍰 Десерты</div>
       </div>
     </div>
 
@@ -375,175 +441,10 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:30px;heigh
 
   </div>
 
-  <div id="bottom" class="bottom" style="display:none">
-    <button class="btn" id="btn" onclick="next()">Далее</button>
+  <div id="ob_bottom" class="bottom" style="display:none">
+    <button class="btn" id="ob_btn" onclick="obNext()">Далее</button>
   </div>
 </div>
-
-<script>
-var D={name:'',gender:'',age:25,height:170,weight:70,target:60,goal:'',subgoal:'',calFactor:1,act:'3',water:2,diet:[],allergy:[],health:[],meals:'3',cuisine:[]};
-
-var STEPS=['sc0','sc1','sc2','sc3','sc4','sc5','sc6','sc7','sc7b','sc8','sc9','sc10','sc11','sc12','sc13','sc14','sc15'];
-var cur=0;
-var SUBGOALS={
-  loss:{emoji:'⚖️',title:'Темп похудения',sub:'Как быстро хотите снижать вес?',opts:[
-    {icon:'🌿',text:'Лёгкое — минус 0.5 кг в неделю',val:'loss_light',cf:0.88},
-    {icon:'⚡',text:'Среднее — минус 1 кг в неделю',val:'loss_mid',cf:0.83},
-    {icon:'💥',text:'Быстрое — минус 1.5 кг в неделю',val:'loss_hard',cf:0.76}
-  ]},
-  cut:{emoji:'🔥',title:'Интенсивность сушки',sub:'Выберите режим сушки',opts:[
-    {icon:'🌿',text:'Лёгкая сушка — дефицит 200 ккал',val:'cut_light',cf:0.91},
-    {icon:'⚡',text:'Средняя сушка — дефицит 400 ккал',val:'cut_mid',cf:0.83},
-    {icon:'💥',text:'Жёсткая сушка — дефицит 600 ккал',val:'cut_hard',cf:0.76}
-  ]},
-  bulk:{emoji:'💪',title:'Темп набора массы',sub:'Сколько хотите набирать?',opts:[
-    {icon:'🐢',text:'Лёгкий — плюс 0.5 кг в неделю',val:'bulk_light',cf:1.08},
-    {icon:'🚀',text:'Агрессивный — плюс 1 кг в неделю',val:'bulk_hard',cf:1.15}
-  ]}
-};
-
-function showStep(idx){
-  var id=STEPS[idx];
-  document.querySelectorAll('.screen').forEach(function(s){s.classList.remove('active');});
-  document.getElementById(id).classList.add('active');
-  var isWelcome=idx===0;
-  var isResult=id==='sc15';
-  document.getElementById('topbar').style.display=isWelcome?'none':'flex';
-  document.getElementById('bottom').style.display=isWelcome||isResult?'none':'flex';
-  if(!isWelcome&&!isResult){
-    var visIdx=idx; // visible step number
-    if(D.goal!=='loss'&&D.goal!=='bulk'&&id==='sc7b') return;
-    var total=D.goal==='loss'||D.goal==='bulk'?16:15;
-    document.getElementById('pf').style.width=Math.round((idx/STEPS.length)*100)+'%';
-    document.getElementById('pl').textContent=idx+' / '+total;
-  }
-  
-  if(id==='sc15'){
-    setTimeout(function(){
-      document.getElementById('bottom').style.display='flex';
-      document.getElementById('btn').textContent='Начать пользоваться →';
-    },2500);
-    calcResult();
-  }
-  document.getElementById('content').scrollTop=0;
-  checkBtn();
-}
-
-function next(){
-  var id=STEPS[cur];
-  if(id==='sc15'){alert('Добро пожаловать в Nutrivo! 🎉');return;}
-  if(id==='sc7'){
-    var sg=SUBGOALS[D.goal];
-    if(sg){
-      renderSubgoal(sg);
-      cur++;
-      showStep(cur);
-      return;
-    } else {
-      cur+=2; // skip sc7b
-      showStep(cur);
-      return;
-    }
-  }
-  cur++;
-  showStep(cur);
-}
-
-function back(){
-  if(cur<=1) return;
-  var id=STEPS[cur];
-  if(id==='sc8'&&STEPS[cur-1]==='sc7b'&&!SUBGOALS[D.goal]){
-    cur-=2;
-  } else {
-    cur--;
-  }
-  showStep(cur);
-}
-
-function pick(key,val,el){
-  D[key]=val;
-  var group=el.parentElement;
-  group.querySelectorAll('.card,.meal-n').forEach(function(c){c.classList.remove('sel');});
-  el.classList.add('sel');
-  checkBtn();
-}
-
-function toggleChip(el,key,val){
-  if(val==='none'){
-    el.parentElement.querySelectorAll('.chip').forEach(function(c){c.classList.remove('sel');});
-    el.classList.add('sel');
-    D[key]=[];
-    return;
-  }
-  el.parentElement.querySelector('.chip:first-child').classList.remove('sel');
-  el.classList.toggle('sel');
-}
-
-function renderSubgoal(sg){
-  document.getElementById('sub_emoji').textContent=sg.emoji;
-  document.getElementById('sub_title').textContent=sg.title;
-  document.getElementById('sub_sub').textContent=sg.sub;
-  var html='';
-  sg.opts.forEach(function(o){
-    html+='<div class="card" onclick="pickSub(this,\''+o.val+'\','+o.cf+')"><div class="card-icon">'+o.icon+'</div><div class="card-text">'+o.text+'</div><div class="card-check">✓</div></div>';
-  });
-  document.getElementById('g_subgoal').innerHTML=html;
-}
-
-function pickSub(el,val,cf){
-  D.subgoal=val; D.calFactor=cf;
-  document.getElementById('g_subgoal').querySelectorAll('.card').forEach(function(c){c.classList.remove('sel');});
-  el.classList.add('sel');
-}
-
-function checkBtn(){
-  var btn=document.getElementById('btn');
-  if(!btn) return;
-  var id=STEPS[cur];
-  if(id==='sc1') btn.disabled=!document.getElementById('inp_name').value.trim();
-  else btn.disabled=false;
-}
-
-function setAge(v){
-  D.age=Math.min(80,Math.max(10,v));
-  var disp=document.getElementById('age_disp');
-  var sl=document.getElementById('age_slider');
-  if(disp) disp.textContent=D.age;
-  if(sl) sl.value=D.age;
-}
-function changeAge(d){setAge((D.age||25)+d);}
-function initWheel(){}
-function renderWheel(){}
-
-function calcResult(){
-  setTimeout(function(){
-    var w=D.weight||70,h=D.height||170,a=D.age||25;
-    var bmr=D.gender==='female'?(10*w+6.25*h-5*a-161):(10*w+6.25*h-5*a+5);
-    var m=[1.2,1.375,1.55,1.725,1.9];
-    var tdee=bmr*(m[Math.min(+(D.act||3)-1,4)]||1.55);
-    var cf=D.calFactor||1;
-    if(!D.subgoal){
-      var gm={loss:0.83,maint:1,bulk:1.15,health:1,protein:1.05};
-      cf=gm[D.goal]||1;
-    }
-    var cal=Math.round(tdee*cf);
-    var prot=Math.round(w*1.8);
-    var fat=Math.round(cal*0.27/9);
-    var carbs=Math.round((cal-prot*4-fat*9)/4);
-    document.getElementById('r_cal').textContent=cal;
-    document.getElementById('r_p').textContent=prot+'г';
-    document.getElementById('r_f').textContent=fat+'г';
-    document.getElementById('r_c').textContent=carbs+'г';
-    var name=document.getElementById('inp_name').value||'друг';
-    document.getElementById('r_msg').textContent=name+', ваш персональный план готов! Следуйте рекомендациям AI каждый день — результат не заставит ждать.';
-    document.getElementById('loading_wrap').style.display='none';
-    document.getElementById('result_wrap').style.display='block';
-  },2300);
-}
-
-showStep(0);
-</script>
-    </div>
   </div>
 
   <!-- MAIN -->
@@ -1531,7 +1432,7 @@ function showWeeklyPlan(){
   var meals5=isCut?"5 (завтрак+перекус+обед+полдник+ужин)":"4 (завтрак+обед+перекус+ужин)";
   var cutTip=isCut?"Углеводы до 17:00, ужин — белок и овощи. ":"";
   var jsonTpl=isCut?"{days:[{day:Пн,breakfast:...,snack1:...,lunch:...,snack2:...,dinner:...,cal:1800}]}":"{days:[{day:Пн,breakfast:...,lunch:...,snack:...,dinner:...,cal:2000}]}";
-  var userCtx=getUserContext(); var prompt="Составь план питания на 7 дней. "+userCtx+(S.gender==="female"?"Женщина":"Мужчина")+", "+S.age+" лет, "+S.weight+"кг → "+S.targetWeight+"кг. Цель: "+GP[S.gl]+"."+subInfo+" Норма: "+S.dg.calories+" ккал, белок "+S.dg.protein+"г, жиры "+S.dg.fat+"г, углеводы "+S.dg.carbs+"г. Приёмов в день: "+meals5+". "+cutTip+"Блюда: конкретный продукт + граммы. Примеры: куриные бёдра тушёные 200г, гречка варёная 150г, омлет из 3 яиц. JSON структура: "+jsonTpl;
+  var userCtx=getUserContext();var prompt="Составь план питания на 7 дней. "+userCtx+(S.gender==="female"?"Женщина":"Мужчина")+", "+S.age+" лет, "+S.weight+"кг → "+S.targetWeight+"кг. Цель: "+GP[S.gl]+"."+subInfo+" Норма: "+S.dg.calories+" ккал, белок "+S.dg.protein+"г, жиры "+S.dg.fat+"г, углеводы "+S.dg.carbs+"г. Приёмов в день: "+meals5+". "+cutTip+"Блюда: конкретный продукт + граммы. Примеры: куриные бёдра тушёные 200г, гречка варёная 150г, омлет из 3 яиц. JSON структура: "+jsonTpl;
   fetch("/api/claude",{method:"POST",headers:{"Content-Type":"application/json"},
     body:JSON.stringify({model:"claude-haiku-4-5",max_tokens:4000,
       system:"Ты диетолог. Используй только: яйца, куриные бёдра/грудка, гречка, рис, овсянка, творог, кефир, картофель, капуста, морковь, огурец, помидор, яблоко, банан. Без стейков и лосося. Верни ТОЛЬКО валидный JSON без markdown.",
@@ -2612,69 +2513,49 @@ function applyTranslations(){
 
 
 function obFinish(){
-  var d=OB_D;
-  S.name=d.name||'';
-  S.gender=d.gender||'male';
-  S.age=d.age||25;
-  S.height=d.height||170;
-  S.weight=d.weight||70;
-  S.targetWeight=d.target||60;
-  S.gl=d.goal||'loss';
-  S.activity=+(d.act||3);
-  // Calculate dg
+  var d=OB_D;S.name=d.name||'';S.gender=d.gender||'male';
+  S.age=d.age||25;S.height=d.height||170;S.weight=d.weight||70;S.targetWeight=d.target||60;
+  var gm={loss:'loss',cut:'cutting',maint:'maint',bulk:'bulking',health:'healthy',protein:'sport'};
+  S.gl=gm[d.goal]||d.goal||'loss';S.activity=+(d.act||3);
   var bmr=S.gender==='female'?(10*S.weight+6.25*S.height-5*S.age-161):(10*S.weight+6.25*S.height-5*S.age+5);
-  var mults=[1.2,1.375,1.55,1.725,1.9];
-  var tdee=bmr*(mults[Math.min(S.activity-1,4)]||1.55);
-  var cf=d.calFactor||({loss:0.83,cut:0.83,maint:1,bulk:1.15,health:1,protein:1.05}[d.goal]||1);
-  var cal=Math.round(tdee*cf);
-  var prot=Math.round(S.weight*1.8);
-  var fat=Math.round(cal*0.27/9);
-  var carbs=Math.round((cal-prot*4-fat*9)/4);
+  var tdee=bmr*([1.2,1.375,1.55,1.725,1.9][Math.min(S.activity-1,4)]||1.55);
+  var cf=d.calFactor||({loss:0.83,cut:0.83,maint:1,bulk:1.15,health:1,protein:1.05}[d.goal]||0.83);
+  var cal=Math.round(tdee*cf);var prot=Math.round(S.weight*1.8);
+  var fat=Math.round(cal*0.27/9);var carbs=Math.round((cal-prot*4-fat*9)/4);
   S.dg={calories:cal,protein:prot,fat:fat,carbs:carbs};
-  // Save preferences
-  S.diet=d.diet||[];
-  S.allergy=d.allergy||[];
-  S.healthCond=d.health||[];
-  S.cuisine=d.cuisine||[];
-  S.mealsPerDay=d.meals||'3';
+  S.diet=d.diet||[];S.allergy=d.allergy||[];S.healthCond=d.health||[];S.cuisine=d.cuisine||[];S.mealsPerDay=d.meals||'3';
+  var g=GOALS.filter(function(x){return x.id===S.gl;})[0]||GOALS[0];
+  if(g&&typeof setCSSVars==='function')setCSSVars(g);
   try{
-    localStorage.setItem('nc_diet',JSON.stringify(S.diet));
-    localStorage.setItem('nc_allergy',JSON.stringify(S.allergy));
-    localStorage.setItem('nc_healthcond',JSON.stringify(S.healthCond));
-    localStorage.setItem('nc_cuisine',JSON.stringify(S.cuisine));
+    localStorage.setItem('nc_diet',JSON.stringify(S.diet));localStorage.setItem('nc_allergy',JSON.stringify(S.allergy));
+    localStorage.setItem('nc_healthcond',JSON.stringify(S.healthCond));localStorage.setItem('nc_cuisine',JSON.stringify(S.cuisine));
     localStorage.setItem('nc_mealspd',S.mealsPerDay);
-    localStorage.setItem('nc_profile',JSON.stringify({
-      name:S.name,weight:S.weight,height:S.height,age:S.age,
-      targetWeight:S.targetWeight,gender:S.gender,activity:S.activity,
-      gl:S.gl,dg:S.dg,diet:S.diet,allergy:S.allergy,
-      healthCond:S.healthCond,cuisine:S.cuisine,mealsPerDay:S.mealsPerDay
-    }));
+    localStorage.setItem('nc_profile',JSON.stringify({name:S.name,weight:S.weight,height:S.height,age:S.age,
+      targetWeight:S.targetWeight,gender:S.gender,activity:S.activity,gl:S.gl,dg:S.dg,
+      diet:S.diet,allergy:S.allergy,healthCond:S.healthCond,cuisine:S.cuisine,mealsPerDay:S.mealsPerDay}));
   }catch(e){}
-  showScreen('main');
-  renderDashboard();
+  showScreen('main');renderDashboard();
 }
-
 function getUserContext(){
   var ctx='';
-  var dm={veg:'Вегетарианец — нет мяса',vegan:'Веган',halal:'Халяль — строго без свинины и алкоголя',nolac:'Без лактозы',noglu:'Без глютена',lowc:'Низкоуглеводное'};
-  var am={nuts:'АЛЛЕРГИЯ на орехи',dairy:'АЛЛЕРГИЯ на молочные',eggs:'АЛЛЕРГИЯ на яйца',fish:'АЛЛЕРГИЯ на рыбу',sea:'АЛЛЕРГИЯ на морепродукты',soy:'АЛЛЕРГИЯ на сою'};
-  var hm={diab:'Диабет — избегать сахара',bp:'Давление — меньше соли',gut:'ЖКТ — мягкая еда'};
+  var dm={veg:'Вегетарианец',vegan:'Веган',halal:'Халяль — без свинины и алкоголя',nolac:'Без лактозы',noglu:'Без глютена',lowc:'Низкоуглеводное'};
+  var am={nuts:'АЛЛЕРГИЯ на орехи',dairy:'АЛЛЕРГИЯ на молочное',eggs:'АЛЛЕРГИЯ на яйца',fish:'АЛЛЕРГИЯ на рыбу',sea:'АЛЛЕРГИЯ на морепродукты',soy:'АЛЛЕРГИЯ на сою'};
+  var hm={diab:'Диабет — избегать сахара',bp:'Давление — меньше соли',gut:'ЖКТ — щадящая еда'};
   var cm={kz:'Предпочитает казахскую кухню (бешбармак манты плов)'};
-  var r=[];
-  (S.diet||[]).forEach(function(d){if(dm[d]) r.push(dm[d]);});
-  (S.allergy||[]).forEach(function(a){if(am[a]) r.push(am[a]);});
-  (S.healthCond||[]).forEach(function(h){if(hm[h]) r.push(hm[h]);});
-  var cu=[];
-  (S.cuisine||[]).forEach(function(c){if(cm[c]) cu.push(cm[c]);});
-  if(r.length) ctx+='ОГРАНИЧЕНИЯ (СТРОГО): '+r.join('; ')+'. ';
-  if(cu.length) ctx+='Предпочтения: '+cu.join('; ')+'. ';
+  var r=[];(S.diet||[]).forEach(function(d){if(dm[d])r.push(dm[d]);});
+  (S.allergy||[]).forEach(function(a){if(am[a])r.push(am[a]);});
+  (S.healthCond||[]).forEach(function(h){if(hm[h])r.push(hm[h]);});
+  var cu=[];(S.cuisine||[]).forEach(function(c){if(cm[c])cu.push(cm[c]);});
+  if(r.length)ctx+='ОГРАНИЧЕНИЯ (СТРОГО): '+r.join('; ')+'. ';
+  if(cu.length)ctx+='Предпочтения: '+cu.join('; ')+'. ';
   return ctx;
 }
+
 var OB_D={name:'',gender:'',age:25,height:170,weight:70,target:60,goal:'',subgoal:'',calFactor:1,act:'3',water:2,diet:[],allergy:[],health:[],meals:'3',cuisine:[]};
 
-var STEPS=['sc0','sc1','sc2','sc3','sc4','sc5','sc6','sc7','sc7b','sc8','sc9','sc10','sc11','sc12','sc13','sc14','sc15'];
-var cur=0;
-var SUBGOALS={
+var OB_STEPS=['sc0','sc1','sc2','sc3','sc4','sc5','sc6','sc7','sc7b','sc8','sc9','sc10','sc11','sc12','sc13','sc14','sc15'];
+var OB_CUR=0;
+var OB_SUBGOALS={
   loss:{emoji:'⚖️',title:'Темп похудения',sub:'Как быстро хотите снижать вес?',opts:[
     {icon:'🌿',text:'Лёгкое — минус 0.5 кг в неделю',val:'loss_light',cf:0.88},
     {icon:'⚡',text:'Среднее — минус 1 кг в неделю',val:'loss_mid',cf:0.83},
@@ -2691,129 +2572,129 @@ var SUBGOALS={
   ]}
 };
 
-function showStep(idx){
-  var id=STEPS[idx];
-  document.querySelectorAll('.screen').forEach(function(s){s.classList.remove('active');});
+function obShow(idx){
+  var id=OB_STEPS[idx];
+  (document.getElementById('ob_content')||document.querySelector('#scr-onboard .screens')||{querySelectorAll:function(){return [];}}).querySelectorAll('.screen').forEach(function(s){s.classList.remove('active');});
   document.getElementById(id).classList.add('active');
   var isWelcome=idx===0;
   var isResult=id==='sc15';
-  document.getElementById('topbar').style.display=isWelcome?'none':'flex';
-  document.getElementById('bottom').style.display=isWelcome||isResult?'none':'flex';
+  var _tb=document.getElementById('ob_topbar');if(_tb)_tb.style.display=isWelcome?'none':'flex';
+  var _bb=document.getElementById('ob_bottom');if(_bb)_bb.style.display=isWelcome||isResult?'none':'flex';
   if(!isWelcome&&!isResult){
     var visIdx=idx; // visible step number
-    if(OB_D.goal!=='loss'&&D.goal!=='bulk'&&id==='sc7b') return;
-    var total=D.goal==='loss'||D.goal==='bulk'?16:15;
-    document.getElementById('pf').style.width=Math.round((idx/STEPS.length)*100)+'%';
-    document.getElementById('pl').textContent=idx+' / '+total;
+    if(OB_D.goal!=='loss'&&OB_D.goal!=='bulk'&&id==='sc7b') return;
+    var total=OB_D.goal==='loss'||OB_D.goal==='bulk'?16:15;
+    var _pf=document.getElementById('ob_pf');if(_pf)_pf.style.width=Math.round((idx/STEPS.length)*100)+'%';
+    var _pl=document.getElementById('ob_pl');if(_pl)_pl.textContent=idx+' / '+total;
   }
   
   if(id==='sc15'){
     setTimeout(function(){
-      document.getElementById('bottom').style.display='flex';
-      document.getElementById('btn').textContent='Начать пользоваться →';
+      document.getElementById('ob_bottom').style.display='flex';
+      document.getElementById('ob_btn').textContent='Начать пользоваться →';
     },2500);
-    calcResult();
+    obCalcResult();
   }
-  document.getElementById('content').scrollTop=0;
-  checkBtn();
+  document.getElementById('ob_content').scrollTop=0;
+  obCheckBtn();
 }
 
 function obNext(){
-  var id=STEPS[cur];
+  var id=OB_STEPS[OB_CUR];
   if(id==='sc15'){obFinish();return;}
   if(id==='sc7'){
-    var sg=SUBGOALS[D.goal];
+    var sg=OB_SUBGOALS[OB_D.goal];
     if(sg){
-      renderSubgoal(sg);
-      cur++;
-      showStep(cur);
+      obRenderSubgoal(sg);
+      OB_CUR++;
+      obShow(OB_CUR);
       return;
     } else {
-      cur+=2; // skip sc7b
-      showStep(cur);
+      OB_CUR+=2; // skip sc7b
+      obShow(OB_CUR);
       return;
     }
   }
-  cur++;
-  showStep(cur);
+  OB_CUR++;
+  obShow(OB_CUR);
 }
 
 function obBack(){
   if(cur<=1) return;
-  var id=STEPS[cur];
-  if(id==='sc8'&&STEPS[cur-1]==='sc7b'&&!SUBGOALS[D.goal]){
+  var id=OB_STEPS[OB_CUR];
+  if(id==='sc8'&&OB_STEPS[cur-1]==='sc7b'&&!OB_SUBGOALS[OB_D.goal]){
     cur-=2;
   } else {
     cur--;
   }
-  showStep(cur);
+  obShow(OB_CUR);
 }
 
-function pick(key,val,el){
+function obPick(key,val,el){
   OB_D[key]=val;
   var group=el.parentElement;
   group.querySelectorAll('.card,.meal-n').forEach(function(c){c.classList.remove('sel');});
   el.classList.add('sel');
-  checkBtn();
+  obCheckBtn();
 }
 
-function toggleChip(el,key,val){
+function obToggleChip(el,key,val){
   if(val==='none'){
     el.parentElement.querySelectorAll('.chip').forEach(function(c){c.classList.remove('sel');});
     el.classList.add('sel');
-    OB_D[key]=[];
+    D[key]=[];
     return;
   }
   el.parentElement.querySelector('.chip:first-child').classList.remove('sel');
   el.classList.toggle('sel');
 }
 
-function renderSubgoal(sg){
+function obRenderSubgoal(sg){
   document.getElementById('sub_emoji').textContent=sg.emoji;
   document.getElementById('sub_title').textContent=sg.title;
   document.getElementById('sub_sub').textContent=sg.sub;
   var html='';
   sg.opts.forEach(function(o){
-    html+='<div class="card" onclick="pickSub(this,\''+o.val+'\','+o.cf+')"><div class="card-icon">'+o.icon+'</div><div class="card-text">'+o.text+'</div><div class="card-check">✓</div></div>';
+    html+='<div class="card" onclick="obPickSub(this,\''+o.val+'\','+o.cf+')"><div class="card-icon">'+o.icon+'</div><div class="card-text">'+o.text+'</div><div class="card-check">✓</div></div>';
   });
   document.getElementById('g_subgoal').innerHTML=html;
 }
 
-function pickSub(el,val,cf){
+function obPickSub(el,val,cf){
   OB_D.subgoal=val; OB_D.calFactor=cf;
   document.getElementById('g_subgoal').querySelectorAll('.card').forEach(function(c){c.classList.remove('sel');});
   el.classList.add('sel');
 }
 
-function checkBtn(){
-  var btn=document.getElementById('btn');
+function obCheckBtn(){
+  var btn=document.getElementById('ob_btn');
   if(!btn) return;
-  var id=STEPS[cur];
+  var id=OB_STEPS[OB_CUR];
   if(id==='sc1') btn.disabled=!document.getElementById('inp_name').value.trim();
   else btn.disabled=false;
 }
 
-function setAge(v){
+function obSetAge(v){
   OB_D.age=Math.min(80,Math.max(10,v));
   var disp=document.getElementById('age_disp');
   var sl=document.getElementById('age_slider');
-  if(disp) disp.textContent=D.age;
-  if(sl) sl.value=D.age;
+  if(disp) disp.textContent=OB_D.age;
+  if(sl) sl.value=OB_D.age;
 }
-function changeAge(d){setAge((OB_D.age||25)+d);}
-function initWheel(){}
-function renderWheel(){}
+function obChangeAge(d){obSetAge((OB_D.age||25)+d);}
+function obInitWheel(){}
+function obRenderWheel(){}
 
-function calcResult(){
+function obCalcResult(){
   setTimeout(function(){
-    var w=D.weight||70,h=D.height||170,a=D.age||25;
-    var bmr=D.gender==='female'?(10*w+6.25*h-5*a-161):(10*w+6.25*h-5*a+5);
+    var w=OB_D.weight||70,h=OB_D.height||170,a=OB_D.age||25;
+    var bmr=OB_D.gender==='female'?(10*w+6.25*h-5*a-161):(10*w+6.25*h-5*a+5);
     var m=[1.2,1.375,1.55,1.725,1.9];
     var tdee=bmr*(m[Math.min(+(OB_D.act||3)-1,4)]||1.55);
-    var cf=D.calFactor||1;
-    if(!D.subgoal){
+    var cf=OB_D.calFactor||1;
+    if(!OB_D.subgoal){
       var gm={loss:0.83,maint:1,bulk:1.15,health:1,protein:1.05};
-      cf=gm[D.goal]||1;
+      cf=gm[OB_D.goal]||1;
     }
     var cal=Math.round(tdee*cf);
     var prot=Math.round(w*1.8);
@@ -2825,12 +2706,11 @@ function calcResult(){
     document.getElementById('r_c').textContent=carbs+'г';
     var name=document.getElementById('inp_name').value||'друг';
     document.getElementById('r_msg').textContent=name+', ваш персональный план готов! Следуйте рекомендациям AI каждый день — результат не заставит ждать.';
-    document.getElementById('loading_wrap').style.display='none';
-    document.getElementById('result_wrap').style.display='block';
+    var _lw=document.getElementById('loading_wrap');if(_lw)_lw.style.display='none';
+    var _rw=document.getElementById('result_wrap');if(_rw)_rw.style.display='block';
   },2300);
 }
 
-showStep(0);
 window.addEventListener("DOMContentLoaded",function(){
   try{renderGoals();}catch(e){}
   renderLangBtn();
@@ -2848,7 +2728,7 @@ window.addEventListener("DOMContentLoaded",function(){
       return;
     }
   }catch(e){}
-  obShow(0);
+  try{obShow(0);}catch(e){console.warn("OB:",e.message);}
   showScreen("onboard");
 });
 </script>
