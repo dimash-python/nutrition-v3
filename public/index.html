@@ -225,7 +225,7 @@ body{font-family:'Plus Jakarta Sans',-apple-system,sans-serif;color:#1e293b;disp
       <span class="emoji">👋</span>
       <div class="title">Как вас зовут?</div>
       <div class="sub">Мы будем обращаться к вам по имени</div>
-      <input type="text" id="inp_name" placeholder="Ваше имя" oninput="obCheckBtn()" autocomplete="off"/>
+      <input type="text" id="inp_name" placeholder="Ваше имя" oninput="obNameInput(this)" autocomplete="off"/>
     </div>
 
     <!-- 2: Gender -->
@@ -561,6 +561,24 @@ body{font-family:'Plus Jakarta Sans',-apple-system,sans-serif;color:#1e293b;disp
 </div>
 
 <script>
+
+// Stub functions for language (translation system not active)
+function switchLang(){
+  try{
+    S.lang=(S.lang==='ru'?'kz':'ru');
+    localStorage.setItem('nc_lang',S.lang);
+    var btn=document.getElementById('lang-btn');
+    if(btn) btn.textContent=S.lang==='kz'?'🇰🇿 ҚАЗ':'🇷🇺 РУС';
+  }catch(e){}
+}
+function applyTranslations(){}
+function renderLangBtn(){
+  try{
+    var btn=document.getElementById('lang-btn');
+    if(btn) btn.textContent=S.lang==='kz'?'🇰🇿 ҚАЗ':'🇷🇺 РУС';
+  }catch(e){}
+}
+
 // ═══════════════════════════════════════════════════════════════
 // GOALS & CONSTANTS
 // ═══════════════════════════════════════════════════════════════
@@ -2361,157 +2379,6 @@ function openPlanTab(){
   }
 }
 
-var obCur=0;
-function obNext(){
-  var slides=["ob-s0","ob-s1","ob-s2","ob-s3"];
-  var dots=["dot0","dot1","dot2","dot3"];
-  obCur++;
-  if(obCur>=slides.length){showScreen("goal");return;}
-  for(var i=0;i<slides.length;i++){
-    var s=document.getElementById(slides[i]);
-    var d=document.getElementById(dots[i]);
-    if(s) s.style.display=i===obCur?"block":"none";
-    if(d){d.style.width=i===obCur?"24px":"8px";d.style.background=i===obCur?"var(--c)":"rgba(255,255,255,.2)";}
-  }
-  var btn=document.getElementById("ob-next-btn");
-  if(btn) btn.textContent=obCur===slides.length-1?"Выбрать цель →":"Дальше →";
-}
-
-function renderPremiumBanner(){
-  var el=document.getElementById("premium-banner");
-  if(!el) return;
-  if(S_PREMIUM){el.style.display="none";return;}
-  var used=getTodayAnalysisCount();
-  var left=Math.max(0,3-used);
-  el.style.display="block";
-  var dots="";
-  for(var i=0;i<3;i++){
-    dots+="<div style='width:8px;height:8px;border-radius:50%;background:"+(i<used?"#f97316":"#fed7aa")+"'></div>";
-  }
-  el.innerHTML=
-    "<div style='display:flex;align-items:center;gap:12px'>" +
-      "<div style='flex:1'>" +
-        "<div style='font-size:12px;font-weight:700;color:#f97316;margin-bottom:4px'>🎁 Попробуй бесплатно</div>" +
-        "<div style='display:flex;align-items:center;gap:5px;margin-bottom:3px'>" +
-          dots +
-          "<span style='font-size:11px;color:#94a3b8;margin-left:3px'>"+(left>0?left+" из 3 осталось":"анализы закончились")+"</span>" +
-        "</div>" +
-        "<div style='font-size:10px;color:#94a3b8'>Безлимит — 990₸/мес</div>" +
-      "</div>" +
-      "<button onclick='showPaywall()' style='padding:10px 16px;font-size:12px;font-weight:700;border-radius:12px;background:#f97316;color:#fff;border:none;cursor:pointer;font-family:inherit;white-space:nowrap;flex-shrink:0;box-shadow:0 2px 8px rgba(249,115,22,.3)'>Купить</button>" +
-    "</div>";
-}
-
-// ═══════════════════════════════════════════════════════════════
-// LANGUAGE SYSTEM
-// ═══════════════════════════════════════════════════════════════
-var LANG={
-  ru:{
-    main:"Главная",history:"История",food:"Еда",plan:"План",body:"Тело",
-    calories:"ккал",protein:"Белок",fat:"Жиры",carbs:"Углеводы",water:"Вода",
-    goal:"Цель",remaining:"Остаток",today:"Сегодня",meals:"приёмов",
-    mission:"МИССИЯ ДНЯ",done:"Выполнил",level:"Level",streak:"Streak",
-    analyze:"Анализировать",photo:"Фото",text:"Текст",barcode:"Штрихкод",favs:"Избранное",
-    bodyTwin:"BODY TWIN — AI АНАЛИЗ ТЕЛА",scenarios:"ДВА СЦЕНАРИЯ — 30 ДНЕЙ",
-    noPlan:"БЕЗ ПЛАНА",withPlan:"ПО ПЛАНУ",
-    save:"Сохранить",add:"Добавить",back:"↩ Назад",
-    premium:"Премиум",free:"Бесплатно",activate:"Активировать",
-    hello:"Привет",drink:"Пей больше воды"
-  },
-  kz:{
-    main:"Басты",history:"Тарих",food:"Тамақ",plan:"Жоспар",body:"Дене",
-    calories:"ккал",protein:"Белок",fat:"Майлар",carbs:"Көмірсулар",water:"Су",
-    goal:"Мақсат",remaining:"Қалдық",today:"Бүгін",meals:"тамақ",
-    mission:"КҮНДІК ТАПСЫРМА",done:"Орындадым",level:"Деңгей",streak:"Жолақ",
-    analyze:"Талдау",photo:"Фото",text:"Мәтін",barcode:"Штрихкод",favs:"Таңдаулы",
-    bodyTwin:"ДЕНЕ ТАЛДАУЫ — AI",scenarios:"ЕКІ СЦЕНАРИЙ — 30 КҮН",
-    noPlan:"ЖОСПАРСЫЗ",withPlan:"ЖОСПАР БОЙЫНША",
-    save:"Сақтау",add:"Қосу",back:"↩ Артқа",
-    premium:"Премиум",free:"Тегін",activate:"Белсендіру",
-    hello:"Сәлем",drink:"Көбірек су іш"
-  }
-};
-
-function t(key){
-  var lang=S.lang||"ru";
-  return (LANG[lang]&&LANG[lang][key])||LANG.ru[key]||key;
-}
-
-function switchLang(){
-  S.lang=S.lang==="ru"?"kz":"ru";
-  try{localStorage.setItem("nc_lang",S.lang);}catch(e){}
-  renderLangBtn();
-  if(S.currentTab==="main") renderDashboard();
-  else if(S.currentTab==="body") renderBodyScreen();
-  else if(S.currentTab==="history") renderHistoryScreen();
-  else if(S.currentTab==="food") renderFoodScreen();
-  setTimeout(function(){applyTranslations();},50);
-}
-
-function renderLangBtn(){
-  var btn=document.getElementById("lang-btn");
-  if(!btn) return;
-  btn.textContent=S.lang==="ru"?"🇰🇿 ҚАЗ":"🇷🇺 РУС";
-  // Update nav labels
-  var labels={
-    "nav-lbl-main":t("main"),"nav-lbl-hist":t("history"),
-    "nav-lbl-plan":t("plan"),"nav-lbl-body":t("body")
-  };
-  for(var id in labels){
-    var el=document.getElementById(id);
-    if(el) el.textContent=labels[id];
-  }
-}
-
-function applyTranslations(){
-  if(S.lang==="ru") return; // Russian is default, no changes needed
-  var map={
-    "Главная":"Басты","История":"Тарих","Еда":"Тамақ","План":"Жоспар","Тело":"Дене",
-    "Белок":"Белок","Жиры":"Майлар","Углеводы":"Көмірсулар","Вода":"Су",
-    "Цель:":"Мақсат:","Остаток:":"Қалдық:","Сегодня":"Бүгін",
-    "приёмов":"тамақ","приём":"тамақ",
-    "МИССИЯ ДНЯ":"КҮНДІК ТАПСЫРМА","Выполнил":"Орындадым",
-    "ДВА СЦЕНАРИЯ — 30 ДНЕЙ":"ЕКІ СЦЕНАРИЙ — 30 КҮН",
-    "БЕЗ ПЛАНА":"ЖОСПАРСЫЗ","ПО ПЛАНУ":"ЖОСПАР БОЙЫНША",
-    "BODY TWIN — AI АНАЛИЗ ТЕЛА":"ДЕНЕ ТАЛДАУЫ — AI",
-    "ВЕС — ИСТОРИЯ":"ШЕУ — ТАРИХ",
-    "Сохранить":"Сақтау","Добавить":"Қосу",
-    "Пей больше воды":"Көбірек су іш",
-    "Норма выполнена":"Норма орындалды",
-    "Хорошо, добавь ещё":"Жақсы, тағы қос",
-    "КАЛОРИИ ЗА 7 ДНЕЙ":"7 КҮНДЕГІ КАЛОРИЯ",
-    "Эта неделя:":"Осы апта:",
-    "Поделиться":"Бөлісу","Карточка прогресса":"Прогресс картасы",
-    "Скачать PNG":"PNG жүктеу",
-    "Level":"Деңгей","Streak:":"Жолақ:",
-    "до Level":"Деңгейге дейін",
-    "Жир горит":"Май жанады","Мышцы растут":"Бұлшықет өседі",
-    "Идеальный день":"Тамаша күн","Недобор":"Жетпеді",
-    "ТРЕНИРОВКА":"ЖАТТЫҒУ","Добавить тренировку":"Жаттығу қосу",
-    "сожжено":"жандырылды","Остаток":"Қалдық",
-    "ВОДА":"СУ","Норма":"Норма",
-    "Обновить вес":"Салмақ жаңарту"
-  };
-  // Apply to main content areas
-  var areas=["main-content","history-content","body-content","food-content","macro-bars","water-card","mission-card","meals-list","notif-card","workout-card","greeting","level-label","xp-label","xp-next","streak-tag","cal-sub","body-state-pill","premium-banner"];
-  areas.forEach(function(id){
-    var el=document.getElementById(id);
-    if(!el) return;
-    var html=el.innerHTML;
-    for(var ru in map){
-      html=html.split(ru).join(map[ru]);
-    }
-    el.innerHTML=html;
-  });
-  // Nav labels
-  var navMap={"nav-lbl-main":"Басты","nav-lbl-hist":"Тарих","nav-lbl-plan":"Жоспар","nav-lbl-body":"Дене"};
-  for(var id in navMap){
-    var el=document.getElementById(id);
-    if(el) el.textContent=navMap[id];
-  }
-}
-
-
 function obFinish(){
   var d=OB_D;S.name=d.name||'';S.gender=d.gender||'male';
   S.age=d.age||25;S.height=d.height||170;S.weight=d.weight||70;S.targetWeight=d.target||60;
@@ -2574,59 +2441,76 @@ var OB_SUBGOALS={
 
 function obShow(idx){
   var id=OB_STEPS[idx];
-  (document.getElementById('ob_content')||document.querySelector('#scr-onboard .screens')||{querySelectorAll:function(){return [];}}).querySelectorAll('.screen').forEach(function(s){s.classList.remove('active');});
-  document.getElementById(id).classList.add('active');
-  var isWelcome=idx===0;
-  var isResult=id==='sc15';
-  var _tb=document.getElementById('ob_topbar');if(_tb)_tb.style.display=isWelcome?'none':'flex';
-  var _bb=document.getElementById('ob_bottom');if(_bb)_bb.style.display=isWelcome||isResult?'none':'flex';
+  if(!id) return;
+  // Hide all onboarding screens
+  var screens=document.querySelectorAll('#scr-onboard .screen');
+  for(var k=0;k<screens.length;k++) screens[k].classList.remove('active');
+  // Show current screen
+  var cur=document.getElementById(id);
+  if(cur) cur.classList.add('active');
+  var isWelcome=(idx===0);
+  var isResult=(id==='sc15');
+  var tb=document.getElementById('ob_topbar');
+  var bb=document.getElementById('ob_bottom');
+  if(tb) tb.style.display=isWelcome?'none':'flex';
+  if(bb) bb.style.display=(isWelcome||isResult)?'none':'flex';
   if(!isWelcome&&!isResult){
-    var visIdx=idx; // visible step number
-    if(OB_D.goal!=='loss'&&OB_D.goal!=='bulk'&&id==='sc7b') return;
-    var total=OB_D.goal==='loss'||OB_D.goal==='bulk'?16:15;
-    var _pf=document.getElementById('ob_pf');if(_pf)_pf.style.width=Math.round((idx/STEPS.length)*100)+'%';
-    var _pl=document.getElementById('ob_pl');if(_pl)_pl.textContent=idx+' / '+total;
+    var total=(OB_D.goal==='loss'||OB_D.goal==='cut'||OB_D.goal==='bulk')?16:15;
+    var pf=document.getElementById('ob_pf');
+    var pl=document.getElementById('ob_pl');
+    if(pf) pf.style.width=Math.round((idx/OB_STEPS.length)*100)+'%';
+    if(pl) pl.textContent=idx+' / '+total;
   }
-  
-  if(id==='sc15'){
+  if(isResult){
     setTimeout(function(){
-      document.getElementById('ob_bottom').style.display='flex';
-      document.getElementById('ob_btn').textContent='Начать пользоваться →';
+      var bb2=document.getElementById('ob_bottom');
+      var btn2=document.getElementById('ob_btn');
+      if(bb2) bb2.style.display='flex';
+      if(btn2) btn2.textContent='Начать пользоваться →';
     },2500);
-    obCalcResult();
+    try{obCalcResult();}catch(e){}
   }
-  document.getElementById('ob_content').scrollTop=0;
-  obCheckBtn();
+  var ct=document.getElementById('ob_content');
+  if(ct) ct.scrollTop=0;
+  try{obCheckBtn();}catch(e){}
+}
+
+
+function obNameInput(inp){
+  OB_D.name=inp.value;
+  var btn=document.getElementById('ob_btn');
+  if(btn) btn.disabled=!inp.value.trim();
 }
 
 function obNext(){
   var id=OB_STEPS[OB_CUR];
   if(id==='sc15'){obFinish();return;}
+  // After goal (sc7), decide whether to show subgoal (sc7b)
   if(id==='sc7'){
-    var sg=OB_SUBGOALS[OB_D.goal];
-    if(sg){
-      obRenderSubgoal(sg);
-      OB_CUR++;
-      obShow(OB_CUR);
-      return;
+    var hasSubgoal=(OB_D.goal==='loss'||OB_D.goal==='cut'||OB_D.goal==='bulk');
+    if(hasSubgoal){
+      var sg=OB_SUBGOALS[OB_D.goal];
+      if(sg) obRenderSubgoal(sg);
+      OB_CUR++; // go to sc7b
     } else {
-      OB_CUR+=2; // skip sc7b
-      obShow(OB_CUR);
-      return;
+      OB_CUR+=2; // skip sc7b, go to sc8
     }
+    obShow(OB_CUR);
+    return;
   }
   OB_CUR++;
   obShow(OB_CUR);
 }
 
 function obBack(){
-  if(cur<=1) return;
-  var id=OB_STEPS[OB_CUR];
-  if(id==='sc8'&&OB_STEPS[cur-1]==='sc7b'&&!OB_SUBGOALS[OB_D.goal]){
-    cur-=2;
-  } else {
-    cur--;
+  if(OB_CUR<=1) return;
+  var prevId=OB_STEPS[OB_CUR-1];
+  // If prev is sc7b but no subgoal, skip back over it
+  if(prevId==='sc7b'){
+    var hasSubgoal=(OB_D.goal==='loss'||OB_D.goal==='cut'||OB_D.goal==='bulk');
+    if(!hasSubgoal){OB_CUR-=2;obShow(OB_CUR);return;}
   }
+  OB_CUR--;
   obShow(OB_CUR);
 }
 
@@ -2670,8 +2554,14 @@ function obCheckBtn(){
   var btn=document.getElementById('ob_btn');
   if(!btn) return;
   var id=OB_STEPS[OB_CUR];
-  if(id==='sc1') btn.disabled=!document.getElementById('inp_name').value.trim();
-  else btn.disabled=false;
+  if(id==='sc1'){
+    var inp=document.getElementById('inp_name');
+    var hasName=inp&&inp.value.trim();
+    if(!hasName&&OB_D.name) hasName=OB_D.name.trim(); // use saved name
+    btn.disabled=!hasName;
+  } else {
+    btn.disabled=false;
+  }
 }
 
 function obSetAge(v){
@@ -2713,7 +2603,7 @@ function obCalcResult(){
 
 window.addEventListener("DOMContentLoaded",function(){
   try{renderGoals();}catch(e){}
-  renderLangBtn();
+  try{renderLangBtn();}catch(e){}
   // Try to restore saved profile
   try{
     var saved=JSON.parse(localStorage.getItem("nc_profile")||"null");
