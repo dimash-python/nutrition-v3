@@ -66,7 +66,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;color
 .sel-card.sel{border-color:var(--green);background:var(--green-light)}
 /* overlay + sheet */
 .overlay{display:none;position:fixed;inset:0;background:rgba(20,40,20,.4);z-index:100;align-items:flex-end;justify-content:center;backdrop-filter:blur(4px)}
-.sheet{background:var(--surface);border-radius:28px 28px 0 0;padding:24px 20px 36px;width:100%;max-width:390px;box-shadow:0 -8px 40px rgba(0,0,0,.12);animation:sheetUp .3s cubic-bezier(.22,1,.36,1)}
+.sheet{background:var(--surface);border-radius:28px 28px 0 0;padding:24px 20px 36px;width:100%;max-width:390px;box-shadow:0 -8px 40px rgba(0,0,0,.12);animation:sheetUp .3s cubic-bezier(.22,1,.36,1);max-height:90vh;overflow-y:auto;-webkit-overflow-scrolling:touch}
 @keyframes sheetUp{from{transform:translateY(100%)}to{transform:none}}
 /* bottom nav */
 #main-nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:390px;background:rgba(255,255,255,.92);backdrop-filter:blur(20px);border-top:1px solid var(--line);display:none;justify-content:space-around;align-items:center;padding:10px 0 28px;z-index:50}
@@ -91,6 +91,14 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;color
 @keyframes dotPulse{0%,60%,100%{opacity:.3;transform:scale(.8)}30%{opacity:1;transform:scale(1)}}
 @keyframes spin{to{transform:rotate(360deg)}}
 @keyframes resultRise{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+
+/* Floating action button fan menu */
+.fab-item{display:flex;align-items:center;gap:12px;opacity:0;transform:translateY(20px) scale(.8);transition:opacity .3s cubic-bezier(.34,1.56,.64,1),transform .3s cubic-bezier(.34,1.56,.64,1);pointer-events:none}
+.fab-item.show{opacity:1;transform:translateY(0) scale(1);pointer-events:auto}
+.fab-lbl{background:var(--surface);color:var(--ink);font-size:14px;font-weight:600;padding:9px 15px;border-radius:12px;box-shadow:var(--shadow-md);white-space:nowrap}
+.fab-ic{width:50px;height:50px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:23px;box-shadow:var(--shadow-md);cursor:pointer;flex-shrink:0}
+#nav-add-btn.open{transform:rotate(45deg) scale(1.05)}
+.nav-add{transition:transform .3s cubic-bezier(.34,1.56,.64,1)}
 </style>
 </head>
 <body>
@@ -469,30 +477,30 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;color
       <span class="emoji">🚀</span>
       <div class="title">Постоянная поддержка работает</div>
       <div class="sub">Nutrivo всегда рядом, чтобы вести тебя к цели</div>
-      <div style="display:flex;gap:14px;margin:28px 0 20px;align-items:flex-end">
+      <div style="display:flex;gap:14px;margin:20px 0 16px;align-items:flex-end">
         <!-- Без -->
         <div style="flex:1;text-align:center">
-          <div style="font-size:40px;margin-bottom:10px">😕</div>
-          <div style="background:var(--surface2);border:1px solid var(--line);border-radius:20px;padding:18px 12px;height:230px;display:flex;flex-direction:column;justify-content:flex-end;position:relative;overflow:hidden">
-            <div style="position:absolute;top:16px;left:0;right:0;font-size:14px;font-weight:800;color:var(--ink2)">Без Nutrivo</div>
-            <div id="cmp-bar-without" style="background:var(--line2);border-radius:14px;height:28%;display:flex;align-items:center;justify-content:center;transition:height 1s cubic-bezier(.4,0,.2,1)">
-              <span style="font-size:20px;font-weight:900;color:var(--ink3)">1x</span>
+          <div style="font-size:34px;margin-bottom:8px">😕</div>
+          <div style="background:var(--surface2);border:1px solid var(--line);border-radius:18px;padding:14px 10px;height:170px;display:flex;flex-direction:column;justify-content:flex-end;position:relative;overflow:hidden">
+            <div style="position:absolute;top:12px;left:0;right:0;font-size:13px;font-weight:800;color:var(--ink2)">Без Nutrivo</div>
+            <div id="cmp-bar-without" style="background:var(--line2);border-radius:12px;height:28%;display:flex;align-items:center;justify-content:center;transition:height 1s cubic-bezier(.4,0,.2,1)">
+              <span style="font-size:18px;font-weight:900;color:var(--ink3)">1x</span>
             </div>
           </div>
         </div>
         <!-- С -->
         <div style="flex:1;text-align:center">
-          <div style="font-size:40px;margin-bottom:10px">🤩</div>
-          <div style="background:var(--green-soft);border:1.5px solid var(--green-mid);border-radius:20px;padding:18px 12px;height:230px;display:flex;flex-direction:column;justify-content:flex-end;position:relative;overflow:hidden">
-            <div style="position:absolute;top:16px;left:0;right:0;font-size:14px;font-weight:800;color:var(--green-text)">С Nutrivo</div>
-            <div id="cmp-bar-with" style="background:linear-gradient(180deg,#66bb6a,#4CAF50);border-radius:14px;height:8%;display:flex;align-items:center;justify-content:center;transition:height 1.2s cubic-bezier(.4,0,.2,1);box-shadow:0 4px 16px rgba(76,175,80,.3)">
-              <span style="font-size:22px;font-weight:900;color:#fff">2x</span>
+          <div style="font-size:34px;margin-bottom:8px">🤩</div>
+          <div style="background:var(--green-soft);border:1.5px solid var(--green-mid);border-radius:18px;padding:14px 10px;height:170px;display:flex;flex-direction:column;justify-content:flex-end;position:relative;overflow:hidden">
+            <div style="position:absolute;top:12px;left:0;right:0;font-size:13px;font-weight:800;color:var(--green-text)">С Nutrivo</div>
+            <div id="cmp-bar-with" style="background:linear-gradient(180deg,#66bb6a,#4CAF50);border-radius:12px;height:8%;display:flex;align-items:center;justify-content:center;transition:height 1.2s cubic-bezier(.4,0,.2,1);box-shadow:0 4px 16px rgba(76,175,80,.3)">
+              <span style="font-size:20px;font-weight:900;color:#fff">2x</span>
             </div>
           </div>
         </div>
       </div>
-      <div style="background:var(--green-soft);border:1px solid var(--green-mid);border-radius:16px;padding:16px;margin-bottom:8px">
-        <div style="font-size:13px;color:var(--ink2);line-height:1.6;text-align:center">Люди, которые следят за питанием с поддержкой AI-тренера, достигают цели заметно стабильнее 💪</div>
+      <div style="background:var(--green-soft);border:1px solid var(--green-mid);border-radius:16px;padding:14px 16px;margin-bottom:20px">
+        <div style="font-size:13px;color:var(--ink2);line-height:1.55;text-align:center">Люди, которые следят за питанием с поддержкой AI-тренера, достигают цели заметно стабильнее 💪</div>
       </div>
     </div>
 
@@ -528,7 +536,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;color
   </div>
 
   <!-- MAIN -->
-  <div id="scr-main" class="screen hidden" style="padding:56px 18px 0">
+  <div id="scr-main" class="screen hidden" style="padding:56px 18px 120px">
     <!-- Header -->
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:22px;animation:cardRise .5s cubic-bezier(.22,1,.36,1) both">
       <div>
@@ -659,6 +667,19 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;color
     </div>
   </div>
 
+  <!-- FLOATING ACTION BUTTON (fan menu) -->
+  <div id="fab-overlay" onclick="closeFab()" style="display:none;position:fixed;inset:0;background:rgba(15,26,18,.55);backdrop-filter:blur(3px);z-index:80;opacity:0;transition:opacity .25s"></div>
+  <div id="fab-wrap" style="display:none;position:fixed;right:20px;bottom:100px;z-index:90;flex-direction:column;align-items:flex-end;gap:12px">
+    <div class="fab-item" data-i="0" onclick="fabAction('food')"><span class="fab-lbl">Скан еды</span><span class="fab-ic" style="background:linear-gradient(135deg,#4CAF50,#43a047)">📸</span></div>
+    <div class="fab-item" data-i="1" onclick="fabAction('fridge')"><span class="fab-lbl">Холодильник</span><span class="fab-ic" style="background:linear-gradient(135deg,#3b9eed,#5bb3f5)">🧊</span></div>
+    <div class="fab-item" data-i="2" onclick="fabAction('cook')"><span class="fab-lbl">Что приготовить</span><span class="fab-ic" style="background:linear-gradient(135deg,#f5a623,#ffb74d)">🍳</span></div>
+    <div class="fab-item" data-i="3" onclick="fabAction('water')"><span class="fab-lbl">Добавить воду</span><span class="fab-ic" style="background:linear-gradient(135deg,#42a5f5,#64b5f6)">💧</span></div>
+    <div class="fab-item" data-i="4" onclick="fabAction('workout')"><span class="fab-lbl">Тренировка</span><span class="fab-ic" style="background:linear-gradient(135deg,#9b59d0,#b074dd)">🏋️</span></div>
+    <div class="fab-item" data-i="5" onclick="fabAction('body')"><span class="fab-lbl">Скан тела</span><span class="fab-ic" style="background:linear-gradient(135deg,#ef5350,#f47570)">🪞</span></div>
+    <div class="fab-item" data-i="6" onclick="fabAction('coach')"><span class="fab-lbl">Спросить Коуча</span><span class="fab-ic" style="background:linear-gradient(135deg,#26a69a,#4db6ac)">🤖</span></div>
+  </div>
+  
+
   <nav id="main-nav" style="display:none">
     <button class="nav-btn active" id="nav-main" onclick="switchTab('main')">
       <span class="nav-icon">🏠</span><span class="nav-lbl-main">Главная</span>
@@ -666,7 +687,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;color
     <button class="nav-btn" id="nav-history" onclick="switchTab('history')">
       <span class="nav-icon">📊</span><span class="nav-lbl-hist">История</span>
     </button>
-    <button class="nav-add" onclick="openFood()">+</button>
+    <button class="nav-add" id="nav-add-btn" onclick="toggleFab()">+</button>
     <button class="nav-btn" id="nav-plan" onclick="openPlanTab()">
       <span class="nav-icon">📅</span><span class="nav-lbl-plan">План</span>
     </button>
@@ -688,9 +709,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;color
 </div>
 
 <!-- MODALS -->
-<div id="cook-modal" class="overlay"><div id="cook-sheet" class="sheet"></div></div>
+<div id="cook-modal" class="overlay"><div id="cook-sheet" class="sheet" style="max-height:88vh;overflow-y:auto"></div></div>
   <div id="paywall-modal" style="display:none" class="overlay"><div class="sheet" id="paywall-sheet" style="max-height:90vh;overflow-y:auto"></div></div>
-<div id="workout-modal" style="display:none" class="overlay" onclick="closeModal('workout-modal',event)"><div class="sheet" id="workout-sheet"></div></div>
+<div id="workout-modal" style="display:none" class="overlay" onclick="closeModal('workout-modal',event)"><div class="sheet" id="workout-sheet" style="max-height:88vh;overflow-y:auto"></div></div>
 <div id="hunger-modal" style="display:none" class="overlay" onclick="closeModal('hunger-modal',event)"><div class="sheet" id="hunger-sheet"></div></div>
 <div id="share-modal" style="display:none" class="overlay" onclick="closeModal('share-modal',event)"><div class="sheet" id="share-sheet"></div></div>
 <div id="plan-modal" style="display:none" class="overlay" onclick="closeModal('plan-modal',event)"><div class="sheet" id="plan-sheet" style="max-height:85vh;overflow-y:auto"></div></div>
@@ -821,11 +842,13 @@ function showScreen(name){
     nav.style.display="flex";
     S.currentTab=name;
     updateNavActive();
+    try{closeFab();}catch(e){}
     if(name==="history") renderHistoryScreen();
     if(name==="body") renderBodyScreen();
     if(name==="food") renderFoodScreen();
   } else {
     nav.style.display="none";
+    try{closeFab();}catch(e){}
     if(name==="coach") renderChat();
   }
 }
@@ -3494,6 +3517,71 @@ function runPrepAnimation(){
       },600);
     }
   },480);
+}
+
+
+// ═══════════════════════════════════════════════
+// FLOATING ACTION BUTTON — fan menu
+// ═══════════════════════════════════════════════
+var FAB_OPEN=false;
+function toggleFab(){FAB_OPEN?closeFab():openFab();}
+function openFab(){
+  FAB_OPEN=true;
+  var ov=document.getElementById("fab-overlay");
+  var wrap=document.getElementById("fab-wrap");
+  var main=document.getElementById("nav-add-btn");
+  if(ov){ov.style.display="block";setTimeout(function(){ov.style.opacity="1";},10);}
+  if(wrap)wrap.style.display="flex";
+  if(main)main.classList.add("open");
+  var items=document.querySelectorAll(".fab-item");
+  // stagger from bottom (closest to button) up
+  var arr=Array.prototype.slice.call(items).reverse();
+  arr.forEach(function(it,i){
+    setTimeout(function(){it.classList.add("show");},i*45);
+  });
+}
+function closeFab(){
+  FAB_OPEN=false;
+  var ov=document.getElementById("fab-overlay");
+  var wrap=document.getElementById("fab-wrap");
+  var main=document.getElementById("nav-add-btn");
+  if(main)main.classList.remove("open");
+  var items=document.querySelectorAll(".fab-item");
+  items.forEach(function(it){it.classList.remove("show");});
+  if(ov){ov.style.opacity="0";setTimeout(function(){ov.style.display="none";},250);}
+  setTimeout(function(){if(wrap&&!FAB_OPEN)wrap.style.display="none";},300);
+}
+function fabAction(act){
+  closeFab();
+  setTimeout(function(){
+    if(act==="food") openFood();
+    else if(act==="fridge") openFridge();
+    else if(act==="cook") openCookIdeas();
+    else if(act==="water"){ fabAddWater(); }
+    else if(act==="workout") showWorkoutModal();
+    else if(act==="body"){ switchTab("body"); }
+    else if(act==="coach") openCoachChat();
+  },180);
+}
+function fabAddWater(){
+  // safe water add (since addWater may not exist)
+  S.water=(S.water||0)+250;
+  try{localStorage.setItem("nc_water_"+new Date().toDateString(),String(S.water));}catch(e){}
+  if(S.currentTab==="main"){try{renderWater();}catch(e){}}
+  // small toast
+  showToast("💧 +250 мл воды");
+}
+function showToast(msg){
+  var t=document.getElementById("nc-toast");
+  if(!t){
+    t=document.createElement("div");
+    t.id="nc-toast";
+    t.style.cssText="position:fixed;bottom:170px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--ink);color:#fff;padding:12px 22px;border-radius:14px;font-size:14px;font-weight:600;z-index:200;opacity:0;transition:all .3s;box-shadow:var(--shadow-lg);pointer-events:none";
+    document.body.appendChild(t);
+  }
+  t.textContent=msg;
+  setTimeout(function(){t.style.opacity="1";t.style.transform="translateX(-50%) translateY(0)";},10);
+  setTimeout(function(){t.style.opacity="0";t.style.transform="translateX(-50%) translateY(20px)";},2000);
 }
 
 window.addEventListener("DOMContentLoaded",function(){
