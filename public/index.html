@@ -464,6 +464,38 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;color
       </div>
     </div>
 
+    <!-- COMPARE: Без / С Nutrivo -->
+    <div class="screen" id="sc_compare">
+      <span class="emoji">🚀</span>
+      <div class="title">Постоянная поддержка работает</div>
+      <div class="sub">Nutrivo всегда рядом, чтобы вести тебя к цели</div>
+      <div style="display:flex;gap:14px;margin:28px 0 20px;align-items:flex-end">
+        <!-- Без -->
+        <div style="flex:1;text-align:center">
+          <div style="font-size:40px;margin-bottom:10px">😕</div>
+          <div style="background:var(--surface2);border:1px solid var(--line);border-radius:20px;padding:18px 12px;height:230px;display:flex;flex-direction:column;justify-content:flex-end;position:relative;overflow:hidden">
+            <div style="position:absolute;top:16px;left:0;right:0;font-size:14px;font-weight:800;color:var(--ink2)">Без Nutrivo</div>
+            <div id="cmp-bar-without" style="background:var(--line2);border-radius:14px;height:28%;display:flex;align-items:center;justify-content:center;transition:height 1s cubic-bezier(.4,0,.2,1)">
+              <span style="font-size:20px;font-weight:900;color:var(--ink3)">1x</span>
+            </div>
+          </div>
+        </div>
+        <!-- С -->
+        <div style="flex:1;text-align:center">
+          <div style="font-size:40px;margin-bottom:10px">🤩</div>
+          <div style="background:var(--green-soft);border:1.5px solid var(--green-mid);border-radius:20px;padding:18px 12px;height:230px;display:flex;flex-direction:column;justify-content:flex-end;position:relative;overflow:hidden">
+            <div style="position:absolute;top:16px;left:0;right:0;font-size:14px;font-weight:800;color:var(--green-text)">С Nutrivo</div>
+            <div id="cmp-bar-with" style="background:linear-gradient(180deg,#66bb6a,#4CAF50);border-radius:14px;height:8%;display:flex;align-items:center;justify-content:center;transition:height 1.2s cubic-bezier(.4,0,.2,1);box-shadow:0 4px 16px rgba(76,175,80,.3)">
+              <span style="font-size:22px;font-weight:900;color:#fff">2x</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div style="background:var(--green-soft);border:1px solid var(--green-mid);border-radius:16px;padding:16px;margin-bottom:8px">
+        <div style="font-size:13px;color:var(--ink2);line-height:1.6;text-align:center">Люди, которые следят за питанием с поддержкой AI-тренера, достигают цели заметно стабильнее 💪</div>
+      </div>
+    </div>
+
     <!-- 15: Result -->
     <div class="screen" id="sc15">
       <div class="result-wrap" id="loading_wrap">
@@ -2771,7 +2803,7 @@ function getUserContext(){
 
 var OB_D={name:'',gender:'',age:25,height:170,weight:70,target:60,goal:'',subgoal:'',calFactor:1,act:'3',water:2,diet:[],allergy:[],health:[],meals:'3',cuisine:[]};
 
-var OB_STEPS=['sc0','sc1','sc2','sc3','sc4','sc5','sc6','sc7','sc7b','sc8','sc9','sc10','sc11','sc12','sc13','sc14','sc15'];
+var OB_STEPS=['sc0','sc1','sc2','sc3','sc4','sc5','sc6','sc7','sc7b','sc8','sc9','sc10','sc11','sc12','sc13','sc14','sc_compare','sc15'];
 var OB_CUR=0;
 var OB_SUBGOALS={
   loss:{emoji:'⚖️',title:'Темп похудения',sub:'Как быстро хотите снижать вес?',opts:[
@@ -2796,6 +2828,8 @@ function obShow(idx){
   var _cs=document.getElementById(id);if(_cs)_cs.classList.add('active');
   var isWelcome=idx===0;
   var isResult=id==='sc15';
+  var _btnReset=document.getElementById('ob_btn');
+  if(_btnReset&&id!=='sc_compare'&&id!=='sc15')_btnReset.textContent='Далее';
   var _t=document.getElementById('ob_topbar');if(_t)_t.style.display=isWelcome?'none':'flex';
   var _b=document.getElementById('ob_bottom');if(_b)_b.style.display=isWelcome||isResult?'none':'flex';
   if(!isWelcome&&!isResult){
@@ -2806,6 +2840,16 @@ function obShow(idx){
     var _l=document.getElementById('ob_pl');if(_l)_l.textContent=idx+' / '+total;
   }
   
+  if(id==='sc_compare'){
+    // animate the comparison bars
+    setTimeout(function(){
+      var bw=document.getElementById('cmp-bar-without');
+      var bn=document.getElementById('cmp-bar-with');
+      if(bw) bw.style.height='40%';
+      if(bn) bn.style.height='85%';
+    },200);
+    var _btn=document.getElementById('ob_btn');if(_btn)_btn.textContent='Продолжить';
+  }
   if(id==='sc15'){
     setTimeout(function(){
       var _b=document.getElementById('ob_bottom');if(_b)_b.style.display='flex';
