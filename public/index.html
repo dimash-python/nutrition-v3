@@ -59,14 +59,17 @@ body{font-family:'Plus Jakarta Sans',-apple-system,sans-serif;color:#1e293b;disp
 <div id="app">
 
   <!-- ONBOARDING -->
-  <div id="scr-onboard" class="screen fade-in" style="padding:0;overflow:hidden">
+  <div id="scr-onboard" class="screen fade-in" style="padding:0;overflow:hidden;background:#f5f7f5">
     <style>
+/* Ensure content scrolls and bottom stays visible */
+#scr-onboard .content{flex:1 1 auto;overflow-y:auto;min-height:0}
+#scr-onboard .bottom{flex:0 0 auto}
 
 #scr-onboard {box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 
 #scr-onboard {font-family:-apple-system,BlinkMacSystemFont,sans-serif;background:#f0f9f0;color:#1a1a1a;height:100vh;overflow:hidden}
 
-#scr-onboard .app {max-width:390px;height:100vh;margin:0 auto;background:#fff;display:flex;flex-direction:column;position:relative;overflow:hidden}
+#scr-onboard .app {max-width:390px;height:100%;margin:0 auto;background:#fff;display:flex;flex-direction:column;position:relative;overflow:hidden}
 
 #scr-onboard .topbar {padding:16px 20px 0;display:flex;align-items:center;gap:12px;flex-shrink:0;min-height:56px}
 
@@ -194,8 +197,7 @@ body{font-family:'Plus Jakarta Sans',-apple-system,sans-serif;color:#1e293b;disp
 
 #scr-onboard .btn:disabled {background:#c8e6c9;cursor:not-allowed}
 
-
-    </style>
+</style>
 <div class="app">
   <div class="topbar" id="ob_topbar" style="display:none">
     <button class="back-btn" onclick="obBack()">‹</button>
@@ -225,7 +227,7 @@ body{font-family:'Plus Jakarta Sans',-apple-system,sans-serif;color:#1e293b;disp
       <span class="emoji">👋</span>
       <div class="title">Как вас зовут?</div>
       <div class="sub">Мы будем обращаться к вам по имени</div>
-      <input type="text" id="inp_name" placeholder="Ваше имя" oninput="obNameInput(this)" autocomplete="off"/>
+      <input type="text" id="inp_name" placeholder="Ваше имя" oninput="obNameI(this)" autocomplete="off"/>
     </div>
 
     <!-- 2: Gender -->
@@ -561,24 +563,6 @@ body{font-family:'Plus Jakarta Sans',-apple-system,sans-serif;color:#1e293b;disp
 </div>
 
 <script>
-
-// Stub functions for language (translation system not active)
-function switchLang(){
-  try{
-    S.lang=(S.lang==='ru'?'kz':'ru');
-    localStorage.setItem('nc_lang',S.lang);
-    var btn=document.getElementById('lang-btn');
-    if(btn) btn.textContent=S.lang==='kz'?'🇰🇿 ҚАЗ':'🇷🇺 РУС';
-  }catch(e){}
-}
-function applyTranslations(){}
-function renderLangBtn(){
-  try{
-    var btn=document.getElementById('lang-btn');
-    if(btn) btn.textContent=S.lang==='kz'?'🇰🇿 ҚАЗ':'🇷🇺 РУС';
-  }catch(e){}
-}
-
 // ═══════════════════════════════════════════════════════════════
 // GOALS & CONSTANTS
 // ═══════════════════════════════════════════════════════════════
@@ -2379,6 +2363,143 @@ function openPlanTab(){
   }
 }
 
+
+function renderPremiumBanner(){
+  var el=document.getElementById("premium-banner");
+  if(!el) return;
+  if(S_PREMIUM){el.style.display="none";return;}
+  var used=getTodayAnalysisCount();
+  var left=Math.max(0,3-used);
+  el.style.display="block";
+  var dots="";
+  for(var i=0;i<3;i++){
+    dots+="<div style='width:8px;height:8px;border-radius:50%;background:"+(i<used?"#f97316":"#fed7aa")+"'></div>";
+  }
+  el.innerHTML=
+    "<div style='display:flex;align-items:center;gap:12px'>" +
+      "<div style='flex:1'>" +
+        "<div style='font-size:12px;font-weight:700;color:#f97316;margin-bottom:4px'>🎁 Попробуй бесплатно</div>" +
+        "<div style='display:flex;align-items:center;gap:5px;margin-bottom:3px'>" +
+          dots +
+          "<span style='font-size:11px;color:#94a3b8;margin-left:3px'>"+(left>0?left+" из 3 осталось":"анализы закончились")+"</span>" +
+        "</div>" +
+        "<div style='font-size:10px;color:#94a3b8'>Безлимит — 990₸/мес</div>" +
+      "</div>" +
+      "<button onclick='showPaywall()' style='padding:10px 16px;font-size:12px;font-weight:700;border-radius:12px;background:#f97316;color:#fff;border:none;cursor:pointer;font-family:inherit;white-space:nowrap;flex-shrink:0;box-shadow:0 2px 8px rgba(249,115,22,.3)'>Купить</button>" +
+    "</div>";
+}
+
+// ═══════════════════════════════════════════════════════════════
+// LANGUAGE SYSTEM
+// ═══════════════════════════════════════════════════════════════
+var LANG={
+  ru:{
+    main:"Главная",history:"История",food:"Еда",plan:"План",body:"Тело",
+    calories:"ккал",protein:"Белок",fat:"Жиры",carbs:"Углеводы",water:"Вода",
+    goal:"Цель",remaining:"Остаток",today:"Сегодня",meals:"приёмов",
+    mission:"МИССИЯ ДНЯ",done:"Выполнил",level:"Level",streak:"Streak",
+    analyze:"Анализировать",photo:"Фото",text:"Текст",barcode:"Штрихкод",favs:"Избранное",
+    bodyTwin:"BODY TWIN — AI АНАЛИЗ ТЕЛА",scenarios:"ДВА СЦЕНАРИЯ — 30 ДНЕЙ",
+    noPlan:"БЕЗ ПЛАНА",withPlan:"ПО ПЛАНУ",
+    save:"Сохранить",add:"Добавить",back:"↩ Назад",
+    premium:"Премиум",free:"Бесплатно",activate:"Активировать",
+    hello:"Привет",drink:"Пей больше воды"
+  },
+  kz:{
+    main:"Басты",history:"Тарих",food:"Тамақ",plan:"Жоспар",body:"Дене",
+    calories:"ккал",protein:"Белок",fat:"Майлар",carbs:"Көмірсулар",water:"Су",
+    goal:"Мақсат",remaining:"Қалдық",today:"Бүгін",meals:"тамақ",
+    mission:"КҮНДІК ТАПСЫРМА",done:"Орындадым",level:"Деңгей",streak:"Жолақ",
+    analyze:"Талдау",photo:"Фото",text:"Мәтін",barcode:"Штрихкод",favs:"Таңдаулы",
+    bodyTwin:"ДЕНЕ ТАЛДАУЫ — AI",scenarios:"ЕКІ СЦЕНАРИЙ — 30 КҮН",
+    noPlan:"ЖОСПАРСЫЗ",withPlan:"ЖОСПАР БОЙЫНША",
+    save:"Сақтау",add:"Қосу",back:"↩ Артқа",
+    premium:"Премиум",free:"Тегін",activate:"Белсендіру",
+    hello:"Сәлем",drink:"Көбірек су іш"
+  }
+};
+
+function t(key){
+  var lang=S.lang||"ru";
+  return (LANG[lang]&&LANG[lang][key])||LANG.ru[key]||key;
+}
+
+function switchLang(){
+  S.lang=S.lang==="ru"?"kz":"ru";
+  try{localStorage.setItem("nc_lang",S.lang);}catch(e){}
+  renderLangBtn();
+  if(S.currentTab==="main") renderDashboard();
+  else if(S.currentTab==="body") renderBodyScreen();
+  else if(S.currentTab==="history") renderHistoryScreen();
+  else if(S.currentTab==="food") renderFoodScreen();
+  setTimeout(function(){applyTranslations();},50);
+}
+
+function renderLangBtn(){
+  var btn=document.getElementById("lang-btn");
+  if(!btn) return;
+  btn.textContent=S.lang==="ru"?"🇰🇿 ҚАЗ":"🇷🇺 РУС";
+  // Update nav labels
+  var labels={
+    "nav-lbl-main":t("main"),"nav-lbl-hist":t("history"),
+    "nav-lbl-plan":t("plan"),"nav-lbl-body":t("body")
+  };
+  for(var id in labels){
+    var el=document.getElementById(id);
+    if(el) el.textContent=labels[id];
+  }
+}
+
+function applyTranslations(){
+  if(S.lang==="ru") return; // Russian is default, no changes needed
+  var map={
+    "Главная":"Басты","История":"Тарих","Еда":"Тамақ","План":"Жоспар","Тело":"Дене",
+    "Белок":"Белок","Жиры":"Майлар","Углеводы":"Көмірсулар","Вода":"Су",
+    "Цель:":"Мақсат:","Остаток:":"Қалдық:","Сегодня":"Бүгін",
+    "приёмов":"тамақ","приём":"тамақ",
+    "МИССИЯ ДНЯ":"КҮНДІК ТАПСЫРМА","Выполнил":"Орындадым",
+    "ДВА СЦЕНАРИЯ — 30 ДНЕЙ":"ЕКІ СЦЕНАРИЙ — 30 КҮН",
+    "БЕЗ ПЛАНА":"ЖОСПАРСЫЗ","ПО ПЛАНУ":"ЖОСПАР БОЙЫНША",
+    "BODY TWIN — AI АНАЛИЗ ТЕЛА":"ДЕНЕ ТАЛДАУЫ — AI",
+    "ВЕС — ИСТОРИЯ":"ШЕУ — ТАРИХ",
+    "Сохранить":"Сақтау","Добавить":"Қосу",
+    "Пей больше воды":"Көбірек су іш",
+    "Норма выполнена":"Норма орындалды",
+    "Хорошо, добавь ещё":"Жақсы, тағы қос",
+    "КАЛОРИИ ЗА 7 ДНЕЙ":"7 КҮНДЕГІ КАЛОРИЯ",
+    "Эта неделя:":"Осы апта:",
+    "Поделиться":"Бөлісу","Карточка прогресса":"Прогресс картасы",
+    "Скачать PNG":"PNG жүктеу",
+    "Level":"Деңгей","Streak:":"Жолақ:",
+    "до Level":"Деңгейге дейін",
+    "Жир горит":"Май жанады","Мышцы растут":"Бұлшықет өседі",
+    "Идеальный день":"Тамаша күн","Недобор":"Жетпеді",
+    "ТРЕНИРОВКА":"ЖАТТЫҒУ","Добавить тренировку":"Жаттығу қосу",
+    "сожжено":"жандырылды","Остаток":"Қалдық",
+    "ВОДА":"СУ","Норма":"Норма",
+    "Обновить вес":"Салмақ жаңарту"
+  };
+  // Apply to main content areas
+  var areas=["main-content","history-content","body-content","food-content","macro-bars","water-card","mission-card","meals-list","notif-card","workout-card","greeting","level-label","xp-label","xp-next","streak-tag","cal-sub","body-state-pill","premium-banner"];
+  areas.forEach(function(id){
+    var el=document.getElementById(id);
+    if(!el) return;
+    var html=el.innerHTML;
+    for(var ru in map){
+      html=html.split(ru).join(map[ru]);
+    }
+    el.innerHTML=html;
+  });
+  // Nav labels
+  var navMap={"nav-lbl-main":"Басты","nav-lbl-hist":"Тарих","nav-lbl-plan":"Жоспар","nav-lbl-body":"Дене"};
+  for(var id in navMap){
+    var el=document.getElementById(id);
+    if(el) el.textContent=navMap[id];
+  }
+}
+
+
+function obNameI(inp){OB_D.name=inp.value;}
 function obFinish(){
   var d=OB_D;S.name=d.name||'';S.gender=d.gender||'male';
   S.age=d.age||25;S.height=d.height||170;S.weight=d.weight||70;S.targetWeight=d.target||60;
@@ -2441,76 +2562,59 @@ var OB_SUBGOALS={
 
 function obShow(idx){
   var id=OB_STEPS[idx];
-  if(!id) return;
-  // Hide all onboarding screens
-  var screens=document.querySelectorAll('#scr-onboard .screen');
-  for(var k=0;k<screens.length;k++) screens[k].classList.remove('active');
-  // Show current screen
-  var cur=document.getElementById(id);
-  if(cur) cur.classList.add('active');
-  var isWelcome=(idx===0);
-  var isResult=(id==='sc15');
-  var tb=document.getElementById('ob_topbar');
-  var bb=document.getElementById('ob_bottom');
-  if(tb) tb.style.display=isWelcome?'none':'flex';
-  if(bb) bb.style.display=(isWelcome||isResult)?'none':'flex';
+  document.querySelectorAll('#scr-onboard .screen').forEach(function(s){s.classList.remove('active');});
+  var _cs=document.getElementById(id);if(_cs)_cs.classList.add('active');
+  var isWelcome=idx===0;
+  var isResult=id==='sc15';
+  var _t=document.getElementById('ob_topbar');if(_t)_t.style.display=isWelcome?'none':'flex';
+  var _b=document.getElementById('ob_bottom');if(_b)_b.style.display=isWelcome||isResult?'none':'flex';
   if(!isWelcome&&!isResult){
-    var total=(OB_D.goal==='loss'||OB_D.goal==='cut'||OB_D.goal==='bulk')?16:15;
-    var pf=document.getElementById('ob_pf');
-    var pl=document.getElementById('ob_pl');
-    if(pf) pf.style.width=Math.round((idx/OB_STEPS.length)*100)+'%';
-    if(pl) pl.textContent=idx+' / '+total;
+    var visIdx=idx; // visible step number
+    if(OB_D.goal!=='loss'&&OB_D.goal!=='bulk'&&id==='sc7b') return;
+    var total=OB_D.goal==='loss'||OB_D.goal==='bulk'?16:15;
+    var _p=document.getElementById('ob_pf');if(_p)_p.style.width=Math.round((idx/OB_STEPS.length)*100)+'%';
+    var _l=document.getElementById('ob_pl');if(_l)_l.textContent=idx+' / '+total;
   }
-  if(isResult){
+  
+  if(id==='sc15'){
     setTimeout(function(){
-      var bb2=document.getElementById('ob_bottom');
-      var btn2=document.getElementById('ob_btn');
-      if(bb2) bb2.style.display='flex';
-      if(btn2) btn2.textContent='Начать пользоваться →';
+      var _b=document.getElementById('ob_bottom');if(_b)_b.style.display='flex';
+      document.getElementById('ob_btn').textContent='Начать пользоваться →';
     },2500);
-    try{obCalcResult();}catch(e){}
+    obCalcResult();
   }
-  var ct=document.getElementById('ob_content');
-  if(ct) ct.scrollTop=0;
-  try{obCheckBtn();}catch(e){}
-}
-
-
-function obNameInput(inp){
-  OB_D.name=inp.value;
-  var btn=document.getElementById('ob_btn');
-  if(btn) btn.disabled=!inp.value.trim();
+  var _ct=document.getElementById('ob_content');if(_ct)_ct.scrollTop=0;
+  obCheckBtn();
 }
 
 function obNext(){
   var id=OB_STEPS[OB_CUR];
   if(id==='sc15'){obFinish();return;}
-  // After goal (sc7), decide whether to show subgoal (sc7b)
   if(id==='sc7'){
-    var hasSubgoal=(OB_D.goal==='loss'||OB_D.goal==='cut'||OB_D.goal==='bulk');
-    if(hasSubgoal){
-      var sg=OB_SUBGOALS[OB_D.goal];
-      if(sg) obRenderSubgoal(sg);
-      OB_CUR++; // go to sc7b
+    var sg=OB_SUBGOALS[OB_D.goal];
+    if(sg){
+      obRenderSubgoal(sg);
+      OB_CUR++;
+      obShow(OB_CUR);
+      return;
     } else {
-      OB_CUR+=2; // skip sc7b, go to sc8
+      OB_CUR+=2; // skip sc7b
+      obShow(OB_CUR);
+      return;
     }
-    obShow(OB_CUR);
-    return;
   }
   OB_CUR++;
   obShow(OB_CUR);
 }
 
 function obBack(){
-  if(OB_CUR<=1) return;
-  var prevId=OB_STEPS[OB_CUR-1];
-  // If prev is sc7b but no subgoal, skip back over it
-  if(prevId==='sc7b'){
-    var hasSubgoal=(OB_D.goal==='loss'||OB_D.goal==='cut'||OB_D.goal==='bulk');
-    if(!hasSubgoal){OB_CUR-=2;obShow(OB_CUR);return;}
+  if(cur<=1) return;
+  var id=OB_STEPS[OB_CUR];
+  if(id==='sc8'&&OB_STEPS[cur-1]==='sc7b'&&!OB_SUBGOALS[OB_D.goal]){
+    cur-=2;
+  } else {
+    cur--;
   }
-  OB_CUR--;
   obShow(OB_CUR);
 }
 
@@ -2526,7 +2630,7 @@ function obToggleChip(el,key,val){
   if(val==='none'){
     el.parentElement.querySelectorAll('.chip').forEach(function(c){c.classList.remove('sel');});
     el.classList.add('sel');
-    D[key]=[];
+    OB_D[key]=[];
     return;
   }
   el.parentElement.querySelector('.chip:first-child').classList.remove('sel');
@@ -2554,14 +2658,8 @@ function obCheckBtn(){
   var btn=document.getElementById('ob_btn');
   if(!btn) return;
   var id=OB_STEPS[OB_CUR];
-  if(id==='sc1'){
-    var inp=document.getElementById('inp_name');
-    var hasName=inp&&inp.value.trim();
-    if(!hasName&&OB_D.name) hasName=OB_D.name.trim(); // use saved name
-    btn.disabled=!hasName;
-  } else {
-    btn.disabled=false;
-  }
+  if(id==='sc1') btn.disabled=!document.getElementById('inp_name').value.trim();
+  else btn.disabled=false;
 }
 
 function obSetAge(v){
@@ -2604,21 +2702,26 @@ function obCalcResult(){
 window.addEventListener("DOMContentLoaded",function(){
   try{renderGoals();}catch(e){}
   try{renderLangBtn();}catch(e){}
-  // Try to restore saved profile
+  // URL ?new or ?reset clears everything and forces onboarding
+  try{if(location.search&&(location.search.indexOf("new")>=0||location.search.indexOf("reset")>=0)){localStorage.clear();}}catch(e){}
+  // Restore saved profile only if COMPLETE
   try{
     var saved=JSON.parse(localStorage.getItem("nc_profile")||"null");
-    if(saved&&saved.name&&saved.weight&&saved.gl){
+    if(saved&&saved.name&&saved.weight&&saved.gl&&saved.dg&&saved.dg.calories){
       S.name=saved.name; S.weight=saved.weight; S.height=saved.height;
       S.age=saved.age; S.targetWeight=saved.targetWeight;
       S.gender=saved.gender; S.activity=saved.activity||3;
-      S.gl=saved.gl; S.subGl=saved.subGl||null;
-      S.subGlData=saved.subGlData||null; S.dg=saved.dg;
+      S.gl=saved.gl; S.dg=saved.dg;
+      S.diet=saved.diet||[]; S.allergy=saved.allergy||[];
+      S.healthCond=saved.healthCond||[]; S.cuisine=saved.cuisine||[];
+      S.mealsPerDay=saved.mealsPerDay||"3";
       showScreen("main");
       renderDashboard();
       return;
     }
   }catch(e){}
-  try{obShow(0);}catch(e){console.warn("OB:",e.message);}
+  // Show onboarding
+  try{obShow(0);}catch(e){console.warn("OB:",e);}
   showScreen("onboard");
 });
 </script>
