@@ -9,6 +9,7 @@
 <meta name="theme-color" content="#ff9432"/>
 <link rel="manifest" href="/manifest.json"/>
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"/>
+<!-- v2-button-fix -->
 <title>AI Nutrition Coach</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;700;900&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet"/>
@@ -61,6 +62,13 @@ body{font-family:'Plus Jakarta Sans',-apple-system,sans-serif;color:#1e293b;disp
   <!-- ONBOARDING -->
   <div id="scr-onboard" class="screen fade-in" style="padding:0;overflow:hidden;background:#f5f7f5">
     <style>
+/* CRITICAL: override main app .screen properties that break onboarding layout */
+#scr-onboard.screen{padding-bottom:0 !important;overflow:hidden !important;position:absolute !important;inset:0 !important}
+#scr-onboard .app{height:100% !important;display:flex !important;flex-direction:column !important;overflow:hidden !important}
+#scr-onboard .content{flex:1 1 auto !important;overflow-y:auto !important;min-height:0 !important}
+#scr-onboard .bottom{flex:0 0 auto !important;position:relative !important;z-index:10 !important;background:#fff !important}
+#scr-onboard .btn{position:relative !important;z-index:11 !important;pointer-events:auto !important}
+
 /* Ensure content scrolls and bottom stays visible */
 #scr-onboard .content{flex:1 1 auto;overflow-y:auto;min-height:0}
 #scr-onboard .bottom{flex:0 0 auto}
