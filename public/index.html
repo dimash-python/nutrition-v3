@@ -103,6 +103,13 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;color
 @keyframes firePulse{0%{transform:scale(1) translateY(0)}25%{transform:scale(1.04,.98) translateY(-1px)}50%{transform:scale(.98,1.05) translateY(1px)}75%{transform:scale(1.03,1) translateY(-1px)}100%{transform:scale(1) translateY(0)}}
 @keyframes flameGlowPulse{0%,100%{opacity:.85;transform:scale(1)}50%{opacity:1;transform:scale(1.12)}}
 @keyframes sparkGlow{0%,100%{opacity:.5;transform:scale(.9)}50%{opacity:1;transform:scale(1.1)}}
+
+@keyframes ringBreathe{0%,100%{transform:scale(1);opacity:.85}50%{transform:scale(1.05);opacity:1}}
+.ring-breathe{animation:ringBreathe 2.4s ease-in-out infinite}
+@keyframes ringDonePop{0%{transform:scale(0)}60%{transform:scale(1.2)}100%{transform:scale(1)}}
+.meal-ring-card:active{transform:scale(.96)}
+.meal-sheet-btn:active{transform:scale(.98)}
+@keyframes ringPulse{0%{box-shadow:0 0 0 0 rgba(76,175,80,.4)}100%{box-shadow:0 0 0 16px rgba(76,175,80,0)}}
 </style>
 </head>
 <body>
@@ -541,47 +548,69 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;color
 
   <!-- MAIN -->
   <div id="scr-main" class="screen hidden" style="padding:56px 18px 120px">
-    <!-- Header -->
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:22px;animation:cardRise .5s cubic-bezier(.22,1,.36,1) both">
-      <div>
-        <div style="font-size:14px;color:var(--ink3);font-weight:500;margin-bottom:4px" id="greeting">Привет!</div>
-        <div style="font-size:27px;font-weight:800;color:var(--ink);line-height:1;letter-spacing:-.02em" id="level-label">Level 1</div>
+    <!-- Header (emotional) -->
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:18px;animation:cardRise .5s cubic-bezier(.22,1,.36,1) both">
+      <div style="flex:1;min-width:0">
+        <div style="font-size:22px;font-weight:800;color:var(--ink);line-height:1.15;letter-spacing:-.02em;margin-bottom:4px" id="greeting">Привет!</div>
+        <div style="font-size:13px;color:var(--ink3);font-weight:500" id="greeting-sub">Сегодня отличный день</div>
       </div>
-      <div style="display:flex;align-items:center;gap:7px;background:linear-gradient(135deg,#fff5e9,#fef0db);border:1.5px solid #fde3c0;border-radius:99px;padding:9px 15px;box-shadow:0 2px 10px rgba(245,166,35,.12)">
+      <div id="streak-badge" style="display:flex;align-items:center;gap:8px;background:linear-gradient(135deg,#fff5e9,#fef0db);border:1.5px solid #fde3c0;border-radius:99px;padding:8px 14px 8px 11px;box-shadow:0 3px 14px rgba(245,166,35,.18);flex-shrink:0;margin-left:12px;position:relative;overflow:hidden">
         <span style="font-size:16px">🔥</span>
         <span style="font-size:14px;font-weight:800;color:var(--amber-text)" id="streak-tag">0 дней</span>
       </div>
     </div>
-    <!-- AI Coach hero card -->
-    <div id="coach-card" style="margin-bottom:18px"></div>
-    <!-- XP -->
-    <div style="margin-bottom:20px;animation:cardRise .5s cubic-bezier(.22,1,.36,1) .04s both">
-      <div style="display:flex;justify-content:space-between;margin-bottom:7px">
-        <span style="font-size:12px;color:var(--ink3);font-weight:600" id="xp-label">0 XP</span>
-        <span style="font-size:12px;color:var(--ink3);font-weight:500" id="xp-next">до Level 2</span>
+    <!-- XP progress (level secondary) -->
+    <div style="margin-bottom:18px;animation:cardRise .5s cubic-bezier(.22,1,.36,1) .04s both">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+        <div style="display:flex;align-items:center;gap:8px">
+          <span style="font-size:11px;font-weight:800;color:var(--green-text);background:var(--green-soft);padding:3px 9px;border-radius:99px" id="level-label">Level 1</span>
+          <span style="font-size:12px;color:var(--ink3);font-weight:600" id="xp-today">⭐ +0 XP сегодня</span>
+        </div>
+        <span style="font-size:12px;color:var(--ink3);font-weight:500" id="xp-next">75 XP до ур. 2</span>
       </div>
       <div class="xpbar"><div class="xpbar-fill" id="xp-bar" style="width:0%"></div></div>
     </div>
+    <!-- AI Coach hero card -->
+    <div id="coach-card" style="margin-bottom:18px"></div>
     <!-- Body state pill -->
     <div id="body-state-pill" style="margin-bottom:14px"></div>
-    <!-- Calorie ring card -->
-    <div class="card" id="cal-card" style="padding:24px">
-      <div style="display:flex;align-items:center;gap:22px">
-        <div style="position:relative;flex-shrink:0">
-          <svg width="124" height="124" viewBox="0 0 124 124">
-            <circle cx="62" cy="62" r="54" fill="none" stroke="var(--green-mid)" stroke-width="11"/>
-            <circle cx="62" cy="62" r="54" fill="none" id="cal-ring" stroke="var(--green)" stroke-width="11" stroke-dasharray="339.3" stroke-dashoffset="339.3" stroke-linecap="round" transform="rotate(-90 62 62)" style="transition:stroke-dashoffset 1s cubic-bezier(.4,0,.2,1)"/>
+    <!-- Calorie ring card (premium) -->
+    <div class="card" id="cal-card" style="padding:26px 24px">
+      <div style="display:flex;align-items:center;gap:24px">
+        <div id="cal-ring-wrap" style="position:relative;flex-shrink:0;width:130px;height:130px">
+          <svg width="130" height="130" viewBox="0 0 130 130">
+            <defs>
+              <linearGradient id="calGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#66d36e"/>
+                <stop offset="55%" stop-color="#4CAF50"/>
+                <stop offset="100%" stop-color="#2e9e54"/>
+              </linearGradient>
+              <filter id="calGlow" x="-50%" y="-50%" width="200%" height="200%">
+                <feGaussianBlur stdDeviation="3" result="b"/>
+                <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+              </filter>
+            </defs>
+            <circle cx="65" cy="65" r="54" fill="none" stroke="var(--green-mid)" stroke-width="13" opacity="0.5"/>
+            <circle cx="65" cy="65" r="54" fill="none" id="cal-ring" stroke="url(#calGrad)" stroke-width="13" stroke-dasharray="339.3" stroke-dashoffset="339.3" stroke-linecap="round" transform="rotate(-90 65 65)" filter="url(#calGlow)" style="transition:stroke-dashoffset 1.1s cubic-bezier(.34,1.4,.5,1)"/>
           </svg>
           <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center">
-            <div class="stat-num" style="font-size:26px;font-weight:900;color:var(--ink);line-height:1" id="cal-ring-val">0</div>
-            <div style="font-size:10px;color:var(--ink3);margin-top:3px;font-weight:600;letter-spacing:.03em">ККАЛ</div>
+            <div class="stat-num" style="font-size:30px;font-weight:900;color:var(--ink);line-height:1;letter-spacing:-.02em" id="cal-ring-val">0</div>
+            <div style="font-size:9px;color:var(--ink3);margin-top:4px;font-weight:700;letter-spacing:.1em">ККАЛ</div>
           </div>
         </div>
-        <div style="flex:1">
-          <div style="font-size:12px;color:var(--ink3);margin-bottom:14px;font-weight:500" id="cal-sub">Цель: — · Остаток: —</div>
+        <div style="flex:1;min-width:0">
+          <div style="font-size:12px;color:var(--ink3);margin-bottom:15px;font-weight:600" id="cal-sub">Цель: — · Остаток: —</div>
           <div id="macro-bars"></div>
         </div>
       </div>
+    </div>
+    <!-- PREMIUM MEAL RINGS -->
+    <div class="card" id="meal-rings-card" style="padding:20px 18px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px">
+        <div style="font-size:15px;font-weight:800;color:var(--ink);letter-spacing:-.01em">Приёмы пищи</div>
+        <div style="font-size:12px;color:var(--ink3);font-weight:600" id="meals-progress">0 из 4</div>
+      </div>
+      <div id="meal-rings-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:14px"></div>
     </div>
     <!-- Quick action: What to cook -->
     <div onclick="openCookIdeas()" style="display:flex;align-items:center;gap:14px;background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:16px 18px;margin-bottom:14px;box-shadow:var(--shadow);cursor:pointer;animation:cardRise .5s cubic-bezier(.22,1,.36,1) .1s both" ontouchstart="">
@@ -770,6 +799,9 @@ var HUNGER_Q=[
 // STATE
 // ═══════════════════════════════════════════════════════════════
 var XP_MAX=5000;
+var _pendingMealType=null;
+var _lastCommittedType=null;
+var _streakFlameRAF=null;
 var S={
   gl:null,gender:null,name:"",weight:0,height:0,age:0,targetWeight:0,
   dg:{calories:2000,protein:150,fat:65,carbs:200},
@@ -1084,17 +1116,28 @@ function renderDashboard(){
   var g=GOALS.filter(function(x){return x.id===S.gl;})[0];
   setCSSVars(g);
   var gr=document.getElementById("greeting");
-  if(gr) gr.textContent="Привет, "+S.name+" "+(S.gender==="female"?"👩":"👨");
+  if(gr){
+    var h=new Date().getHours();
+    var greet=h<6?"Доброй ночи":h<12?"Доброе утро":h<18?"Добрый день":"Добрый вечер";
+    gr.textContent=greet+", "+S.name+" 👋";
+  }
+  var grs=document.getElementById("greeting-sub");
+  if(grs){
+    var subs=["Сегодня отличный день","Маленькие шаги — большие результаты","Ты на верном пути","Каждый приём пищи имеет значение","Продолжай в том же духе"];
+    grs.textContent=subs[Math.floor(Math.random()*subs.length)];
+  }
   renderXP();renderBodyState();renderCalRing();renderMacroBars();renderWater();renderMission();renderMeals();renderWorkoutCard();renderNotif();renderPremiumBadge();setTimeout(function(){applyTranslations();},30);renderPremiumBanner();
   try{loadCoach();}catch(e){}
+  try{renderMealRings();}catch(e){}
 }
 function renderXP(){
   var ll=document.getElementById("level-label");
   if(ll) ll.textContent="Level "+S.lv;
-  var xl=document.getElementById("xp-label");
-  if(xl) xl.textContent=S.xp+" XP";
   var xn=document.getElementById("xp-next");
-  if(xn) xn.textContent="до Level "+(S.lv+1);
+  var remain=XP_MAX-(S.xp%XP_MAX);
+  if(xn) xn.textContent=remain+" XP до ур. "+(S.lv+1);
+  var xt=document.getElementById("xp-today");
+  if(xt) xt.textContent="⭐ +"+(S.xpToday||0)+" XP сегодня";
   var xb=document.getElementById("xp-bar");
   if(xb) xb.style.width=Math.min(100,Math.round((S.xp%XP_MAX)/XP_MAX*100))+"%";
   var st=document.getElementById("streak-tag");
@@ -1104,10 +1147,23 @@ function renderBodyState(){
   var el=document.getElementById("body-state-pill");
   if(!el) return;
   var bs=BSTATES[S.bs]||BSTATES.burning;
+  // dynamic text based on remaining calories
+  var remain=Math.max(0,(S.dg.calories||2000)-(S.st.calories||0));
+  var msgs=[bs.label];
+  if(S.gl==="loss"||S.gl==="cutting"){
+    if(remain>0) msgs=["Жир горит","Отличный дефицит","До цели "+remain+" ккал","Сегодня ты в форме"];
+    else msgs=["Норма закрыта","Отличный день","Цель достигнута 🎯"];
+  } else if(S.gl==="bulking"||S.gl==="sport"){
+    msgs=["Набор идёт","Топливо для роста","Ещё "+remain+" ккал до нормы"];
+  } else {
+    msgs=["В балансе","Здоровый день","Так держать"];
+  }
+  var msg=msgs[Math.floor(Math.random()*msgs.length)];
   el.innerHTML="<div style='display:inline-flex;align-items:center;gap:8px;background:var(--green-light);border:1.5px solid var(--green-mid);border-radius:99px;padding:8px 15px'>"+
-    "<span style='font-size:17px'>"+bs.icon+"</span>"+
-    "<span style='font-size:13px;font-weight:700;color:var(--green-text)'>"+bs.label+"</span></div>";
+    "<span style='font-size:16px'>"+bs.icon+"</span>"+
+    "<span style='font-size:13px;font-weight:700;color:var(--green-text)' id='bodystate-text'>"+msg+"</span></div>";
 }
+
 function renderCalRing(){
   var used=S.st.calories, goal=S.dg.calories||1;
   var pct=Math.min(1,used/goal);
@@ -1245,7 +1301,9 @@ function toggleNotif(){
     } else alert("Разреши уведомления в настройках браузера");
   });
 }
-function addXP(n){S.xp+=n;if(S.xp>=XP_MAX*S.lv)S.lv++;renderXP();}
+function addXP(n){
+  S.xpToday=(S.xpToday||0)+(arguments[0]||0);
+  try{localStorage.setItem("nc_xptoday_"+new Date().toDateString(),String(S.xpToday));}catch(e){}S.xp+=n;if(S.xp>=XP_MAX*S.lv)S.lv++;renderXP();}
 
 // ═══════════════════════════════════════════════════════════════
 // HISTORY
@@ -1587,17 +1645,17 @@ function finishAnalysis(a1){
     if(a2.bodyState&&BSTATES[a2.bodyState]) S.bs=a2.bodyState;
     S.st.calories+=a1.total.calories;S.st.protein+=a1.total.protein;S.st.fat+=a1.total.fat;S.st.carbs+=a1.total.carbs;
     var meal={id:Date.now(),name:a1.dishes.map(function(d){return d.name;}).join(" + "),time:new Date().toLocaleTimeString("ru",{hour:"2-digit",minute:"2-digit"}),calories:a1.total.calories,protein:a1.total.protein,fat:a1.total.fat,carbs:a1.total.carbs};
-    S.meals.push(meal);saveToHistory(meal);
+    meal.type=_pendingMealType||currentMealTypeByTime();_lastCommittedType=meal.type;S.meals.push(meal);saveToHistory(meal);_pendingMealType=null;
     addXP(100+Math.floor(Math.random()*60));
-    renderCalRing();renderMacroBars();renderMeals();renderBodyState();renderMission();
+    renderCalRing();renderMacroBars();renderMeals();renderBodyState();try{renderMealRings();mealRingImpulse(_lastCommittedType);}catch(e){}renderMission();
     S.loadingFood=false;
     renderFoodResults(document.getElementById("food-content"),GOALS.filter(function(x){return x.id===S.gl;})[0]);
   }).catch(function(){
     S.st.calories+=a1.total.calories;S.st.protein+=a1.total.protein;S.st.fat+=a1.total.fat;S.st.carbs+=a1.total.carbs;
     S.foodAdv={mainAdvice:"Записано. Продолжай следить за рационом.",nextMeal:"Следующий приём через 3-4 часа.",bodyState:"burning"};
     var meal={id:Date.now(),name:a1.dishes.map(function(d){return d.name;}).join(" + "),time:new Date().toLocaleTimeString("ru",{hour:"2-digit",minute:"2-digit"}),calories:a1.total.calories,protein:a1.total.protein,fat:a1.total.fat,carbs:a1.total.carbs};
-    S.meals.push(meal);saveToHistory(meal);
-    addXP(80);renderCalRing();renderMacroBars();renderMeals();renderBodyState();renderMission();
+    meal.type=_pendingMealType||currentMealTypeByTime();_lastCommittedType=meal.type;S.meals.push(meal);saveToHistory(meal);_pendingMealType=null;
+    addXP(80);renderCalRing();renderMacroBars();renderMeals();renderBodyState();try{renderMealRings();mealRingImpulse(_lastCommittedType);}catch(e){}renderMission();
     S.loadingFood=false;
     renderFoodResults(document.getElementById("food-content"),GOALS.filter(function(x){return x.id===S.gl;})[0]);
   });
@@ -2212,7 +2270,7 @@ function addFavoriteMeal(id){
   for(var i=0;i<S.favorites.length;i++){if(S.favorites[i].id===id){fav=S.favorites[i];break;}}
   if(!fav) return;
   var meal={id:Date.now(),name:fav.name,time:new Date().toLocaleTimeString("ru",{hour:"2-digit",minute:"2-digit"}),calories:fav.calories,protein:fav.protein,fat:fav.fat,carbs:fav.carbs};
-  S.meals.push(meal); saveToHistory(meal);
+  meal.type=_pendingMealType||currentMealTypeByTime();_lastCommittedType=meal.type;S.meals.push(meal); saveToHistory(meal);_pendingMealType=null;
   S.st.calories+=meal.calories; S.st.protein+=meal.protein; S.st.fat+=meal.fat; S.st.carbs+=meal.carbs;
   addXP(40); renderCalRing(); renderMacroBars(); renderMeals(); renderMission();
   switchTab("main");
@@ -2223,7 +2281,7 @@ function repeatMeal(id){
   for(var i=0;i<S.meals.length;i++){if(S.meals[i].id===id){meal=S.meals[i];break;}}
   if(!meal) return;
   var nm={id:Date.now(),name:meal.name,time:new Date().toLocaleTimeString("ru",{hour:"2-digit",minute:"2-digit"}),calories:meal.calories,protein:meal.protein,fat:meal.fat,carbs:meal.carbs};
-  S.meals.push(nm); saveToHistory(nm); addToFavorites(nm);
+  nm.type=_pendingMealType||currentMealTypeByTime();_lastCommittedType=nm.type;S.meals.push(nm); saveToHistory(nm); addToFavorites(nm);_pendingMealType=null;
   S.st.calories+=nm.calories; S.st.protein+=nm.protein; S.st.fat+=nm.fat; S.st.carbs+=nm.carbs;
   addXP(40); renderCalRing(); renderMacroBars(); renderMeals(); renderMission();
 }
@@ -4009,6 +4067,156 @@ function flyFireToStreak(){
   },950);
 }
 
+
+// ═══════════════════════════════════════════════
+// PREMIUM MEAL RINGS — breathing, glass, glow + meal-type system
+// ═══════════════════════════════════════════════
+var MEAL_TYPES=[
+  {id:"breakfast",emoji:"🍳",label:"Завтрак",color:"#f5a623",soft:"#fff4e0",share:0.30},
+  {id:"lunch",    emoji:"🥗",label:"Обед",   color:"#4CAF50",soft:"#e6f4e6",share:0.35},
+  {id:"snack",    emoji:"🍎",label:"Перекус",color:"#42a5f5",soft:"#e3f0fc",share:0.10},
+  {id:"dinner",   emoji:"🌙",label:"Ужин",   color:"#9b59d0",soft:"#f0e6fa",share:0.25}
+];
+function mealTypeTarget(typeId){
+  var mt=MEAL_TYPES.filter(function(x){return x.id===typeId;})[0];
+  return Math.round((S.dg.calories||2000)*(mt?mt.share:0.25));
+}
+function mealsByType(typeId){
+  return (S.meals||[]).filter(function(m){return (m.type||"snack")===typeId;});
+}
+function renderMealRings(){
+  var grid=document.getElementById("meal-rings-grid");
+  if(!grid) return;
+  var doneCount=0;
+  var html="";
+  MEAL_TYPES.forEach(function(mt,i){
+    var meals=mealsByType(mt.id);
+    var cal=meals.reduce(function(a,m){return a+(m.calories||0);},0);
+    var target=mealTypeTarget(mt.id);
+    var pct=Math.min(1,target>0?cal/target:0);
+    var hasFood=meals.length>0;
+    var isDone=pct>=0.85;
+    if(isDone) doneCount++;
+    var R=30, C=2*Math.PI*R;
+    var offset=C*(1-pct);
+    // breathing class only when empty
+    var breatheClass=hasFood?"":"ring-breathe";
+    html+="<div onclick='openMealSheet(\""+mt.id+"\")' style='position:relative;background:linear-gradient(135deg,"+mt.soft+",rgba(255,255,255,.4));border:1px solid var(--line);border-radius:20px;padding:16px 12px;cursor:pointer;overflow:hidden;transition:transform .15s' ontouchstart='' class='meal-ring-card'>";
+    // glow behind when has food
+    if(hasFood) html+="<div style='position:absolute;top:-20px;left:50%;transform:translateX(-50%);width:80px;height:80px;background:radial-gradient(circle,"+mt.color+"33,transparent 70%);border-radius:50%;pointer-events:none'></div>";
+    html+="<div style='position:relative;display:flex;flex-direction:column;align-items:center'>";
+    // ring
+    html+="<div class='"+breatheClass+"' style='position:relative;width:74px;height:74px;margin-bottom:10px'>";
+    html+="<svg width='74' height='74' viewBox='0 0 74 74'>";
+    html+="<circle cx='37' cy='37' r='30' fill='none' stroke='rgba(0,0,0,.06)' stroke-width='6'/>";
+    html+="<circle cx='37' cy='37' r='30' fill='none' stroke='"+mt.color+"' stroke-width='6' stroke-linecap='round' stroke-dasharray='"+C.toFixed(1)+"' stroke-dashoffset='"+offset.toFixed(1)+"' transform='rotate(-90 37 37)' style='transition:stroke-dashoffset .9s cubic-bezier(.34,1.56,.64,1);filter:drop-shadow(0 0 4px "+mt.color+"55)'/>";
+    html+="</svg>";
+    // center: emoji or checkmark
+    html+="<div style='position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:"+(isDone?"26":"28")+"px'>";
+    html+=isDone?"<div style='width:34px;height:34px;border-radius:50%;background:"+mt.color+";display:flex;align-items:center;justify-content:center;color:#fff;font-size:18px;box-shadow:0 2px 10px "+mt.color+"66;animation:ringDonePop .5s cubic-bezier(.34,1.56,.64,1)'>✓</div>":mt.emoji;
+    html+="</div>";
+    html+="</div>";
+    // label
+    html+="<div style='font-size:13px;font-weight:700;color:var(--ink);margin-bottom:2px'>"+mt.label+"</div>";
+    html+="<div style='font-size:11px;color:"+(hasFood?mt.color:"var(--ink3)")+";font-weight:"+(hasFood?"700":"500")+"'>"+(hasFood?cal+" / "+target+" ккал":"Нажми +")+"</div>";
+    html+="</div></div>";
+  });
+  grid.innerHTML=html;
+  var prog=document.getElementById("meals-progress");
+  if(prog) prog.textContent=doneCount+" из 4";
+}
+// ─── Meal type selection + add sheet ───
+function mealRingImpulse(typeId){
+  if(!typeId) return;
+  try{if(navigator.vibrate)navigator.vibrate(18);}catch(e){}
+  // find the ring card for this type and pulse it
+  var grid=document.getElementById("meal-rings-grid");
+  if(!grid) return;
+  var idx=MEAL_TYPES.map(function(m){return m.id;}).indexOf(typeId);
+  var cards=grid.querySelectorAll(".meal-ring-card");
+  if(cards&&cards[idx]){
+    var card=cards[idx];
+    card.style.animation="ringPulse .6s ease-out";
+    setTimeout(function(){if(card)card.style.animation="";},650);
+  }
+}
+function openMealSheet(typeId){
+  _pendingMealType=typeId;
+  var mt=MEAL_TYPES.filter(function(x){return x.id===typeId;})[0]||MEAL_TYPES[0];
+  var existing=mealsByType(typeId);
+  var modal=document.getElementById("meal-add-modal");
+  if(!modal){
+    modal=document.createElement("div");
+    modal.id="meal-add-modal";
+    modal.className="overlay";
+    modal.onclick=function(e){if(e.target===modal)closeMealSheet();};
+    document.body.appendChild(modal);
+  }
+  var existHtml="";
+  if(existing.length){
+    existHtml="<div style='margin-bottom:16px'><div style='font-size:11px;font-weight:700;color:var(--ink3);text-transform:uppercase;letter-spacing:.04em;margin-bottom:8px'>Уже добавлено</div>";
+    existing.forEach(function(m){
+      existHtml+="<div style='display:flex;justify-content:space-between;align-items:center;padding:10px 12px;background:var(--surface2);border-radius:12px;margin-bottom:6px'>"+
+        "<div style='font-size:13px;color:var(--ink);font-weight:500;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap'>"+m.name+"</div>"+
+        "<div style='font-size:13px;font-weight:700;color:"+mt.color+";margin-left:10px'>"+m.calories+" ккал</div></div>";
+    });
+    existHtml+="</div>";
+  }
+  modal.innerHTML=
+    "<div class='sheet' style='max-height:90vh;overflow-y:auto'>"+
+      "<div style='width:40px;height:5px;background:var(--line2);border-radius:99px;margin:0 auto 20px'></div>"+
+      "<div style='display:flex;align-items:center;gap:14px;margin-bottom:20px'>"+
+        "<div style='width:54px;height:54px;border-radius:16px;background:"+mt.soft+";display:flex;align-items:center;justify-content:center;font-size:28px'>"+mt.emoji+"</div>"+
+        "<div><div style='font-size:20px;font-weight:800;color:var(--ink)'>"+mt.label+"</div>"+
+        "<div style='font-size:13px;color:var(--ink3)'>Цель ~"+mealTypeTarget(typeId)+" ккал</div></div>"+
+      "</div>"+
+      existHtml+
+      "<div style='font-size:11px;font-weight:700;color:var(--ink3);text-transform:uppercase;letter-spacing:.04em;margin-bottom:10px'>Добавить еду</div>"+
+      "<div style='display:flex;flex-direction:column;gap:9px'>"+
+        mealSheetBtn("📷","Сфотографировать","Распознаю по фото","food")+
+        mealSheetBtn("🍽️","Выбрать из истории","Частые блюда","history")+
+        mealSheetBtn("✍️","Ввести текстом","Опиши что съел","text")+
+        mealSheetBtn("📦","Сканировать штрихкод","Готовый продукт","barcode")+
+        mealSheetBtn("🤖","Спросить AI","Совет по приёму","coach")+
+      "</div>"+
+      "<button onclick='closeMealSheet()' style='display:block;width:100%;padding:13px;border:none;background:none;color:var(--ink3);font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;margin-top:8px' ontouchstart=''>Закрыть</button>"+
+    "</div>";
+  modal.style.display="flex";
+}
+function mealSheetBtn(icon,title,sub,action){
+  return "<div onclick='mealSheetAction(\""+action+"\")' style='display:flex;align-items:center;gap:13px;padding:14px;background:var(--surface2);border:1px solid var(--line);border-radius:16px;cursor:pointer;transition:transform .12s' ontouchstart='' class='meal-sheet-btn'>"+
+    "<div style='width:42px;height:42px;border-radius:12px;background:var(--surface);display:flex;align-items:center;justify-content:center;font-size:21px;flex-shrink:0;box-shadow:var(--shadow)'>"+icon+"</div>"+
+    "<div style='flex:1'><div style='font-size:15px;font-weight:700;color:var(--ink)'>"+title+"</div>"+
+    "<div style='font-size:12px;color:var(--ink3)'>"+sub+"</div></div>"+
+    "<span style='color:var(--ink3);font-size:16px'>›</span></div>";
+}
+function mealSheetAction(action){
+  closeMealSheet();
+  // _pendingMealType stays set so the committed food gets tagged
+  setTimeout(function(){
+    if(action==="food") openFood();
+    else if(action==="history") openFood(); // history picker lives in food screen
+    else if(action==="text"){ openFood(); setTimeout(function(){if(typeof setFoodMode==='function')setFoodMode('manual');},200); }
+    else if(action==="barcode"){ openFood(); setTimeout(function(){if(typeof setFoodMode==='function')setFoodMode('barcode');},200); }
+    else if(action==="coach") openCoachChat();
+  },180);
+}
+function closeMealSheet(){
+  var modal=document.getElementById("meal-add-modal");
+  if(modal) modal.style.display="none";
+}
+// Auto-assign meal type by time of day (fallback if no pending type)
+function currentMealTypeByTime(){
+  var h=new Date().getHours();
+  if(h<11) return "breakfast";
+  if(h<16) return "lunch";
+  if(h<21) return "dinner";
+  return "snack";
+}
+
+
+
+
 window.addEventListener("DOMContentLoaded",function(){
   try{renderGoals();}catch(e){}
   try{renderLangBtn();}catch(e){}
@@ -4023,6 +4231,7 @@ window.addEventListener("DOMContentLoaded",function(){
       S.gender=saved.gender; S.activity=saved.activity||3;
       S.gl=saved.gl; S.dg=saved.dg;
       try{var wkey="nc_water_"+new Date().toDateString();var wv=localStorage.getItem(wkey);if(wv)S.water=parseInt(wv)||0;}catch(e){}
+      try{var xk="nc_xptoday_"+new Date().toDateString();var xv=localStorage.getItem(xk);if(xv)S.xpToday=parseInt(xv)||0;}catch(e){}
       S.diet=saved.diet||[]; S.allergy=saved.allergy||[];
       S.healthCond=saved.healthCond||[]; S.cuisine=saved.cuisine||[];
       S.mealsPerDay=saved.mealsPerDay||"3";
