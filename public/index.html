@@ -33,7 +33,8 @@
   --c:#4CAF50; --cb:rgba(76,175,80,.12);
 }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-html,body{height:100%;background:var(--bg);overflow:hidden;position:fixed;width:100%;top:0;left:0}
+html{height:100%}
+body{height:100%;background:var(--bg);overflow:hidden;position:fixed;width:100%;top:0;left:0;right:0;bottom:0}
 body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;color:var(--ink);display:flex;justify-content:center}
 #app{width:100%;max-width:390px;height:100%;position:relative;background:var(--bg);overflow:hidden}
 .screen{position:absolute;inset:0;overflow-y:scroll;padding-bottom:96px;scrollbar-width:none;-webkit-overflow-scrolling:touch;transition:opacity .3s,transform .3s;touch-action:pan-y;overscroll-behavior:none}
@@ -69,7 +70,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;color
 .sheet{background:var(--surface);border-radius:28px 28px 0 0;padding:24px 20px 36px;width:100%;max-width:390px;box-shadow:0 -8px 40px rgba(0,0,0,.12);animation:sheetUp .3s cubic-bezier(.22,1,.36,1);max-height:90vh;overflow-y:auto;-webkit-overflow-scrolling:touch}
 @keyframes sheetUp{from{transform:translateY(100%)}to{transform:none}}
 /* bottom nav */
-#main-nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:390px;background:rgba(255,255,255,.92);backdrop-filter:blur(20px);border-top:1px solid var(--line);display:none;justify-content:space-around;align-items:center;padding:10px 0 28px;z-index:50}
+#main-nav{position:absolute;bottom:0;left:0;width:100%;max-width:390px;background:rgba(255,255,255,.92);backdrop-filter:blur(20px);border-top:1px solid var(--line);display:none;justify-content:space-around;align-items:center;padding:10px 0 28px;z-index:50}
 .nav-btn{background:none;border:none;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px;padding:0 12px;font-family:inherit}
 .nav-icon{font-size:22px;line-height:1;opacity:.45;transition:opacity .2s}
 .nav-btn.active .nav-icon{opacity:1}
@@ -696,8 +697,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;color
   </div>
 
   <!-- FLOATING ACTION BUTTON (fan menu) -->
-  <div id="fab-overlay" onclick="closeFab()" style="display:none;position:fixed;inset:0;background:rgba(15,26,18,.55);backdrop-filter:blur(3px);z-index:80;opacity:0;transition:opacity .25s"></div>
-  <div id="fab-wrap" style="display:none;position:fixed;right:max(16px, calc(50vw - 179px));width:180px;bottom:148px;z-index:90;flex-direction:column;align-items:flex-end;gap:12px">
+  <div id="fab-overlay" onclick="closeFab()" style="display:none;position:absolute;inset:0;background:rgba(15,26,18,.55);backdrop-filter:blur(3px);z-index:80;opacity:0;transition:opacity .25s"></div>
+  <div id="fab-wrap" style="display:none;position:absolute;right:18px;width:180px;bottom:158px;z-index:90;flex-direction:column;align-items:flex-end;gap:12px">
     <div class="fab-item" data-i="0" onclick="fabAction('food')"><span class="fab-lbl">Скан еды</span><span class="fab-ic" style="background:linear-gradient(135deg,#4CAF50,#43a047)">📸</span></div>
     <div class="fab-item" data-i="1" onclick="fabAction('fridge')"><span class="fab-lbl">Холодильник</span><span class="fab-ic" style="background:linear-gradient(135deg,#3b9eed,#5bb3f5)">🧊</span></div>
     <div class="fab-item" data-i="2" onclick="fabAction('cook')"><span class="fab-lbl">Что приготовить</span><span class="fab-ic" style="background:linear-gradient(135deg,#f5a623,#ffb74d)">🍳</span></div>
@@ -723,7 +724,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;color
     </button>
   </nav>
   <!-- Floating + button (bottom right) -->
-  <button id="nav-add-btn" onclick="toggleFab()" style="display:none;position:fixed;right:max(16px, calc(50vw - 179px));bottom:82px;z-index:91;width:56px;height:56px;border-radius:50%;border:none;background:var(--green);color:#fff;font-size:30px;font-weight:300;cursor:pointer;box-shadow:0 8px 24px rgba(76,175,80,.5), 0 0 0 5px rgba(76,175,80,.1);align-items:center;justify-content:center;transition:transform .35s cubic-bezier(.34,1.56,.64,1), opacity .35s ease" ontouchstart="">+</button>
+  <button id="nav-add-btn" onclick="toggleFab()" style="display:none;position:absolute;right:18px;bottom:90px;z-index:91;width:58px;height:58px;border-radius:50%;border:none;background:var(--green);color:#fff;font-size:30px;font-weight:300;cursor:pointer;box-shadow:0 8px 24px rgba(76,175,80,.5), 0 0 0 5px rgba(76,175,80,.1);align-items:center;justify-content:center;transition:transform .35s cubic-bezier(.34,1.56,.64,1), opacity .35s ease" ontouchstart="">+</button>
 
   <!-- BODY -->
   <div id="scr-body" class="screen hidden" style="padding:56px 18px 120px">
