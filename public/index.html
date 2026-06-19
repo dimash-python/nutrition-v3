@@ -19,17 +19,17 @@
 :root{
   --green:#4CAF50; --green-d:#43a047; --green-light:#f0f9f0; --green-mid:#e8f5e1;
   --green-text:#2e7d32; --green-soft:#edf7ed;
-  --bg:#f5f8f5; --surface:#ffffff; --surface2:#fafafa;
+  --bg:#f4f7f3; --surface:#fffef9; --surface2:#f7f9f5;
   --ink:#0f1a12; --ink2:#5a6b5e; --ink3:#8a9a8e; --ink4:#b8c4bb;
-  --line:#eef2ee; --line2:#e3eae4;
+  --line:#edf1ec; --line2:#e3eae4;
   --blue:#3b9eed; --blue-bg:#eaf4fd; --blue-text:#1565c0;
   --amber:#f5a623; --amber-bg:#fef6e9; --amber-text:#b06d00;
   --purple:#9b59d0; --purple-bg:#f4ecfb; --purple-text:#6d28a8;
   --red:#ef5350; --red-bg:#fdeded;
   --radius:20px; --radius-sm:14px; --radius-lg:26px;
-  --shadow:0 2px 16px rgba(15,40,20,.05);
-  --shadow-md:0 8px 28px rgba(15,40,20,.08);
-  --shadow-lg:0 16px 48px rgba(15,40,20,.12);
+  --shadow:0 4px 20px rgba(15,40,20,.055), 0 1px 3px rgba(15,40,20,.04);
+  --shadow-md:0 10px 34px rgba(15,40,20,.09), 0 2px 6px rgba(15,40,20,.05);
+  --shadow-lg:0 20px 56px rgba(15,40,20,.14), 0 4px 12px rgba(15,40,20,.06);
   --c:#4CAF50; --cb:rgba(76,175,80,.12);
 }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
@@ -46,7 +46,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;color
 .pulse{animation:pulse 1.5s infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
 @keyframes countUp{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
-.card{background:var(--surface);border-radius:var(--radius);padding:20px;margin-bottom:14px;box-shadow:var(--shadow);border:1px solid var(--line);transition:transform .2s cubic-bezier(.4,0,.2,1),box-shadow .2s}
+.card{background:var(--surface);border-radius:var(--radius);padding:20px;margin-bottom:14px;box-shadow:var(--shadow);border:1px solid var(--line);transition:transform .2s cubic-bezier(.4,0,.2,1),box-shadow .2s;border:1px solid rgba(255,255,255,.6);box-shadow:var(--shadow), inset 0 1px 0 rgba(255,255,255,.5)}
 .tag{display:inline-flex;align-items:center;padding:4px 11px;border-radius:99px;font-size:11px;font-weight:700;letter-spacing:.03em}
 .text-head{font-size:12px;font-weight:700;letter-spacing:.04em;color:var(--ink3);margin-bottom:10px;text-transform:uppercase}
 .text-muted{color:var(--ink2);font-size:14px}
@@ -110,6 +110,32 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;color
 .meal-ring-card:active{transform:scale(.96)}
 .meal-sheet-btn:active{transform:scale(.98)}
 @keyframes ringPulse{0%{box-shadow:0 0 0 0 rgba(76,175,80,.4)}100%{box-shadow:0 0 0 16px rgba(76,175,80,0)}}
+
+@keyframes ringGoalBounce{0%{transform:scale(1)}40%{transform:scale(1.08)}100%{transform:scale(1)}}
+@keyframes calImpulse{0%{transform:scale(1);opacity:.8}100%{transform:scale(1.25);opacity:0}}
+
+.nav-btn{position:relative;transition:transform .2s cubic-bezier(.34,1.56,.64,1)}
+.nav-btn .nav-icon{position:relative;z-index:2}
+.nav-btn span:last-child{position:relative;z-index:2}
+.nav-btn.active{transform:translateY(-1px)}
+.nav-btn.active::before{content:"";position:absolute;top:-6px;left:50%;transform:translateX(-50%);width:52px;height:52px;background:var(--green-soft);border-radius:50%;z-index:1;animation:navCapsule .4s cubic-bezier(.34,1.56,.64,1)}
+.nav-btn.active .nav-icon{opacity:1}
+.nav-btn.active span:last-child{color:var(--green-text)!important;font-weight:700}
+@keyframes navBounce{0%{transform:translateY(-1px) scale(1)}40%{transform:translateY(-3px) scale(1.08)}100%{transform:translateY(-1px) scale(1)}}
+@keyframes navCapsule{0%{transform:translateX(-50%) scale(.5);opacity:0}100%{transform:translateX(-50%) scale(1);opacity:1}}
+
+.coach-living{background:linear-gradient(135deg,#4CAF50,#43a047,#2e9e54,#4CAF50);background-size:300% 300%;animation:coachGradient 8s ease infinite, cardRise .5s cubic-bezier(.22,1,.36,1) both;box-shadow:0 10px 32px rgba(76,175,80,.35), inset 0 1px 0 rgba(255,255,255,.2)}
+@keyframes coachGradient{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
+.coach-shimmer{position:absolute;top:0;left:-60%;width:50%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.18),transparent);transform:skewX(-20deg);animation:coachSweep 5s ease-in-out infinite;pointer-events:none;z-index:1}
+@keyframes coachSweep{0%{left:-60%}30%{left:130%}100%{left:130%}}
+.coach-avatar{animation:coachBreathe 3.2s ease-in-out infinite}
+@keyframes coachBreathe{0%,100%{transform:scale(1)}50%{transform:scale(1.06)}}
+.coach-avatar-glow{position:absolute;inset:-4px;border-radius:18px;background:radial-gradient(circle,rgba(255,255,255,.4),transparent 70%);opacity:.6;animation:coachGlowPulse 3.2s ease-in-out infinite;pointer-events:none}
+@keyframes coachGlowPulse{0%,100%{opacity:.4;transform:scale(.9)}50%{opacity:.8;transform:scale(1.15)}}
+@keyframes coachUnread{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.3);opacity:.7}}
+
+@keyframes cardSuccessBounce{0%{transform:scale(1)}35%{transform:scale(1.015)}100%{transform:scale(1)}}
+.card{will-change:transform}
 </style>
 </head>
 <body>
@@ -612,42 +638,11 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;color
       </div>
       <div id="meal-rings-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:14px"></div>
     </div>
-    <!-- Quick action: What to cook -->
-    <div onclick="openCookIdeas()" style="display:flex;align-items:center;gap:14px;background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:16px 18px;margin-bottom:14px;box-shadow:var(--shadow);cursor:pointer;animation:cardRise .5s cubic-bezier(.22,1,.36,1) .1s both" ontouchstart="">
-      <div style="width:48px;height:48px;border-radius:15px;background:linear-gradient(135deg,#fff5e9,#fde3c0);display:flex;align-items:center;justify-content:center;font-size:25px;flex-shrink:0">🍳</div>
-      <div style="flex:1">
-        <div style="font-size:15px;font-weight:700;color:var(--ink);margin-bottom:2px">Что приготовить сейчас?</div>
-        <div style="font-size:12px;color:var(--ink3)">AI подберёт блюда под твой остаток калорий</div>
-      </div>
-      <div style="width:32px;height:32px;border-radius:50%;background:var(--green-soft);display:flex;align-items:center;justify-content:center;font-size:15px;color:var(--green-text);flex-shrink:0">›</div>
-    </div>
-    <!-- AI Fridge quick action -->
-    <div onclick="openFridge()" style="display:flex;align-items:center;gap:14px;background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:16px 18px;margin-bottom:14px;box-shadow:var(--shadow);cursor:pointer;animation:cardRise .5s cubic-bezier(.22,1,.36,1) .12s both" ontouchstart="">
-      <div style="width:48px;height:48px;border-radius:15px;background:linear-gradient(135deg,#eaf4fd,#d6e9fb);display:flex;align-items:center;justify-content:center;font-size:25px;flex-shrink:0">🧊</div>
-      <div style="flex:1">
-        <div style="font-size:15px;font-weight:700;color:var(--ink);margin-bottom:2px">Что в холодильнике?</div>
-        <div style="font-size:12px;color:var(--ink3)">Сфоткай — AI предложит блюда из продуктов</div>
-      </div>
-      <div style="width:32px;height:32px;border-radius:50%;background:var(--blue-bg);display:flex;align-items:center;justify-content:center;font-size:15px;color:var(--blue-text);flex-shrink:0">›</div>
-    </div>
     <!-- Water -->
     <div class="card" id="water-card"></div>
     <!-- Mission -->
     <div class="card" id="mission-card" style="background:linear-gradient(135deg,#fef6e9,#fdf0db);border-color:#fde3c0"></div>
-    <!-- Workout -->
-    <div id="workout-card" style="margin-bottom:14px"></div>
-    <!-- Premium banner -->
-    <div id="premium-banner" style="display:none"></div>
-    <!-- Today's meals -->
-    <div style="display:flex;justify-content:space-between;align-items:center;margin:22px 4px 14px">
-      <div style="font-size:12px;font-weight:700;letter-spacing:.06em;color:var(--ink3);text-transform:uppercase">Сегодня</div>
-      <div style="font-size:12px;color:var(--ink3);font-weight:600" id="meals-count">0 приёмов</div>
-    </div>
-    <div class="card" id="meals-list"></div>
-    <div id="notif-card" style="display:none"></div>
-  </div>
-
-  <!-- FOOD -->
+    <!-- FOOD -->
   <div id="scr-food" class="screen hidden" style="padding:56px 18px 120px">
     <div style="font-size:27px;font-weight:800;color:var(--ink);letter-spacing:-.02em;margin-bottom:5px">Анализ питания</div>
     <div style="font-size:15px;color:var(--ink3);margin-bottom:20px">Фото, штрихкод или текст — AI посчитает КБЖУ</div>
@@ -702,7 +697,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;color
 
   <!-- FLOATING ACTION BUTTON (fan menu) -->
   <div id="fab-overlay" onclick="closeFab()" style="display:none;position:fixed;inset:0;background:rgba(15,26,18,.55);backdrop-filter:blur(3px);z-index:80;opacity:0;transition:opacity .25s"></div>
-  <div id="fab-wrap" style="display:none;position:fixed;right:max(18px, calc(50vw - 177px));width:240px;bottom:158px;z-index:90;flex-direction:column;align-items:flex-end;gap:12px">
+  <div id="fab-wrap" style="display:none;position:fixed;right:max(16px, calc(50vw - 179px));width:180px;bottom:148px;z-index:90;flex-direction:column;align-items:flex-end;gap:12px">
     <div class="fab-item" data-i="0" onclick="fabAction('food')"><span class="fab-lbl">Скан еды</span><span class="fab-ic" style="background:linear-gradient(135deg,#4CAF50,#43a047)">📸</span></div>
     <div class="fab-item" data-i="1" onclick="fabAction('fridge')"><span class="fab-lbl">Холодильник</span><span class="fab-ic" style="background:linear-gradient(135deg,#3b9eed,#5bb3f5)">🧊</span></div>
     <div class="fab-item" data-i="2" onclick="fabAction('cook')"><span class="fab-lbl">Что приготовить</span><span class="fab-ic" style="background:linear-gradient(135deg,#f5a623,#ffb74d)">🍳</span></div>
@@ -728,7 +723,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;color
     </button>
   </nav>
   <!-- Floating + button (bottom right) -->
-  <button id="nav-add-btn" onclick="toggleFab()" style="display:none;position:fixed;right:max(18px, calc(50vw - 177px));bottom:88px;z-index:91;width:58px;height:58px;border-radius:50%;border:none;background:var(--green);color:#fff;font-size:30px;font-weight:300;cursor:pointer;box-shadow:0 6px 22px rgba(76,175,80,.45);align-items:center;justify-content:center;transition:transform .3s cubic-bezier(.34,1.56,.64,1)" ontouchstart="">+</button>
+  <button id="nav-add-btn" onclick="toggleFab()" style="display:none;position:fixed;right:max(16px, calc(50vw - 179px));bottom:82px;z-index:91;width:56px;height:56px;border-radius:50%;border:none;background:var(--green);color:#fff;font-size:30px;font-weight:300;cursor:pointer;box-shadow:0 8px 24px rgba(76,175,80,.5), 0 0 0 5px rgba(76,175,80,.1);align-items:center;justify-content:center;transition:transform .35s cubic-bezier(.34,1.56,.64,1), opacity .35s ease" ontouchstart="">+</button>
 
   <!-- BODY -->
   <div id="scr-body" class="screen hidden" style="padding:56px 18px 120px">
@@ -892,14 +887,18 @@ function showScreen(name){
     if(name==="coach") renderChat();
   }
 }
-function switchTab(t){S.currentTab=t;showScreen(t);}
+function switchTab(t){try{if(navigator.vibrate)navigator.vibrate(8);}catch(e){}S.currentTab=t;showScreen(t);}
 function updateNavActive(){
-  ["main","history","body"].forEach(function(t){
+  ["main","history","plan","body"].forEach(function(t){
     var b=document.getElementById("nav-"+t);
-    if(b) b.classList.toggle("active",S.currentTab===t);
+    if(b){
+      var isActive=S.currentTab===t;
+      b.classList.toggle("active",isActive);
+      if(isActive){
+        b.style.animation="";void b.offsetWidth;b.style.animation="navBounce .45s cubic-bezier(.34,1.56,.64,1)";
+      }
+    }
   });
-  var fl=document.getElementById("nav-food-label");
-  if(fl) fl.style.color=S.currentTab==="food"?"var(--c)":"rgba(255,255,255,.28)";
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -1129,6 +1128,7 @@ function renderDashboard(){
   renderXP();renderBodyState();renderCalRing();renderMacroBars();renderWater();renderMission();renderMeals();renderWorkoutCard();renderNotif();renderPremiumBadge();setTimeout(function(){applyTranslations();},30);renderPremiumBanner();
   try{loadCoach();}catch(e){}
   try{renderMealRings();}catch(e){}
+  try{applyDynamicBg();}catch(e){}
 }
 function renderXP(){
   var ll=document.getElementById("level-label");
@@ -1167,33 +1167,65 @@ function renderBodyState(){
 function renderCalRing(){
   var used=S.st.calories, goal=S.dg.calories||1;
   var pct=Math.min(1,used/goal);
-  var circ=326.7;
+  var circ=339.3;
   var ring=document.getElementById("cal-ring");
-  if(ring){ring.style.strokeDashoffset=circ*(1-pct);ring.setAttribute("stroke","var(--green)");}
+  if(ring){ring.style.strokeDashoffset=circ*(1-pct);}
+  // animated count-up of the number
   var rv=document.getElementById("cal-ring-val");
-  if(rv) rv.textContent=used;
+  if(rv){
+    var prev=parseInt(rv.getAttribute("data-val")||"0")||0;
+    animateNumber(rv,prev,used,700);
+    rv.setAttribute("data-val",used);
+  }
   var sub=document.getElementById("cal-sub");
   if(sub) sub.textContent="Цель: "+goal+" · Остаток: "+Math.max(0,goal-used);
+  // bounce when goal reached
+  if(pct>=1){
+    var wrap=document.getElementById("cal-ring-wrap");
+    if(wrap){wrap.style.animation="";void wrap.offsetWidth;wrap.style.animation="ringGoalBounce .7s cubic-bezier(.34,1.56,.64,1)";}
+  }
+}
+function animateNumber(el,from,to,dur){
+  if(from===to){el.textContent=to;return;}
+  var start=performance.now();
+  function step(now){
+    var p=Math.min(1,(now-start)/dur);
+    var ease=1-Math.pow(1-p,3);
+    el.textContent=Math.round(from+(to-from)*ease);
+    if(p<1) requestAnimationFrame(step);
+    else el.textContent=to;
+  }
+  requestAnimationFrame(step);
+}
+function calRingImpulse(){
+  var wrap=document.getElementById("cal-ring-wrap");
+  if(!wrap) return;
+  // light pulse ring overlay
+  var pulse=document.createElement("div");
+  pulse.style.cssText="position:absolute;inset:0;border-radius:50%;border:3px solid var(--green);opacity:.8;pointer-events:none;animation:calImpulse .7s ease-out forwards";
+  wrap.appendChild(pulse);
+  setTimeout(function(){if(pulse&&pulse.parentNode)pulse.parentNode.removeChild(pulse);},750);
+  try{if(navigator.vibrate)navigator.vibrate(15);}catch(e){}
 }
 function renderMacroBars(){
   var el=document.getElementById("macro-bars");
   if(!el) return;
-  function bar(lbl,used,goal,color,bg){
+  function bar(icon,lbl,used,goal,color,bg,key){
     var p=Math.min(100,Math.round(used/Math.max(1,goal)*100));
-    return "<div style='margin-bottom:11px'>"+
-      "<div style='display:flex;justify-content:space-between;margin-bottom:5px'>"+
-        "<span style='font-size:12px;font-weight:600;color:"+color+"'>"+lbl+"</span>"+
-        "<span class='stat-num' style='font-size:12px;font-weight:700;color:var(--ink)'>"+used+" / "+goal+"г</span>"+
+    return "<div style='margin-bottom:12px'>"+
+      "<div style='display:flex;justify-content:space-between;align-items:center;margin-bottom:5px'>"+
+        "<span style='font-size:12px;font-weight:700;color:"+color+"'>"+icon+" "+lbl+"</span>"+
+        "<span class='stat-num macro-val' data-key='"+key+"' style='font-size:12px;font-weight:800;color:var(--ink)'>"+used+" / "+goal+"г</span>"+
       "</div>"+
-      "<div style='height:6px;background:"+bg+";border-radius:99px;overflow:hidden'>"+
-        "<div style='height:100%;width:"+p+"%;background:"+color+";border-radius:99px;transition:width .8s cubic-bezier(.4,0,.2,1)'></div>"+
+      "<div style='height:7px;background:"+bg+";border-radius:99px;overflow:hidden'>"+
+        "<div style='height:100%;width:"+p+"%;background:linear-gradient(90deg,"+color+"cc,"+color+");border-radius:99px;transition:width .9s cubic-bezier(.34,1.4,.5,1);box-shadow:0 0 6px "+color+"66'></div>"+
       "</div>"+
     "</div>";
   }
   el.innerHTML=
-    bar("Белки",S.st.protein,S.dg.protein,"var(--blue)","var(--blue-bg)")+
-    bar("Жиры",S.st.fat,S.dg.fat,"var(--amber)","var(--amber-bg)")+
-    bar("Углеводы",S.st.carbs,S.dg.carbs,"var(--purple)","var(--purple-bg)");
+    bar("🥩","Белки",S.st.protein,S.dg.protein,"var(--blue)","var(--blue-bg)","protein")+
+    bar("🥑","Жиры",S.st.fat,S.dg.fat,"var(--amber)","var(--amber-bg)","fat")+
+    bar("🌾","Углеводы",S.st.carbs,S.dg.carbs,"var(--purple)","var(--purple-bg)","carbs");
 }
 function renderWater(){
   var el=document.getElementById("water-card");
@@ -1647,7 +1679,7 @@ function finishAnalysis(a1){
     var meal={id:Date.now(),name:a1.dishes.map(function(d){return d.name;}).join(" + "),time:new Date().toLocaleTimeString("ru",{hour:"2-digit",minute:"2-digit"}),calories:a1.total.calories,protein:a1.total.protein,fat:a1.total.fat,carbs:a1.total.carbs};
     meal.type=_pendingMealType||currentMealTypeByTime();_lastCommittedType=meal.type;S.meals.push(meal);saveToHistory(meal);_pendingMealType=null;
     addXP(100+Math.floor(Math.random()*60));
-    renderCalRing();renderMacroBars();renderMeals();renderBodyState();try{renderMealRings();mealRingImpulse(_lastCommittedType);}catch(e){}renderMission();
+    renderCalRing();renderMacroBars();renderMeals();renderBodyState();try{renderMealRings();mealRingImpulse(_lastCommittedType);calRingImpulse();softSuccessGlow();}catch(e){}renderMission();
     S.loadingFood=false;
     renderFoodResults(document.getElementById("food-content"),GOALS.filter(function(x){return x.id===S.gl;})[0]);
   }).catch(function(){
@@ -1655,7 +1687,7 @@ function finishAnalysis(a1){
     S.foodAdv={mainAdvice:"Записано. Продолжай следить за рационом.",nextMeal:"Следующий приём через 3-4 часа.",bodyState:"burning"};
     var meal={id:Date.now(),name:a1.dishes.map(function(d){return d.name;}).join(" + "),time:new Date().toLocaleTimeString("ru",{hour:"2-digit",minute:"2-digit"}),calories:a1.total.calories,protein:a1.total.protein,fat:a1.total.fat,carbs:a1.total.carbs};
     meal.type=_pendingMealType||currentMealTypeByTime();_lastCommittedType=meal.type;S.meals.push(meal);saveToHistory(meal);_pendingMealType=null;
-    addXP(80);renderCalRing();renderMacroBars();renderMeals();renderBodyState();try{renderMealRings();mealRingImpulse(_lastCommittedType);}catch(e){}renderMission();
+    addXP(80);renderCalRing();renderMacroBars();renderMeals();renderBodyState();try{renderMealRings();mealRingImpulse(_lastCommittedType);calRingImpulse();softSuccessGlow();}catch(e){}renderMission();
     S.loadingFood=false;
     renderFoodResults(document.getElementById("food-content"),GOALS.filter(function(x){return x.id===S.gl;})[0]);
   });
@@ -3196,32 +3228,36 @@ function coachFallback(tod){
 function renderCoachCard(msg){
   var el=document.getElementById("coach-card");
   if(!el) return;
-  // Last assistant message preview, or daily msg, or default
   var preview="Напиши мне — подскажу что съесть 💬";
-  var emoji="🤖";
   if(S.chatLog&&S.chatLog.length>0){
     var last=S.chatLog[S.chatLog.length-1];
-    preview=last.text.length>70?last.text.slice(0,70)+"...":last.text;
+    preview=last.text.length>68?last.text.slice(0,68)+"...":last.text;
   } else if(msg&&msg.message){
-    preview=msg.message.length>70?msg.message.slice(0,70)+"...":msg.message;
-    emoji=msg.emoji||"🤖";
+    preview=msg.message.length>68?msg.message.slice(0,68)+"...":msg.message;
   }
-  var unread=S.chatLog&&S.chatLog.length>0?"":"<span style='position:absolute;top:16px;right:16px;width:9px;height:9px;border-radius:50%;background:#fff;box-shadow:0 0 0 3px rgba(255,255,255,.3)'></span>";
+  var unread=(S.chatLog&&S.chatLog.length>0)?"":"<span style='position:absolute;top:18px;right:18px;width:9px;height:9px;border-radius:50%;background:#fff;box-shadow:0 0 0 3px rgba(255,255,255,.3);animation:coachUnread 1.6s ease-in-out infinite'></span>";
   el.innerHTML=
-    "<div onclick='openCoachChat()' style='background:linear-gradient(135deg,#4CAF50,#43a047);border-radius:22px;padding:18px 20px;box-shadow:0 8px 28px rgba(76,175,80,.3);position:relative;overflow:hidden;cursor:pointer;animation:cardRise .5s cubic-bezier(.22,1,.36,1) both' ontouchstart=''>"+
-      "<div style='position:absolute;top:-30px;right:-30px;width:120px;height:120px;background:rgba(255,255,255,.08);border-radius:50%'></div>"+
-      "<div style='position:absolute;bottom:-40px;left:-20px;width:90px;height:90px;background:rgba(255,255,255,.06);border-radius:50%'></div>"+
+    "<div onclick='openCoachChat()' class='coach-living' style='border-radius:24px;padding:18px 20px;position:relative;overflow:hidden;cursor:pointer;animation:cardRise .5s cubic-bezier(.22,1,.36,1) both' ontouchstart=''>"+
+      // shimmer sweep
+      "<div class='coach-shimmer'></div>"+
+      // ambient blobs
+      "<div style='position:absolute;top:-30px;right:-30px;width:120px;height:120px;background:rgba(255,255,255,.1);border-radius:50%'></div>"+
+      "<div style='position:absolute;bottom:-40px;left:-20px;width:90px;height:90px;background:rgba(255,255,255,.07);border-radius:50%'></div>"+
       unread+
-      "<div style='display:flex;align-items:center;gap:13px;position:relative'>"+
-        "<div style='width:48px;height:48px;border-radius:15px;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;font-size:25px;flex-shrink:0'>"+emoji+"</div>"+
-        "<div style='flex:1;min-width:0'>"+
-          "<div style='display:flex;align-items:center;gap:7px;margin-bottom:4px'>"+
-            "<span style='font-size:15px;font-weight:800;color:#fff;letter-spacing:-.01em'>Коуч</span>"+
-            "<span style='font-size:10px;font-weight:600;color:rgba(255,255,255,.85);background:rgba(255,255,255,.2);padding:2px 7px;border-radius:99px'>AI-тренер</span>"+
-          "</div>"+
-          "<div style='font-size:13px;line-height:1.45;color:rgba(255,255,255,.92);white-space:nowrap;overflow:hidden;text-overflow:ellipsis'>"+preview+"</div>"+
+      "<div style='display:flex;align-items:center;gap:14px;position:relative;z-index:2'>"+
+        // living breathing avatar
+        "<div class='coach-avatar' style='width:50px;height:50px;border-radius:16px;background:rgba(255,255,255,.18);display:flex;align-items:center;justify-content:center;flex-shrink:0;position:relative'>"+
+          "<div class='coach-avatar-glow'></div>"+
+          "<span style='font-size:26px;position:relative;z-index:2'>🤖</span>"+
         "</div>"+
-        "<div style='width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,.18);display:flex;align-items:center;justify-content:center;font-size:16px;color:#fff;flex-shrink:0'>›</div>"+
+        "<div style='flex:1;min-width:0'>"+
+          "<div style='display:flex;align-items:center;gap:8px;margin-bottom:3px'>"+
+            "<span style='font-size:16px;font-weight:800;color:#fff;letter-spacing:-.01em'>Коуч</span>"+
+            "<span style='font-size:10px;font-weight:700;color:rgba(255,255,255,.9);background:rgba(255,255,255,.2);padding:2px 8px;border-radius:99px'>AI-тренер</span>"+
+          "</div>"+
+          "<div style='font-size:13px;color:rgba(255,255,255,.92);line-height:1.4;overflow:hidden;text-overflow:ellipsis;white-space:nowrap'>"+preview+"</div>"+
+        "</div>"+
+        "<div style='width:30px;height:30px;border-radius:50%;background:rgba(255,255,255,.18);display:flex;align-items:center;justify-content:center;color:#fff;font-size:15px;flex-shrink:0'>›</div>"+
       "</div>"+
     "</div>";
 }
@@ -4217,7 +4253,75 @@ function currentMealTypeByTime(){
 
 
 
+
+// ═══════════════════════════════════════════════
+// DYNAMIC BACKGROUND — subtle warmth by time of day
+// ═══════════════════════════════════════════════
+function applyDynamicBg(){
+  var h=new Date().getHours();
+  var grad;
+  if(h>=6&&h<11){
+    // morning - warm sunlight
+    grad="radial-gradient(ellipse 120% 60% at 50% 0%, rgba(255,236,200,.55), transparent 55%), var(--bg)";
+  } else if(h>=11&&h<17){
+    // day - neutral fresh
+    grad="radial-gradient(ellipse 120% 60% at 50% 0%, rgba(220,240,225,.4), transparent 55%), var(--bg)";
+  } else if(h>=17&&h<21){
+    // evening - soft amber dusk
+    grad="radial-gradient(ellipse 120% 60% at 50% 0%, rgba(255,220,190,.4), transparent 55%), var(--bg)";
+  } else {
+    // night - very soft cool
+    grad="radial-gradient(ellipse 120% 60% at 50% 0%, rgba(200,215,230,.3), transparent 55%), var(--bg)";
+  }
+  try{
+    document.body.style.background=grad;
+    document.body.style.backgroundAttachment="fixed";
+  }catch(e){}
+}
+
+
+// ═══════════════════════════════════════════════
+// MICRO-INTERACTIONS — soft success light after actions
+// ═══════════════════════════════════════════════
+function softSuccessGlow(){
+  var card=document.getElementById("cal-card");
+  if(!card) return;
+  card.style.animation="";void card.offsetWidth;
+  card.style.animation="cardSuccessBounce .6s cubic-bezier(.34,1.56,.64,1)";
+  // soft light sweep
+  var glow=document.createElement("div");
+  glow.style.cssText="position:absolute;inset:0;border-radius:var(--radius);background:radial-gradient(circle at 30% 50%,rgba(76,175,80,.18),transparent 60%);opacity:0;pointer-events:none;transition:opacity .3s;z-index:1";
+  card.style.position="relative";
+  card.appendChild(glow);
+  setTimeout(function(){glow.style.opacity="1";},10);
+  setTimeout(function(){glow.style.opacity="0";},400);
+  setTimeout(function(){if(glow&&glow.parentNode)glow.parentNode.removeChild(glow);},750);
+}
+
+
+// ═══════════════════════════════════════════════
+// FAB scroll behavior — shrink + glow on scroll
+// ═══════════════════════════════════════════════
+var _fabScrollTimer=null;
+function initFabScroll(){
+  var main=document.getElementById("scr-main");
+  if(!main) return;
+  main.addEventListener("scroll",function(){
+    var btn=document.getElementById("nav-add-btn");
+    if(!btn||btn.style.display==="none") return;
+    if(!FAB_OPEN){
+      btn.style.transform="scale(.82)";
+      btn.style.opacity="0.7";
+    }
+    if(_fabScrollTimer) clearTimeout(_fabScrollTimer);
+    _fabScrollTimer=setTimeout(function(){
+      if(!FAB_OPEN){btn.style.transform="scale(1)";btn.style.opacity="1";}
+    },450);
+  },{passive:true});
+}
+
 window.addEventListener("DOMContentLoaded",function(){
+  try{initFabScroll();}catch(e){}
   try{renderGoals();}catch(e){}
   try{renderLangBtn();}catch(e){}
   // URL ?new or ?reset clears everything and forces onboarding
