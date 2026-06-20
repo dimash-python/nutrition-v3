@@ -137,6 +137,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;color
 
 @keyframes cardSuccessBounce{0%{transform:scale(1)}35%{transform:scale(1.015)}100%{transform:scale(1)}}
 .card{will-change:transform}
+
+.water-chip{flex:1;padding:12px 4px;border-radius:13px;border:1.5px solid #cbe6fb;background:rgba(255,255,255,.7);color:var(--blue-text);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;transition:transform .12s}
+.water-chip:active{transform:scale(.94);background:#dcefff}
 </style>
 </head>
 <body>
@@ -643,6 +646,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;color
     <div class="card" id="water-card"></div>
     <!-- Mission -->
     <div class="card" id="mission-card" style="background:linear-gradient(135deg,#fef6e9,#fdf0db);border-color:#fde3c0"></div>
+  </div>
     <!-- FOOD -->
   <div id="scr-food" class="screen hidden" style="padding:56px 18px 120px">
     <div style="font-size:27px;font-weight:800;color:var(--ink);letter-spacing:-.02em;margin-bottom:5px">Анализ питания</div>
@@ -1228,29 +1232,85 @@ function renderMacroBars(){
     bar("🥑","Жиры",S.st.fat,S.dg.fat,"var(--amber)","var(--amber-bg)","fat")+
     bar("🌾","Углеводы",S.st.carbs,S.dg.carbs,"var(--purple)","var(--purple-bg)","carbs");
 }
+function waterGoal(){
+  return S.dg?Math.round((S.dg.calories/2000)*2500):2500;
+}
+function waterMsg(pct){
+  if(pct>=100) return "Цель выполнена! Отличная работа 🎉";
+  if(pct>=75) return "Почти у цели — организм скажет спасибо";
+  if(pct>=50) return "Отличный темп, продолжай";
+  if(pct>=25) return "Хорошее начало дня";
+  if(pct>0) return "Первый глоток сделан 💧";
+  return "Начни день со стакана воды";
+}
 function renderWater(){
   var el=document.getElementById("water-card");
   if(!el) return;
-  var goal=S.dg?Math.round((S.dg.calories/2000)*2500):2500;
+  var goal=waterGoal();
   var pct=Math.min(100,Math.round((S.water/goal)*100));
-  var msg=S.water>=goal?"Норма выполнена 💧":(S.water>goal*0.5?"Хорошо, продолжай":"Пей больше воды");
+  el.style.padding="0";
+  el.style.background="none";
+  el.style.boxShadow="none";
+  el.style.border="none";
   el.innerHTML=
-    "<div style='display:flex;justify-content:space-between;align-items:center;margin-bottom:14px'>"+
-      "<div>"+
-        "<div style='font-size:11px;font-weight:700;color:var(--blue-text);text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px'>💧 Вода</div>"+
-        "<div class='stat-num' style='font-size:23px;font-weight:800;color:var(--ink);letter-spacing:-.01em'>"+
-          S.water+"<span style='font-size:13px;font-weight:500;color:var(--ink3)'> / "+goal+" мл</span>"+
-        "</div>"+
+    "<div onclick='openWaterSphere()' style='display:flex;align-items:center;gap:16px;background:linear-gradient(135deg,#eaf6ff,#dcefff);border:1px solid #cbe6fb;border-radius:22px;padding:16px 18px;cursor:pointer;box-shadow:var(--shadow);position:relative;overflow:hidden' ontouchstart=''>"+
+      "<div style='position:absolute;bottom:-30px;right:-20px;width:90px;height:90px;background:radial-gradient(circle,rgba(59,158,237,.15),transparent 70%);border-radius:50%'></div>"+
+      // mini sphere preview
+      "<div style='position:relative;width:54px;height:54px;flex-shrink:0'>"+
+        "<canvas id='water-mini-canvas' width='108' height='108' style='width:54px;height:54px;border-radius:50%'></canvas>"+
       "</div>"+
-      "<div style='display:flex;gap:9px'>"+
-        "<button onclick='addWater(-250)' style='width:44px;height:44px;border-radius:14px;border:1.5px solid var(--line2);background:var(--surface2);color:var(--ink2);font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-weight:300;transition:all .15s' ontouchstart=''>−</button>"+
-        "<button onclick='addWater(250)' style='width:44px;height:44px;border-radius:14px;border:none;background:var(--blue);color:#fff;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-weight:600;box-shadow:0 3px 12px rgba(59,158,237,.3);transition:all .15s' ontouchstart=''>+</button>"+
+      "<div style='flex:1;min-width:0;position:relative'>"+
+        "<div style='font-size:11px;font-weight:700;color:var(--blue-text);text-transform:uppercase;letter-spacing:.05em;margin-bottom:3px'>💧 Вода</div>"+
+        "<div class='stat-num' style='font-size:21px;font-weight:800;color:var(--ink);letter-spacing:-.01em'>"+S.water+"<span style='font-size:13px;font-weight:500;color:var(--ink3)'> / "+goal+" мл</span></div>"+
+        "<div style='font-size:11px;color:var(--blue-text);font-weight:600;margin-top:2px'>"+pct+"% · нажми чтобы добавить</div>"+
       "</div>"+
-    "</div>"+
-    "<div style='height:7px;background:var(--blue-bg);border-radius:99px;overflow:hidden;margin-bottom:9px'>"+
-      "<div style='height:100%;width:"+pct+"%;background:linear-gradient(90deg,#3b9eed,#5bb3f5);border-radius:99px;transition:width .6s cubic-bezier(.4,0,.2,1)'></div>"+
-    "</div>"+
-    "<div style='font-size:12px;color:var(--ink3);font-weight:500'>"+msg+"</div>";
+      "<div style='display:flex;gap:8px;position:relative' onclick='event.stopPropagation()'>"+
+        "<button onclick='addWater(-250);renderWater()' style='width:42px;height:42px;border-radius:13px;border:1.5px solid #cbe6fb;background:rgba(255,255,255,.7);color:var(--blue-text);font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-weight:300' ontouchstart=''>−</button>"+
+        "<button onclick='quickAddWater()' style='width:42px;height:42px;border-radius:13px;border:none;background:linear-gradient(135deg,#42a5f5,#3b9eed);color:#fff;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-weight:600;box-shadow:0 3px 12px rgba(59,158,237,.35)' ontouchstart=''>+</button>"+
+      "</div>"+
+    "</div>";
+  try{drawMiniWater();}catch(e){}
+}
+function quickAddWater(){
+  addWater(250);
+  renderWater();
+  if(S.water>=waterGoal()) setTimeout(waterGoalCelebrate,200);
+}
+function drawMiniWater(){
+  var canvas=document.getElementById("water-mini-canvas");
+  if(!canvas) return;
+  var ctx=canvas.getContext("2d");
+  var W=108,H=108,R=50,CX=54,CY=54;
+  var goal=waterGoal();
+  var pct=Math.min(1,S.water/goal);
+  var t0=performance.now();
+  if(canvas._raf) cancelAnimationFrame(canvas._raf);
+  function frame(now){
+    if(!document.getElementById("water-mini-canvas")) return;
+    var t=now-t0;
+    ctx.clearRect(0,0,W,H);
+    ctx.save();
+    // circular clip
+    ctx.beginPath();ctx.arc(CX,CY,R,0,7);ctx.clip();
+    // bg
+    ctx.fillStyle="rgba(255,255,255,.5)";ctx.fillRect(0,0,W,H);
+    // water level
+    var level=CY+R-(2*R*pct);
+    ctx.beginPath();
+    ctx.moveTo(0,H);
+    ctx.lineTo(0,level);
+    for(var x=0;x<=W;x+=4){
+      var wave=Math.sin((x*0.06)+(t*0.003))*3+Math.sin((x*0.13)-(t*0.005))*1.5;
+      ctx.lineTo(x,level+wave);
+    }
+    ctx.lineTo(W,H);ctx.closePath();
+    var grad=ctx.createLinearGradient(0,level,0,H);
+    grad.addColorStop(0,"#5bb3f5");grad.addColorStop(1,"#3b9eed");
+    ctx.fillStyle=grad;ctx.fill();
+    ctx.restore();
+    canvas._raf=requestAnimationFrame(frame);
+  }
+  canvas._raf=requestAnimationFrame(frame);
 }
 function changeWater(d){S.water=Math.max(0,Math.min(4000,S.water+d));renderWater();}
 
@@ -1577,6 +1637,8 @@ function onFoodFile(e){
 function cancelFood(){S.foodImg=null;S.foodB64=null;renderFoodInput();}
 
 function analyzePhoto(){
+  if(!featureAllowed("photo")){S.loadingFood=false;try{renderFoodScreen();}catch(e){}return;}
+  if(!checkUsage("photo")){S.loadingFood=false;try{renderFoodScreen();}catch(e){}return;}
   if(!S.foodB64) return;
   if(!canAnalyze()){showPaywall();return;}
   incrementAnalysisCount();
@@ -1766,6 +1828,8 @@ function resetFood(){
 // WEEKLY PLAN
 // ═══════════════════════════════════════════════════════════════
 function showWeeklyPlan(){
+  if(!featureAllowed("plan")){return;}
+  if(!checkUsage("plan")){return;}
   var g=GOALS.filter(function(x){return x.id===S.gl;})[0];
   var sheet=document.getElementById("plan-sheet");
   if(!sheet) return;
@@ -2036,10 +2100,10 @@ function renderBodyScreen(){
 
 function onBodyFile(e){
   var f=e.target.files[0]; if(!f) return;
-  if(!S_PREMIUM){e.target.value="";showPaywall();return;}
+  if(!featureAllowed("body")){e.target.value="";return;}
   if(!canBodyTwin()){e.target.value="";
     var _d=new Date();var dl=new Date(_d.getFullYear(),_d.getMonth()+1,0).getDate()-_d.getDate();
-    alert("Лимит Body Twin на этот месяц (6/6)\nОсталось "+dl+" дней до обновления");
+    showToast("🌙 Лимит анализов тела на месяц исчерпан (10/10). Обновится через "+dl+" дн.");
     return;
   }
   incrementBodyTwin();
@@ -2643,6 +2707,56 @@ var S_PREMIUM=(function(){
   }catch(e){return false;}
 })();
 
+// ═══════════════════════════════════════════════
+// ACCESS CONTROL — 3-day trial (photo only) → Pro
+// ═══════════════════════════════════════════════
+var TRIAL_DAYS=3;
+function trialStartDate(){
+  try{
+    var d=localStorage.getItem("nc_trial_start");
+    if(!d){
+      // first ever launch - start trial now
+      d=String(Date.now());
+      localStorage.setItem("nc_trial_start",d);
+    }
+    return parseInt(d);
+  }catch(e){return Date.now();}
+}
+function trialDaysLeft(){
+  var started=trialStartDate();
+  var elapsed=(Date.now()-started)/(1000*60*60*24);
+  return Math.max(0,Math.ceil(TRIAL_DAYS-elapsed));
+}
+function isTrialActive(){
+  return trialDaysLeft()>0;
+}
+function isPro(){
+  return S_PREMIUM===true;
+}
+// What can the user access right now?
+// Returns: "pro" | "trial" | "expired"
+function accessLevel(){
+  if(isPro()) return "pro";
+  if(isTrialActive()) return "trial";
+  return "expired";
+}
+// Check if a feature is allowed. Shows paywall if not. Returns true/false.
+// During trial: ONLY photo (food) allowed. Everything else → paywall.
+function featureAllowed(feature){
+  var level=accessLevel();
+  if(level==="pro") return true; // pro = all features (limits handled separately)
+  if(level==="trial"){
+    if(feature==="photo") return true; // trial = food photo only
+    // any other feature → locked
+    try{showPaywall(feature);}catch(e){}
+    return false;
+  }
+  // expired → everything locked
+  try{showPaywall(feature);}catch(e){}
+  return false;
+}
+
+
 function getPremiumDaysLeft(){
   try{
     var p=JSON.parse(localStorage.getItem("nc_premium")||"null");
@@ -2684,7 +2798,7 @@ function incrementBodyTwin(){
 }
 function canBodyTwin(){
   if(!S_PREMIUM) return false;
-  return getBodyTwinMonthCount()<6;
+  return getBodyTwinMonthCount()<10;
 }
 
 function canAnalyze(){
@@ -2709,49 +2823,226 @@ function activatePromo(code){
   return {ok:true,msg:"Premium активирован до "+expDate+" 🎉"};
 }
 
-function showPaywall(){
+
+// ═══════════════════════════════════════════════
+// PREMIUM PAYWALL — full-screen, post-onboarding
+// ═══════════════════════════════════════════════
+var _selectedPlan="year"; // year selected by default
+var PAYWALL_PLANS={
+  week:  {name:"Неделя",  price:3490,  per:"неделя", display:"3 490 ₸", sub:"Для знакомства"},
+  month: {name:"Месяц",   price:2490,  per:"месяц",  display:"2 490 ₸", sub:"", badge:"⭐ Популярный"},
+  year:  {name:"Год",     price:15990, per:"год",    display:"15 990 ₸", sub:"≈1 332 ₸/мес"}
+};
+function openPremiumPaywall(){
+  var modal=document.getElementById("premium-paywall");
+  if(!modal){
+    modal=document.createElement("div");
+    modal.id="premium-paywall";
+    modal.style.cssText="position:absolute;inset:0;z-index:300;background:linear-gradient(180deg,#fffef9 0%,#f4f9f4 100%);overflow-y:auto;opacity:0;transition:opacity .5s;-webkit-overflow-scrolling:touch";
+    document.body.appendChild(modal);
+  }
+  _selectedPlan="year";
+  renderPremiumPaywall();
+  modal.style.display="block";
+  setTimeout(function(){modal.style.opacity="1";},10);
+}
+function closePremiumPaywall(){
+  var modal=document.getElementById("premium-paywall");
+  if(!modal) return;
+  modal.style.opacity="0";
+  setTimeout(function(){
+    modal.style.display="none";
+    // reveal main app
+    try{showScreen("main");renderDashboard();}catch(e){}
+  },500);
+}
+function selectPlan(plan){
+  _selectedPlan=plan;
+  try{if(navigator.vibrate)navigator.vibrate(10);}catch(e){}
+  renderPremiumPaywall();
+}
+function paywallYearSavings(){
+  // honest savings: year vs paying monthly for 12 months
+  var monthly=PAYWALL_PLANS.month.price;
+  var yearAsMonthly=monthly*12; // 29880
+  var yearPrice=PAYWALL_PLANS.year.price; // 15990
+  var saved=yearAsMonthly-yearPrice;
+  var pct=Math.round(saved/yearAsMonthly*100);
+  return {saved:saved, pct:pct, full:yearAsMonthly};
+}
+function renderPremiumPaywall(){
+  var modal=document.getElementById("premium-paywall");
+  if(!modal) return;
+  var sav=paywallYearSavings();
+  // features list
+  var features=[
+    {ic:"📷",t:"AI считает калории по фото за 5 секунд"},
+    {ic:"💪",t:"AI анализирует тело и прогноз формы"},
+    {ic:"📅",t:"Персональные планы питания"},
+    {ic:"🤖",t:"AI-коуч и умные рекомендации 24/7"},
+    {ic:"♾️",t:"Неограниченные анализы каждый день"}
+  ];
+  var featHtml="";
+  features.forEach(function(f){
+    featHtml+="<div style='display:flex;align-items:center;gap:14px;margin-bottom:16px'>"+
+      "<div style='width:42px;height:42px;border-radius:13px;background:var(--green-soft);display:flex;align-items:center;justify-content:center;font-size:21px;flex-shrink:0'>"+f.ic+"</div>"+
+      "<div style='font-size:14px;color:var(--ink);font-weight:500;line-height:1.4;flex:1'>"+f.t+"</div>"+
+    "</div>";
+  });
+  // plan cards
+  function planCard(id){
+    var p=PAYWALL_PLANS[id];
+    var selected=_selectedPlan===id;
+    var isYear=id==="year";
+    var badge="";
+    if(isYear) badge="<div style='position:absolute;top:-11px;right:16px;background:linear-gradient(135deg,#43a047,#2e9e54);color:#fff;font-size:11px;font-weight:800;padding:4px 12px;border-radius:99px;letter-spacing:.02em;box-shadow:0 4px 12px rgba(76,175,80,.4)'>Экономия "+sav.pct+"%</div>";
+    else if(p.badge) badge="<div style='position:absolute;top:-11px;right:16px;background:linear-gradient(135deg,#f5a623,#f0930a);color:#fff;font-size:11px;font-weight:800;padding:4px 12px;border-radius:99px;letter-spacing:.02em;box-shadow:0 4px 12px rgba(245,166,35,.35)'>"+p.badge+"</div>";
+    return "<div onclick='selectPlan(\""+id+"\")' style='position:relative;border:2px solid "+(selected?"var(--green)":"var(--line2)")+";border-radius:20px;padding:18px 20px;cursor:pointer;background:"+(selected?"var(--green-soft)":"var(--surface)")+";transition:all .25s cubic-bezier(.34,1.4,.5,1);transform:scale("+(selected?"1.02":"1")+");box-shadow:"+(selected?"0 8px 24px rgba(76,175,80,.18)":"var(--shadow)")+"' ontouchstart=''>"+
+      badge+
+      "<div style='display:flex;justify-content:space-between;align-items:center'>"+
+        "<div style='display:flex;align-items:center;gap:13px'>"+
+          // radio
+          "<div style='width:24px;height:24px;border-radius:50%;border:2px solid "+(selected?"var(--green)":"var(--line2)")+";display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .2s'>"+
+            (selected?"<div style='width:13px;height:13px;border-radius:50%;background:var(--green)'></div>":"")+
+          "</div>"+
+          "<div>"+
+            "<div style='font-size:17px;font-weight:800;color:var(--ink)'>"+p.name+"</div>"+
+            (p.sub?"<div style='font-size:12px;color:"+(selected?"var(--green-text)":"var(--ink3)")+";font-weight:600'>"+p.sub+"</div>":"")+
+          "</div>"+
+        "</div>"+
+        "<div style='text-align:right'>"+
+          "<div style='font-size:19px;font-weight:800;color:var(--ink)'>"+p.display+"</div>"+
+          "<div style='font-size:11px;color:var(--ink3)'>/ "+p.per+"</div>"+
+        "</div>"+
+      "</div>"+
+    "</div>";
+  }
+  modal.innerHTML=
+    "<div style='max-width:390px;margin:0 auto;padding:0 24px 40px;min-height:100%;display:flex;flex-direction:column'>"+
+      // close X (subtle, top right)
+      "<div style='display:flex;justify-content:flex-end;padding-top:16px'>"+
+        "<button onclick='paywallMaybeLater()' style='width:34px;height:34px;border-radius:50%;border:none;background:rgba(0,0,0,.04);color:var(--ink3);font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center' ontouchstart=''>✕</button>"+
+      "</div>"+
+      // logo flame
+      "<div style='text-align:center;margin-top:8px;margin-bottom:18px'>"+
+        "<div style='width:64px;height:64px;margin:0 auto;background:linear-gradient(135deg,#4CAF50,#2e9e54);border-radius:20px;display:flex;align-items:center;justify-content:center;font-size:34px;box-shadow:0 10px 30px rgba(76,175,80,.35)'>🔥</div>"+
+      "</div>"+
+      // headline
+      "<div style='text-align:center;margin-bottom:8px'>"+
+        "<div style='font-size:27px;font-weight:900;color:var(--ink);letter-spacing:-.03em;line-height:1.15'>Откройте весь<br/>потенциал Nutrivo</div>"+
+      "</div>"+
+      "<div style='text-align:center;font-size:14px;color:var(--ink3);margin-bottom:28px;font-weight:500'>Ваш персональный AI-тренер ждёт вас</div>"+
+      // features
+      "<div style='margin-bottom:28px'>"+featHtml+"</div>"+
+      // plans
+      "<div style='display:flex;flex-direction:column;gap:14px;margin-bottom:22px'>"+
+        planCard("year")+
+        planCard("month")+
+        planCard("week")+
+      "</div>"+
+      // savings note (year only)
+      (_selectedPlan==="year"?"<div style='text-align:center;font-size:12px;color:var(--green-text);font-weight:700;margin-bottom:16px'>Вместо "+sav.full.toLocaleString('ru')+" \u20b8 \u00b7 \u044d\u043a\u043e\u043d\u043e\u043c\u0438\u044f "+sav.saved.toLocaleString('ru')+" \u20b8</div>":"")+
+      // CTA
+      "<button onclick='paywallStartTrial()' style='width:100%;padding:19px;border-radius:20px;border:none;background:linear-gradient(135deg,#4CAF50,#2e9e54);color:#fff;font-size:18px;font-weight:800;cursor:pointer;font-family:inherit;box-shadow:0 10px 30px rgba(76,175,80,.4);margin-bottom:14px;letter-spacing:-.01em' ontouchstart=''>Попробовать бесплатно 3 дня</button>"+
+      // reassurance
+      "<div style='text-align:center;margin-bottom:24px'>"+
+        "<div style='font-size:12px;color:var(--ink2);line-height:1.8;font-weight:500'>"+
+          "✓ Сегодня списаний не будет<br/>"+
+          "✓ Бесплатно первые 3 дня<br/>"+
+          "✓ Отмена в любой момент"+
+        "</div>"+
+      "</div>"+
+      // footer links
+      "<div style='margin-top:auto;text-align:center;line-height:2.2'>"+
+        "<span onclick='paywallRestore()' style='font-size:12px;color:var(--ink3);font-weight:600;cursor:pointer;text-decoration:underline'>Восстановить покупки</span>"+
+        "<div style='font-size:11px;color:var(--ink4);margin-top:6px'>"+
+          "<span onclick='paywallLink(\"privacy\")' style='cursor:pointer'>Конфиденциальность</span> · "+
+          "<span onclick='paywallLink(\"terms\")' style='cursor:pointer'>Условия</span> · "+
+          "<span onclick='paywallLink(\"support\")' style='cursor:pointer'>Поддержка</span>"+
+        "</div>"+
+      "</div>"+
+    "</div>";
+}
+function paywallStartTrial(){
+  try{if(navigator.vibrate)navigator.vibrate([10,30,15]);}catch(e){}
+  // In App Store build, this triggers StoreKit purchase sheet.
+  // For now: activate trial + show confirmation, then enter app.
+  var p=PAYWALL_PLANS[_selectedPlan];
+  try{showToast("✨ Пробный период активирован! 3 дня бесплатно");}catch(e){}
+  closePremiumPaywall();
+}
+function paywallMaybeLater(){
+  // user dismisses - enters app on free trial (photo only)
+  closePremiumPaywall();
+}
+function paywallRestore(){
+  try{showToast("Восстановление покупок...");}catch(e){}
+  // App Store: SKPaymentQueue.restoreCompletedTransactions()
+}
+function paywallLink(type){
+  var urls={
+    privacy:"https://nutrivo.kz/privacy",
+    terms:"https://nutrivo.kz/terms",
+    support:"https://t.me/sakkkaiii"
+  };
+  try{window.open(urls[type]||"https://nutrivo.kz","_blank");}catch(e){}
+}
+
+function showPaywall(feature){
   var modal=document.getElementById("paywall-modal");
   if(!modal) return;
   modal.style.display="flex";
-  var left=3-getTodayAnalysisCount();
+  var level=accessLevel();
+  var daysLeft=trialDaysLeft();
+  // feature display names
+  var fnames={photo:"Анализ еды",fridge:"AI Холодильник",body:"Анализ тела",plan:"План питания",cook:"Идеи блюд",chat:"AI Коуч"};
+  var fname=fnames[feature]||"Эта функция";
+  // dynamic subtitle
+  var subtitle;
+  if(level==="trial"){
+    subtitle="«"+fname+"» доступна в Pro · Пробный период ещё "+daysLeft+" "+(daysLeft===1?"день":"дн.");
+  } else {
+    subtitle="Пробный период закончился · Оформи Pro чтобы продолжить";
+  }
   document.getElementById("paywall-sheet").innerHTML=
     "<div style='width:40px;height:5px;background:var(--line2);border-radius:99px;margin:0 auto 20px'></div>"+
     "<div style='text-align:center;margin-bottom:22px'>"+
       "<div style='width:72px;height:72px;margin:0 auto 14px;background:linear-gradient(135deg,#ffd76a,#f5a623);border-radius:22px;display:flex;align-items:center;justify-content:center;font-size:38px;box-shadow:0 8px 24px rgba(245,166,35,.35)'>👑</div>"+
-      "<div style='font-size:23px;font-weight:800;color:var(--ink);letter-spacing:-.02em;margin-bottom:7px'>Nutrivo Premium</div>"+
-      "<div style='font-size:13px;color:var(--ink3)'>"+(left<=0?"Дневной лимит исчерпан":"Осталось "+left+" из 3 бесплатных анализов")+(getPremiumDaysLeft()>0?" · Premium ещё "+getPremiumDaysLeft()+"д":"")+"</div>"+
+      "<div style='font-size:23px;font-weight:800;color:var(--ink);letter-spacing:-.02em;margin-bottom:7px'>Nutrivo Pro</div>"+
+      "<div style='font-size:13px;color:var(--ink3);padding:0 10px;line-height:1.5'>"+subtitle+"</div>"+
     "</div>"+
-    // Benefits comparison
-    "<div style='background:var(--surface2);border:1px solid var(--line);border-radius:18px;padding:4px;margin-bottom:18px'>"+
-      "<div style='display:grid;grid-template-columns:1fr 1fr;gap:4px'>"+
-        "<div style='padding:16px 14px;border-radius:14px'>"+
-          "<div style='font-size:11px;color:var(--ink3);font-weight:700;margin-bottom:12px;letter-spacing:.04em'>БЕСПЛАТНО</div>"+
-          "<div style='font-size:12px;color:var(--ink3);line-height:2.1'>✓ 3 анализа/день<br/>✗ Недельный план<br/>✗ Body Twin AI<br/>✗ Список покупок<br/>✗ Безлимит</div>"+
-        "</div>"+
-        "<div style='padding:16px 14px;background:var(--green-soft);border-radius:14px;border:1.5px solid var(--green-mid)'>"+
-          "<div style='font-size:11px;color:var(--green-text);font-weight:700;margin-bottom:12px;letter-spacing:.04em'>PREMIUM</div>"+
-          "<div style='font-size:12px;color:var(--ink);line-height:2.1;font-weight:500'>✓ Безлимит анализов<br/>✓ Недельный план<br/>✓ Body Twin AI<br/>✓ Список покупок<br/>✓ Приоритет AI</div>"+
-        "</div>"+
+    // Benefits
+    "<div style='background:var(--surface2);border:1px solid var(--line);border-radius:18px;padding:18px;margin-bottom:18px'>"+
+      "<div style='font-size:11px;color:var(--green-text);font-weight:700;margin-bottom:14px;letter-spacing:.04em'>ЧТО ВХОДИТ В PRO</div>"+
+      "<div style='font-size:13px;color:var(--ink);line-height:2.3;font-weight:500'>"+
+        "📷 Анализ еды — 30 в день<br/>"+
+        "🧊 AI Холодильник — что приготовить из продуктов<br/>"+
+        "📅 Персональный план питания<br/>"+
+        "💪 Анализ тела и прогноз формы<br/>"+
+        "🤖 AI Коуч 24/7<br/>"+
+        "🍳 Безлимит идей блюд"+
       "</div>"+
     "</div>"+
-    // Price highlight
-    "<div style='text-align:center;margin-bottom:18px'>"+
-      "<div style='display:inline-flex;align-items:baseline;gap:4px'>"+
-        "<span style='font-size:36px;font-weight:900;color:var(--ink);letter-spacing:-.02em'>990₸</span>"+
-        "<span style='font-size:15px;color:var(--ink3)'>/мес</span>"+
-      "</div>"+
-      "<div style='font-size:12px;color:var(--ink3);margin-top:2px'>меньше 33₸ в день</div>"+
+    // Three plans
+    "<div style='display:flex;flex-direction:column;gap:10px;margin-bottom:16px'>"+
+      planRow("week","Неделя","990₸","","")+
+      planRow("year","Год","11990₸","999₸/мес","-60% · Популярный")+
+      planRow("month","Месяц","2490₸","","")+
     "</div>"+
-    // Payment
-    "<div style='background:var(--green-soft);border:1px solid var(--green-mid);border-radius:16px;padding:16px;margin-bottom:14px'>"+
-      "<div style='font-size:12px;color:var(--ink2);margin-bottom:8px;text-align:center;line-height:1.6'>Оплати 990₸ на карту Kaspi:</div>"+
-      "<div style='text-align:center;color:var(--green-text);font-weight:800;font-size:17px;letter-spacing:2px;margin-bottom:8px'>XXXX XXXX XXXX XXXX</div>"+
-      "<div style='font-size:11px;color:var(--ink3);text-align:center;line-height:1.6'>После оплаты напиши <a href='https://t.me/sakkkaiii' style='color:var(--green-text);font-weight:700'>@sakkkaiii</a> в Telegram — ответим 24/7 и дадим промокод</div>"+
-    "</div>"+
-    "<input id='promo-input' style='width:100%;padding:15px 18px;border:2px solid var(--line2);border-radius:14px;background:var(--surface2);font-size:15px;font-family:inherit;color:var(--ink);outline:none;text-align:center;text-transform:uppercase;letter-spacing:2px' placeholder='Промокод (AIN-XXXXX)'/>"+
+    "<div style='font-size:11px;color:var(--ink4);text-align:center;line-height:1.5;margin-bottom:14px'>Подписка продлевается автоматически. Отменить можно в настройках App Store в любой момент.</div>"+
+    // Promo code (keep for manual Kaspi flow)
+    "<input id='promo-input' style='width:100%;padding:14px 18px;border:2px solid var(--line2);border-radius:14px;background:var(--surface2);font-size:14px;font-family:inherit;color:var(--ink);outline:none;text-align:center;text-transform:uppercase;letter-spacing:2px' placeholder='Есть промокод?'/>"+
     "<div id='promo-msg' style='text-align:center;font-size:12px;margin-top:8px;min-height:18px'></div>"+
-    "<button onclick='submitPromo()' style='display:block;width:100%;padding:16px;border-radius:16px;border:none;background:var(--green);color:#fff;font-size:16px;font-weight:700;cursor:pointer;font-family:inherit;margin-top:10px;box-shadow:0 4px 16px rgba(76,175,80,.28)' ontouchstart=''>Активировать Premium</button>"+
-    "<button onclick='closeModal(\"paywall-modal\")' style='display:block;width:100%;padding:14px;border:none;background:none;color:var(--ink3);font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;margin-top:6px' ontouchstart=''>Может позже</button>";
+    "<button onclick='submitPromo()' style='display:block;width:100%;padding:15px;border-radius:16px;border:none;background:var(--green);color:#fff;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;margin-top:8px;box-shadow:0 4px 16px rgba(76,175,80,.28)' ontouchstart=''>Активировать промокод</button>"+
+    "<button onclick='closeModal(\"paywall-modal\")' style='display:block;width:100%;padding:13px;border:none;background:none;color:var(--ink3);font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;margin-top:4px' ontouchstart=''>"+(level==="expired"?"Закрыть":"Может позже")+"</button>";
+}
+function planRow(id,name,price,permonth,badge){
+  var isHot=!!badge;
+  return "<div style='position:relative;border:"+(isHot?"2px solid var(--green)":"1.5px solid var(--line2)")+";border-radius:16px;padding:16px 18px;display:flex;justify-content:space-between;align-items:center;background:"+(isHot?"var(--green-soft)":"var(--surface)")+"'>"+
+    (badge?"<div style='position:absolute;top:-10px;left:18px;background:var(--green);color:#fff;font-size:10px;font-weight:800;padding:3px 10px;border-radius:99px;letter-spacing:.03em'>"+badge+"</div>":"")+
+    "<div><div style='font-size:16px;font-weight:800;color:var(--ink)'>"+name+"</div>"+(permonth?"<div style='font-size:12px;color:var(--green-text);font-weight:600'>"+permonth+"</div>":"")+"</div>"+
+    "<div style='font-size:18px;font-weight:800;color:var(--ink)'>"+price+"</div>"+
+  "</div>";
 }
 
 function submitPromo(){
@@ -3332,6 +3623,8 @@ function quickChat(btn){
   sendChat();
 }
 function sendChat(){
+  if(!featureAllowed("chat")){return;}
+  if(!checkUsage("chat")){return;}
   var inp=document.getElementById("chat-input");
   if(!inp) return;
   var text=inp.value.trim();
@@ -3403,6 +3696,8 @@ function onFridgeFile(e){
   e.target.value="";
 }
 function analyzeFridge(){
+  if(!featureAllowed("fridge")){S.fridgeLoading=false;try{renderFoodScreen();}catch(e){}return;}
+  if(!checkUsage("fridge")){S.fridgeLoading=false;try{renderFoodScreen();}catch(e){}return;}
   if(!S.fridgeB64) return;
   S.fridgeLoading=true;
   renderFoodScreen();
@@ -3505,6 +3800,8 @@ function openCookIdeas(){
   generateCookIdeas();
 }
 function generateCookIdeas(){
+  if(!featureAllowed("cook")){S.cookLoading=false;try{renderCookSheet();}catch(e){}return;}
+  if(!checkUsage("cook")){S.cookLoading=false;try{renderCookSheet();}catch(e){}return;}
   S.cookLoading=true;
   renderCookSheet();
   var g=GOALS.filter(function(x){return x.id===S.gl;})[0]||GOALS[0];
@@ -4056,6 +4353,10 @@ function closeStreakCelebration(){
   setTimeout(function(){
     if(_celRAF) cancelAnimationFrame(_celRAF);
     if(ov&&ov.parentNode) ov.parentNode.removeChild(ov);
+    // After fire celebration → show premium paywall (only if not already Pro)
+    if(typeof isPro==="function"&&!isPro()){
+      setTimeout(function(){try{openPremiumPaywall();}catch(e){}},400);
+    }
   },1700);
 }
 function flyFireToStreak(){
@@ -4319,6 +4620,269 @@ function initFabScroll(){
       if(!FAB_OPEN){btn.style.transform="scale(1)";btn.style.opacity="1";}
     },450);
   },{passive:true});
+}
+
+
+// ═══════════════════════════════════════════════
+// WATER SPHERE — signature living water tracker
+// ═══════════════════════════════════════════════
+var _waterSphereRAF=null;
+var _waterBubbles=[];
+var _waterLastAmount=0;
+function openWaterSphere(){
+  var modal=document.getElementById("water-sphere-modal");
+  if(!modal){
+    modal=document.createElement("div");
+    modal.id="water-sphere-modal";
+    modal.style.cssText="position:absolute;inset:0;z-index:200;background:linear-gradient(180deg,#f0f9ff,#e3f2fd);display:flex;flex-direction:column;opacity:0;transition:opacity .4s";
+    document.body.appendChild(modal);
+  }
+  renderWaterSphereUI();
+  modal.style.display="flex";
+  setTimeout(function(){modal.style.opacity="1";},10);
+  startWaterSphere();
+}
+function closeWaterSphere(){
+  var modal=document.getElementById("water-sphere-modal");
+  if(!modal) return;
+  modal.style.opacity="0";
+  if(_waterSphereRAF) cancelAnimationFrame(_waterSphereRAF);
+  setTimeout(function(){modal.style.display="none";try{renderWater();}catch(e){}},400);
+}
+function renderWaterSphereUI(){
+  var modal=document.getElementById("water-sphere-modal");
+  if(!modal) return;
+  var goal=waterGoal();
+  var pct=Math.min(100,Math.round((S.water/goal)*100));
+  var remain=Math.max(0,goal-S.water);
+  // next drink time
+  var hr=new Date().getHours();
+  var nextHint=remain>0?"Следующий приём через ~1 ч":"Ты молодец 💙";
+  modal.innerHTML=
+    // header
+    "<div style='display:flex;justify-content:space-between;align-items:center;padding:18px 20px;flex-shrink:0'>"+
+      "<button onclick='closeWaterSphere()' style='width:38px;height:38px;border-radius:50%;border:none;background:rgba(255,255,255,.7);color:var(--ink2);font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center' ontouchstart=''>✕</button>"+
+      "<div style='font-size:15px;font-weight:800;color:var(--ink)'>Гидратация</div>"+
+      "<div style='width:38px'></div>"+
+    "</div>"+
+    // AI message
+    "<div id='water-ai-msg' style='text-align:center;padding:0 30px;margin-bottom:10px;flex-shrink:0;font-size:14px;font-weight:600;color:var(--blue-text);min-height:20px;transition:opacity .3s'>"+waterMsg(pct)+"</div>"+
+    // the sphere
+    "<div style='flex:1;display:flex;align-items:center;justify-content:center;position:relative'>"+
+      "<div style='position:relative;width:240px;height:240px'>"+
+        "<canvas id='water-sphere-canvas' width='480' height='480' style='width:240px;height:240px'></canvas>"+
+        // center text overlay
+        "<div style='position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:none'>"+
+          "<div class='stat-num' id='water-sphere-val' style='font-size:46px;font-weight:900;color:#fff;line-height:1;text-shadow:0 2px 12px rgba(0,80,160,.4)'>"+S.water+"</div>"+
+          "<div style='font-size:13px;font-weight:600;color:rgba(255,255,255,.9);margin-top:4px;text-shadow:0 1px 6px rgba(0,80,160,.3)'>из "+goal+" мл</div>"+
+          "<div style='font-size:22px;font-weight:800;color:#fff;margin-top:8px;text-shadow:0 2px 8px rgba(0,80,160,.4)'>"+pct+"%</div>"+
+        "</div>"+
+      "</div>"+
+    "</div>"+
+    // stats row
+    "<div style='display:flex;justify-content:space-around;padding:0 24px;margin-bottom:14px;flex-shrink:0'>"+
+      "<div style='text-align:center'><div class='stat-num' style='font-size:18px;font-weight:800;color:var(--ink)'>"+remain+"</div><div style='font-size:11px;color:var(--ink3)'>осталось, мл</div></div>"+
+      "<div style='width:1px;background:var(--line2)'></div>"+
+      "<div style='text-align:center'><div style='font-size:13px;font-weight:700;color:var(--blue-text);max-width:130px'>"+nextHint+"</div></div>"+
+    "</div>"+
+    // add buttons
+    "<div style='padding:0 20px 30px;flex-shrink:0'>"+
+      "<button onclick='sphereAddWater(250)' style='width:100%;padding:18px;border-radius:20px;border:none;background:linear-gradient(135deg,#42a5f5,#3b9eed);color:#fff;font-size:17px;font-weight:800;cursor:pointer;font-family:inherit;box-shadow:0 8px 24px rgba(59,158,237,.4);margin-bottom:10px' ontouchstart=''>+ 250 мл</button>"+
+      "<div style='display:flex;gap:8px'>"+
+        "<button onclick='sphereAddWater(100)' class='water-chip'>+100</button>"+
+        "<button onclick='sphereAddWater(200)' class='water-chip'>+200</button>"+
+        "<button onclick='sphereAddWater(330)' class='water-chip'>+330</button>"+
+        "<button onclick='sphereAddWater(500)' class='water-chip'>+500</button>"+
+        "<button onclick='sphereAddWater(750)' class='water-chip'>+750</button>"+
+      "</div>"+
+      (S.water>0?"<button onclick='sphereUndoWater()' style='display:block;width:100%;padding:11px;border:none;background:none;color:var(--ink3);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;margin-top:8px' ontouchstart=''>↩ Отменить последнее</button>":"")+
+    "</div>";
+}
+function sphereAddWater(ml){
+  _waterLastAmount=ml;
+  addWater(ml);
+  // splash bubbles
+  for(var i=0;i<8;i++) _waterBubbles.push({x:0.3+Math.random()*0.4,y:1,r:2+Math.random()*4,vy:0.006+Math.random()*0.008,life:1});
+  try{if(navigator.vibrate)navigator.vibrate(12);}catch(e){}
+  // update text without full re-render (keep canvas running)
+  updateSphereText();
+  if(S.water>=waterGoal()) setTimeout(waterGoalCelebrate,300);
+}
+function sphereUndoWater(){
+  if(_waterLastAmount>0){addWater(-_waterLastAmount);_waterLastAmount=0;}
+  renderWaterSphereUI();startWaterSphere();
+}
+function updateSphereText(){
+  var goal=waterGoal();var pct=Math.min(100,Math.round((S.water/goal)*100));
+  var v=document.getElementById("water-sphere-val");if(v)v.textContent=S.water;
+  var msg=document.getElementById("water-ai-msg");
+  if(msg){msg.style.opacity="0";setTimeout(function(){msg.textContent=waterMsg(pct);msg.style.opacity="1";},200);}
+  // re-render the rest after a tick (keeps buttons fresh)
+  var modal=document.getElementById("water-sphere-modal");
+  if(modal){
+    var pctEls=modal.querySelectorAll(".stat-num");
+  }
+}
+function startWaterSphere(){
+  var canvas=document.getElementById("water-sphere-canvas");
+  if(!canvas) return;
+  var ctx=canvas.getContext("2d");
+  var W=480,H=480,R=220,CX=240,CY=240;
+  var t0=performance.now();
+  _waterBubbles=[];
+  if(_waterSphereRAF) cancelAnimationFrame(_waterSphereRAF);
+  function frame(now){
+    if(!document.getElementById("water-sphere-canvas")) return;
+    var t=now-t0;
+    var goal=waterGoal();
+    var pct=Math.min(1,S.water/goal);
+    ctx.clearRect(0,0,W,H);
+    ctx.save();
+    // sphere clip
+    ctx.beginPath();ctx.arc(CX,CY,R,0,7);ctx.clip();
+    // glass bg
+    var bgGrad=ctx.createLinearGradient(0,0,0,H);
+    bgGrad.addColorStop(0,"rgba(220,240,255,.6)");bgGrad.addColorStop(1,"rgba(200,228,250,.8)");
+    ctx.fillStyle=bgGrad;ctx.fillRect(0,0,W,H);
+    // water fill level
+    var level=CY+R-(2*R*pct);
+    // back wave
+    ctx.beginPath();ctx.moveTo(0,H);ctx.lineTo(0,level);
+    for(var x=0;x<=W;x+=6){
+      var wave=Math.sin((x*0.018)+(t*0.0022))*14+Math.sin((x*0.035)-(t*0.0035))*7;
+      ctx.lineTo(x,level+wave+6);
+    }
+    ctx.lineTo(W,H);ctx.closePath();
+    ctx.fillStyle="rgba(91,179,245,.5)";ctx.fill();
+    // front wave
+    ctx.beginPath();ctx.moveTo(0,H);ctx.lineTo(0,level);
+    for(var x2=0;x2<=W;x2+=6){
+      var wave2=Math.sin((x2*0.02)+(t*0.003)+1)*12+Math.sin((x2*0.04)-(t*0.005))*6;
+      ctx.lineTo(x2,level+wave2);
+    }
+    ctx.lineTo(W,H);ctx.closePath();
+    var wGrad=ctx.createLinearGradient(0,level-20,0,H);
+    wGrad.addColorStop(0,"#5bb3f5");wGrad.addColorStop(.5,"#3b9eed");wGrad.addColorStop(1,"#2589d6");
+    ctx.fillStyle=wGrad;ctx.fill();
+    // shimmer line on surface
+    ctx.strokeStyle="rgba(255,255,255,.5)";ctx.lineWidth=2;
+    ctx.beginPath();
+    for(var x3=0;x3<=W;x3+=6){
+      var wave3=Math.sin((x3*0.02)+(t*0.003)+1)*12+Math.sin((x3*0.04)-(t*0.005))*6;
+      if(x3===0)ctx.moveTo(x3,level+wave3);else ctx.lineTo(x3,level+wave3);
+    }
+    ctx.stroke();
+    // bubbles rising
+    for(var i=_waterBubbles.length-1;i>=0;i--){
+      var b=_waterBubbles[i];
+      b.y-=b.vy;b.life-=0.004;
+      if(b.life<=0||b.y<0){_waterBubbles.splice(i,1);continue;}
+      var by=CY+R-(2*R*b.y);
+      var bx=b.x*W;
+      ctx.beginPath();ctx.arc(bx,by,b.r,0,7);
+      ctx.fillStyle="rgba(255,255,255,"+(b.life*0.5)+")";ctx.fill();
+    }
+    // spawn ambient bubbles from bottom occasionally
+    if(pct>0.05&&Math.random()<0.08){
+      _waterBubbles.push({x:0.2+Math.random()*0.6,y:0.02,r:1.5+Math.random()*3,vy:0.004+Math.random()*0.006,life:1});
+    }
+    ctx.restore();
+    // glass rim highlight
+    ctx.beginPath();ctx.arc(CX,CY,R,0,7);
+    ctx.strokeStyle="rgba(255,255,255,.6)";ctx.lineWidth=3;ctx.stroke();
+    // top-left glossy highlight
+    var gloss=ctx.createRadialGradient(CX-70,CY-80,10,CX-70,CY-80,120);
+    gloss.addColorStop(0,"rgba(255,255,255,.35)");gloss.addColorStop(1,"rgba(255,255,255,0)");
+    ctx.save();ctx.beginPath();ctx.arc(CX,CY,R,0,7);ctx.clip();
+    ctx.fillStyle=gloss;ctx.fillRect(0,0,W,H);ctx.restore();
+    _waterSphereRAF=requestAnimationFrame(frame);
+  }
+  _waterSphereRAF=requestAnimationFrame(frame);
+}
+function waterGoalCelebrate(){
+  try{if(navigator.vibrate)navigator.vibrate([15,40,15,40,30]);}catch(e){}
+  var modal=document.getElementById("water-sphere-modal");
+  if(!modal||modal.style.display==="none"){
+    try{showToast("🎉 Норма воды выполнена!");}catch(e){}
+    return;
+  }
+  // confetti burst
+  var burst=document.createElement("div");
+  burst.style.cssText="position:absolute;inset:0;pointer-events:none;z-index:5;overflow:hidden";
+  modal.appendChild(burst);
+  for(var i=0;i<40;i++){
+    var p=document.createElement("div");
+    var cols=["#42a5f5","#5bb3f5","#7ee8fa","#fff","#3b9eed"];
+    var size=5+Math.random()*7;
+    var left=40+Math.random()*20;
+    p.style.cssText="position:absolute;left:"+left+"%;top:45%;width:"+size+"px;height:"+size+"px;background:"+cols[i%5]+";border-radius:"+(Math.random()<0.5?"50%":"2px")+";opacity:1;transition:all "+(1+Math.random())+"s cubic-bezier(.1,.7,.3,1)";
+    burst.appendChild(p);
+    (function(el,idx){
+      setTimeout(function(){
+        var ang=Math.random()*Math.PI*2;var dist=80+Math.random()*180;
+        el.style.transform="translate("+Math.cos(ang)*dist+"px,"+(Math.sin(ang)*dist+100)+"px) rotate("+(Math.random()*720)+"deg)";
+        el.style.opacity="0";
+      },10);
+    })(p,i);
+  }
+  // glow flash
+  var flash=document.createElement("div");
+  flash.style.cssText="position:absolute;inset:0;background:radial-gradient(circle at 50% 45%,rgba(126,232,250,.4),transparent 60%);opacity:0;transition:opacity .3s;pointer-events:none;z-index:4";
+  modal.appendChild(flash);
+  setTimeout(function(){flash.style.opacity="1";},10);
+  setTimeout(function(){flash.style.opacity="0";},500);
+  setTimeout(function(){if(burst.parentNode)burst.parentNode.removeChild(burst);if(flash.parentNode)flash.parentNode.removeChild(flash);},2500);
+}
+
+
+// ═══════════════════════════════════════════════
+// USAGE LIMITS — per-feature daily/monthly caps (anti-abuse)
+// ═══════════════════════════════════════════════
+var USAGE_LIMITS={
+  photo:    {max:30, period:"day",   label:"анализов еды"},
+  fridge:   {max:15, period:"day",   label:"анализов холодильника"},
+  plan:     {max:5,  period:"day",   label:"планов питания"},
+  cook:     {max:25, period:"day",   label:"идей блюд"},
+  chat:     {max:60, period:"day",   label:"сообщений коучу"}
+};
+function _usageKey(feature){
+  var d=new Date();
+  var lim=USAGE_LIMITS[feature];
+  var period=lim&&lim.period==="month"
+    ? d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")
+    : d.toDateString();
+  return "nc_usage_"+feature+"_"+period;
+}
+function getUsage(feature){
+  try{return parseInt(localStorage.getItem(_usageKey(feature))||"0")||0;}catch(e){return 0;}
+}
+function usageLeft(feature){
+  var lim=USAGE_LIMITS[feature];
+  if(!lim) return 999;
+  return Math.max(0,lim.max-getUsage(feature));
+}
+// Returns true if allowed (and increments). false if limit hit (shows message).
+function checkUsage(feature){
+  var lim=USAGE_LIMITS[feature];
+  if(!lim) return true;
+  // photo limit depends on tier: trial=10/day, pro=30/day
+  var maxAllowed=lim.max;
+  if(feature==="photo"&&!isPro()) maxAllowed=10;
+  var used=getUsage(feature);
+  if(used>=maxAllowed){
+    var when=lim.period==="month"?"в следующем месяце":"завтра";
+    try{showToast("🌙 Лимит "+lim.label+" на сегодня исчерпан. Обновится "+when);}catch(e){}
+    return false;
+  }
+  // increment
+  try{localStorage.setItem(_usageKey(feature),String(used+1));}catch(e){}
+  // warn when 3 left (after this use)
+  var left=maxAllowed-(used+1);
+  if(left>0&&left<=3){
+    var unit=lim.period==="month"?"в этом месяце":"на сегодня";
+    setTimeout(function(){try{showToast("⚡ Осталось "+left+" "+lim.label+" "+unit);}catch(e){}},1500);
+  }
+  return true;
 }
 
 window.addEventListener("DOMContentLoaded",function(){
