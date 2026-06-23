@@ -140,11 +140,41 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;color
 
 .water-chip{flex:1;padding:12px 4px;border-radius:13px;border:1.5px solid #cbe6fb;background:rgba(255,255,255,.7);color:var(--blue-text);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;transition:transform .12s}
 .water-chip:active{transform:scale(.94);background:#dcefff}
+
+.lang-opt{display:flex;align-items:center;gap:16px;width:100%;padding:18px 20px;border:2px solid var(--line2);border-radius:18px;background:var(--surface);font-size:17px;font-weight:700;color:var(--ink);cursor:pointer;font-family:inherit;transition:all .2s cubic-bezier(.34,1.4,.5,1);box-shadow:var(--shadow)}
+.lang-opt:active{transform:scale(.97);border-color:var(--green);background:var(--green-soft)}
+.lang-check{color:var(--ink3);font-size:20px}
 </style>
 </head>
 <body>
-<button id="lang-btn" onclick="switchLang()" style="position:fixed;top:12px;right:12px;z-index:9999;background:#f1f5f9;border:1px solid rgba(255,255,255,.15);color:#334155;font-size:12px;font-weight:700;padding:5px 10px;border-radius:8px;cursor:pointer;font-family:inherit">🇰🇿 ҚАЗ</button>
+
 <div id="app">
+
+  <!-- LANGUAGE PICKER (first screen) -->
+  <div id="scr-lang" class="screen" style="padding:0;overflow:hidden;background:linear-gradient(180deg,#fffef9,#f4f9f4);display:none">
+    <div style="height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 28px">
+      <div style="width:80px;height:80px;background:linear-gradient(135deg,#4CAF50,#2e9e54);border-radius:24px;display:flex;align-items:center;justify-content:center;font-size:42px;box-shadow:0 12px 36px rgba(76,175,80,.35);margin-bottom:28px">🔥</div>
+      <div style="font-size:26px;font-weight:900;color:var(--ink);letter-spacing:-.02em;margin-bottom:8px;text-align:center">Nutrivo</div>
+      <div id="lang-pick-sub" style="font-size:15px;color:var(--ink3);margin-bottom:40px;text-align:center;font-weight:500">Тілді таңдаңыз · Выберите язык · Choose language</div>
+      <div style="width:100%;max-width:320px;display:flex;flex-direction:column;gap:12px">
+        <button onclick="pickLang('kz')" class="lang-opt" ontouchstart="">
+          <span style="font-size:26px">🇰🇿</span>
+          <span style="flex:1;text-align:left">Қазақша</span>
+          <span class="lang-check">›</span>
+        </button>
+        <button onclick="pickLang('ru')" class="lang-opt" ontouchstart="">
+          <span style="font-size:26px">🇷🇺</span>
+          <span style="flex:1;text-align:left">Русский</span>
+          <span class="lang-check">›</span>
+        </button>
+        <button onclick="pickLang('en')" class="lang-opt" ontouchstart="">
+          <span style="font-size:26px">🇬🇧</span>
+          <span style="flex:1;text-align:left">English</span>
+          <span class="lang-check">›</span>
+        </button>
+      </div>
+    </div>
+  </div>
 
   <!-- ONBOARDING -->
   <div id="scr-onboard" class="screen fade-in" style="padding:0;overflow:hidden;background:#f5f7f5">
@@ -306,49 +336,49 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;color
     <div class="screen active" id="sc0">
       <div class="welcome">
         <div class="w-logo">🥗</div>
-        <div class="w-title">Добро пожаловать в Nutrivo</div>
-        <div class="w-sub">AI поможет считать калории, анализировать питание и отслеживать прогресс</div>
+        <div class="w-title" data-t="ob0">Добро пожаловать в Nutrivo</div>
+        <div class="w-sub" data-t="ob1">AI поможет считать калории, анализировать питание и отслеживать прогресс</div>
         <div class="feats">
           <div class="feat"><div class="feat-dot"></div>Анализ еды по фото за 5 секунд</div>
           <div class="feat"><div class="feat-dot"></div>Персональный план питания</div>
           <div class="feat"><div class="feat-dot"></div>Body Twin — AI оценка тела</div>
         </div>
-        <button class="btn" style="max-width:300px;width:100%" onclick="obNext()">Начать</button>
+        <button class="btn" style="max-width:300px;width:100%" onclick="obNext()" data-t="ob5">Начать</button>
       </div>
     </div>
 
     <!-- 1: Name -->
     <div class="screen" id="sc1">
       <span class="emoji">👋</span>
-      <div class="title">Как вас зовут?</div>
-      <div class="sub">Мы будем обращаться к вам по имени</div>
+      <div class="title" data-t="ob6">Как вас зовут?</div>
+      <div class="sub" data-t="ob7">Мы будем обращаться к вам по имени</div>
       <input type="text" id="inp_name" placeholder="Ваше имя" oninput="obNameI(this)" autocomplete="off"/>
     </div>
 
     <!-- 2: Gender -->
     <div class="screen" id="sc2">
       <span class="emoji">🧬</span>
-      <div class="title">Ваш пол</div>
-      <div class="sub">Влияет на расчёт нормы</div>
+      <div class="title" data-t="ob8">Ваш пол</div>
+      <div class="sub" data-t="ob9">Влияет на расчёт нормы</div>
       <div class="cards" id="g_gender">
-        <div class="card" onclick="obPick('gender','male',this)"><div class="card-icon">👨</div><div class="card-text">Мужской</div><div class="card-check">✓</div></div>
-        <div class="card" onclick="obPick('gender','female',this)"><div class="card-icon">👩</div><div class="card-text">Женский</div><div class="card-check">✓</div></div>
-        <div class="card" onclick="obPick('gender','other',this)"><div class="card-icon">🌟</div><div class="card-text">Предпочитаю не указывать</div><div class="card-check">✓</div></div>
+        <div class="card" onclick="obPick('gender','male',this)"><div class="card-icon">👨</div><div class="card-text" data-t="ob10">Мужской</div><div class="card-check">✓</div></div>
+        <div class="card" onclick="obPick('gender','female',this)"><div class="card-icon">👩</div><div class="card-text" data-t="ob11">Женский</div><div class="card-check">✓</div></div>
+        <div class="card" onclick="obPick('gender','other',this)"><div class="card-icon">🌟</div><div class="card-text" data-t="ob12">Предпочитаю не указывать</div><div class="card-check">✓</div></div>
       </div>
     </div>
 
     <!-- 3: Age -->
     <div class="screen" id="sc3">
       <span class="emoji">🎂</span>
-      <div class="title">Ваш возраст</div>
-      <div class="sub">Введите или выберите ползунком</div>
+      <div class="title" data-t="ob13">Ваш возраст</div>
+      <div class="sub" data-t="ob14">Введите или выберите ползунком</div>
       <div style="text-align:center;margin:12px 0">
         <div style="display:flex;align-items:center;justify-content:center;gap:16px;margin-bottom:24px">
           <button onclick="obChangeAge(-1)" style="width:52px;height:52px;border-radius:50%;border:2px solid #4CAF50;background:#f0f9f0;font-size:28px;color:#4CAF50;cursor:pointer;display:flex;align-items:center;justify-content:center;font-weight:300">−</button>
           <div style="font-size:72px;font-weight:900;color:#4CAF50;min-width:100px;text-align:center;line-height:1" id="age_disp">25</div>
           <button onclick="obChangeAge(1)" style="width:52px;height:52px;border-radius:50%;border:2px solid #4CAF50;background:#f0f9f0;font-size:28px;color:#4CAF50;cursor:pointer;display:flex;align-items:center;justify-content:center;font-weight:300">+</button>
         </div>
-        <div style="font-size:16px;color:#888;margin-bottom:24px">лет</div>
+        <div style="font-size:16px;color:#888;margin-bottom:24px" data-t="ob15">лет</div>
         <input type="range" min="10" max="80" value="25" step="1" id="age_slider" oninput="obSetAge(+this.value)" style="width:100%"/>
         <div style="display:flex;justify-content:space-between;margin-top:8px;font-size:13px;color:#bbb"><span>10</span><span>80</span></div>
       </div>
@@ -357,10 +387,10 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;color
     <!-- 4: Height -->
     <div class="screen" id="sc4">
       <span class="emoji">📏</span>
-      <div class="title">Ваш рост</div>
-      <div class="sub">Сдвиньте ползунок</div>
+      <div class="title" data-t="ob16">Ваш рост</div>
+      <div class="sub" data-t="ob17">Сдвиньте ползунок</div>
       <div class="slider-val" id="v_h">170</div>
-      <div class="slider-unit">см</div>
+      <div class="slider-unit" data-t="ob18">см</div>
       <input type="range" min="120" max="230" value="170" step="1" oninput="document.getElementById('v_h').textContent=this.value;OB_D.height=+this.value"/>
       <div class="range-row"><span>120 см</span><span>230 см</span></div>
     </div>
@@ -368,10 +398,10 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;color
     <!-- 5: Weight -->
     <div class="screen" id="sc5">
       <span class="emoji">⚖️</span>
-      <div class="title">Текущий вес</div>
-      <div class="sub">Ваш вес прямо сейчас</div>
+      <div class="title" data-t="ob19">Текущий вес</div>
+      <div class="sub" data-t="ob20">Ваш вес прямо сейчас</div>
       <div class="slider-val" id="v_w">70</div>
-      <div class="slider-unit">кг</div>
+      <div class="slider-unit" data-t="ob21">кг</div>
       <input type="range" min="30" max="200" value="70" step="1" oninput="document.getElementById('v_w').textContent=this.value;OB_D.weight=+this.value"/>
       <div class="range-row"><span>30 кг</span><span>200 кг</span></div>
     </div>
@@ -379,8 +409,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;color
     <!-- 6: Target weight -->
     <div class="screen" id="sc6">
       <span class="emoji">🎯</span>
-      <div class="title">Желаемый вес</div>
-      <div class="sub">К какому весу хотите прийти?</div>
+      <div class="title" data-t="ob22">Желаемый вес</div>
+      <div class="sub" data-t="ob23">К какому весу хотите прийти?</div>
       <div class="slider-val" id="v_t">60</div>
       <div class="slider-unit">кг</div>
       <input type="range" min="30" max="200" value="60" step="1" oninput="document.getElementById('v_t').textContent=this.value;OB_D.target=+this.value"/>
@@ -390,47 +420,47 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;color
     <!-- 7: Goal -->
     <div class="screen" id="sc7">
       <span class="emoji">🏆</span>
-      <div class="title">Ваша цель</div>
-      <div class="sub">Выберите главную задачу</div>
+      <div class="title" data-t="ob24">Ваша цель</div>
+      <div class="sub" data-t="ob25">Выберите главную задачу</div>
       <div class="cards" id="g_goal">
-        <div class="card" onclick="obPick('goal','loss',this)"><div class="card-icon">⚖️</div><div class="card-text">Похудеть</div><div class="card-sub">Снизить вес, улучшить форму</div><div class="card-check">✓</div></div>
-        <div class="card" onclick="obPick('goal','cut',this)"><div class="card-icon">🔥</div><div class="card-text">Сушка</div><div class="card-sub">Сжечь жир, сохранить мышцы</div><div class="card-check">✓</div></div>
-        <div class="card" onclick="obPick('goal','maint',this)"><div class="card-icon">🎯</div><div class="card-text">Поддерживать вес</div><div class="card-sub">Держать текущую форму</div><div class="card-check">✓</div></div>
-        <div class="card" onclick="obPick('goal','bulk',this)"><div class="card-icon">💪</div><div class="card-text">Набрать массу</div><div class="card-sub">Рост мышц и силы</div><div class="card-check">✓</div></div>
-        <div class="card" onclick="obPick('goal','health',this)"><div class="card-icon">🌿</div><div class="card-text">Улучшить здоровье</div><div class="card-sub">Правильное питание</div><div class="card-check">✓</div></div>
-        <div class="card" onclick="obPick('goal','protein',this)"><div class="card-icon">🥩</div><div class="card-text">Больше белка</div><div class="card-sub">Для роста и восстановления</div><div class="card-check">✓</div></div>
+        <div class="card" onclick="obPick('goal','loss',this)"><div class="card-icon">⚖️</div><div class="card-text" data-t="ob26">Похудеть</div><div class="card-sub" data-t="ob27">Снизить вес, улучшить форму</div><div class="card-check">✓</div></div>
+        <div class="card" onclick="obPick('goal','cut',this)"><div class="card-icon">🔥</div><div class="card-text" data-t="ob28">Сушка</div><div class="card-sub" data-t="ob29">Сжечь жир, сохранить мышцы</div><div class="card-check">✓</div></div>
+        <div class="card" onclick="obPick('goal','maint',this)"><div class="card-icon">🎯</div><div class="card-text" data-t="ob30">Поддерживать вес</div><div class="card-sub" data-t="ob31">Держать текущую форму</div><div class="card-check">✓</div></div>
+        <div class="card" onclick="obPick('goal','bulk',this)"><div class="card-icon">💪</div><div class="card-text" data-t="ob32">Набрать массу</div><div class="card-sub" data-t="ob33">Рост мышц и силы</div><div class="card-check">✓</div></div>
+        <div class="card" onclick="obPick('goal','health',this)"><div class="card-icon">🌿</div><div class="card-text" data-t="ob34">Улучшить здоровье</div><div class="card-sub" data-t="ob35">Правильное питание</div><div class="card-check">✓</div></div>
+        <div class="card" onclick="obPick('goal','protein',this)"><div class="card-icon">🥩</div><div class="card-text" data-t="ob36">Больше белка</div><div class="card-sub" data-t="ob37">Для роста и восстановления</div><div class="card-check">✓</div></div>
       </div>
     </div>
 
     <!-- 7b: Sub-goal -->
     <div class="screen" id="sc7b">
       <span class="emoji" id="sub_emoji">🔥</span>
-      <div class="title" id="sub_title">Интенсивность</div>
-      <div class="sub" id="sub_sub">Выберите темп</div>
+      <div class="title" id="sub_title" data-t="ob38">Интенсивность</div>
+      <div class="sub" id="sub_sub" data-t="ob39">Выберите темп</div>
       <div class="cards" id="g_subgoal"></div>
     </div>
 
     <!-- 8: Activity -->
     <div class="screen" id="sc8">
       <span class="emoji">🏃</span>
-      <div class="title">Уровень активности</div>
-      <div class="sub">Сколько вы двигаетесь?</div>
+      <div class="title" data-t="ob40">Уровень активности</div>
+      <div class="sub" data-t="ob41">Сколько вы двигаетесь?</div>
       <div class="cards" id="g_act">
-        <div class="card" onclick="obPick('act','1',this)"><div class="card-icon">🛋️</div><div class="card-text">Практически нет активности</div><div class="card-check">✓</div></div>
-        <div class="card" onclick="obPick('act','2',this)"><div class="card-icon">🚶</div><div class="card-text">Лёгкая (1–2 тренировки)</div><div class="card-check">✓</div></div>
-        <div class="card" onclick="obPick('act','3',this)"><div class="card-icon">🚴</div><div class="card-text">Средняя (3–4)</div><div class="card-check">✓</div></div>
-        <div class="card" onclick="obPick('act','4',this)"><div class="card-icon">🏋️</div><div class="card-text">Высокая (5+)</div><div class="card-check">✓</div></div>
-        <div class="card" onclick="obPick('act','5',this)"><div class="card-icon">🏅</div><div class="card-text">Профессиональный спорт</div><div class="card-check">✓</div></div>
+        <div class="card" onclick="obPick('act','1',this)"><div class="card-icon">🛋️</div><div class="card-text" data-t="ob42">Практически нет активности</div><div class="card-check">✓</div></div>
+        <div class="card" onclick="obPick('act','2',this)"><div class="card-icon">🚶</div><div class="card-text" data-t="ob43">Лёгкая (1–2 тренировки)</div><div class="card-check">✓</div></div>
+        <div class="card" onclick="obPick('act','3',this)"><div class="card-icon">🚴</div><div class="card-text" data-t="ob44">Средняя (3–4)</div><div class="card-check">✓</div></div>
+        <div class="card" onclick="obPick('act','4',this)"><div class="card-icon">🏋️</div><div class="card-text" data-t="ob45">Высокая (5+)</div><div class="card-check">✓</div></div>
+        <div class="card" onclick="obPick('act','5',this)"><div class="card-icon">🏅</div><div class="card-text" data-t="ob46">Профессиональный спорт</div><div class="card-check">✓</div></div>
       </div>
     </div>
 
     <!-- 9: Water -->
     <div class="screen" id="sc9">
       <span class="emoji">💧</span>
-      <div class="title">Сколько воды пьёте?</div>
-      <div class="sub">В среднем за день</div>
+      <div class="title" data-t="ob47">Сколько воды пьёте?</div>
+      <div class="sub" data-t="ob48">В среднем за день</div>
       <div class="slider-val" id="v_wt">2.0</div>
-      <div class="slider-unit">литра в день</div>
+      <div class="slider-unit" data-t="ob49">литра в день</div>
       <input type="range" min="5" max="50" value="20" step="1" oninput="document.getElementById('v_wt').textContent=(this.value/10).toFixed(1);OB_D.water=this.value/10"/>
       <div class="range-row"><span>0.5 л</span><span>5 л</span></div>
     </div>
@@ -438,55 +468,55 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;color
     <!-- 10: Diet -->
     <div class="screen" id="sc10">
       <span class="emoji">🥗</span>
-      <div class="title">Особенности питания</div>
-      <div class="sub">Можно выбрать несколько</div>
+      <div class="title" data-t="ob50">Особенности питания</div>
+      <div class="sub" data-t="ob51">Можно выбрать несколько</div>
       <div class="grid2">
-        <div class="chip sel" onclick="obToggleChip(this,'diet','none')">🙅 Нет ограничений</div>
-        <div class="chip" onclick="obToggleChip(this,'diet','veg')">🥦 Вегетарианство</div>
-        <div class="chip" onclick="obToggleChip(this,'diet','vegan')">🌱 Веганство</div>
-        <div class="chip" onclick="obToggleChip(this,'diet','halal')">🌙 Халяль</div>
-        <div class="chip" onclick="obToggleChip(this,'diet','nolac')">🥛 Безлактозное</div>
-        <div class="chip" onclick="obToggleChip(this,'diet','noglu')">🌾 Безглютеновое</div>
-        <div class="chip" onclick="obToggleChip(this,'diet','lowc')">🥩 Низкоуглеводное</div>
+        <div class="chip sel" onclick="obToggleChip(this,'diet','none')" data-t="ob52">🙅 Нет ограничений</div>
+        <div class="chip" onclick="obToggleChip(this,'diet','veg')" data-t="ob53">🥦 Вегетарианство</div>
+        <div class="chip" onclick="obToggleChip(this,'diet','vegan')" data-t="ob54">🌱 Веганство</div>
+        <div class="chip" onclick="obToggleChip(this,'diet','halal')" data-t="ob55">🌙 Халяль</div>
+        <div class="chip" onclick="obToggleChip(this,'diet','nolac')" data-t="ob56">🥛 Безлактозное</div>
+        <div class="chip" onclick="obToggleChip(this,'diet','noglu')" data-t="ob57">🌾 Безглютеновое</div>
+        <div class="chip" onclick="obToggleChip(this,'diet','lowc')" data-t="ob58">🥩 Низкоуглеводное</div>
       </div>
     </div>
 
     <!-- 11: Allergies -->
     <div class="screen" id="sc11">
       <span class="emoji">⚠️</span>
-      <div class="title">Аллергии</div>
-      <div class="sub">Отметьте если есть</div>
+      <div class="title" data-t="ob59">Аллергии</div>
+      <div class="sub" data-t="ob60">Отметьте если есть</div>
       <div class="grid2">
-        <div class="chip sel" onclick="obToggleChip(this,'allergy','none')">✅ Нет</div>
-        <div class="chip" onclick="obToggleChip(this,'allergy','nuts')">🥜 Орехи</div>
-        <div class="chip" onclick="obToggleChip(this,'allergy','dairy')">🧀 Молочные</div>
-        <div class="chip" onclick="obToggleChip(this,'allergy','eggs')">🥚 Яйца</div>
-        <div class="chip" onclick="obToggleChip(this,'allergy','fish')">🐟 Рыба</div>
-        <div class="chip" onclick="obToggleChip(this,'allergy','sea')">🦐 Морепродукты</div>
-        <div class="chip" onclick="obToggleChip(this,'allergy','soy')">🫘 Соя</div>
+        <div class="chip sel" onclick="obToggleChip(this,'allergy','none')" data-t="ob61">✅ Нет</div>
+        <div class="chip" onclick="obToggleChip(this,'allergy','nuts')" data-t="ob62">🥜 Орехи</div>
+        <div class="chip" onclick="obToggleChip(this,'allergy','dairy')" data-t="ob63">🧀 Молочные</div>
+        <div class="chip" onclick="obToggleChip(this,'allergy','eggs')" data-t="ob64">🥚 Яйца</div>
+        <div class="chip" onclick="obToggleChip(this,'allergy','fish')" data-t="ob65">🐟 Рыба</div>
+        <div class="chip" onclick="obToggleChip(this,'allergy','sea')" data-t="ob66">🦐 Морепродукты</div>
+        <div class="chip" onclick="obToggleChip(this,'allergy','soy')" data-t="ob67">🫘 Соя</div>
       </div>
     </div>
 
     <!-- 12: Health -->
     <div class="screen" id="sc12">
       <span class="emoji">❤️</span>
-      <div class="title">Состояние здоровья</div>
-      <div class="sub">Учтём в рекомендациях</div>
+      <div class="title" data-t="ob68">Состояние здоровья</div>
+      <div class="sub" data-t="ob69">Учтём в рекомендациях</div>
       <div class="grid2">
         <div class="chip sel" onclick="obToggleChip(this,'health','none')">✅ Нет</div>
-        <div class="chip" onclick="obToggleChip(this,'health','diab')">🩸 Диабет</div>
-        <div class="chip" onclick="obToggleChip(this,'health','bp')">💊 Давление</div>
-        <div class="chip" onclick="obToggleChip(this,'health','gut')">🫀 ЖКТ</div>
-        <div class="chip" onclick="obToggleChip(this,'health','thy')">🦋 Щитовидная</div>
-        <div class="chip" onclick="obToggleChip(this,'health','kid')">🫘 Почки</div>
+        <div class="chip" onclick="obToggleChip(this,'health','diab')" data-t="ob70">🩸 Диабет</div>
+        <div class="chip" onclick="obToggleChip(this,'health','bp')" data-t="ob71">💊 Давление</div>
+        <div class="chip" onclick="obToggleChip(this,'health','gut')" data-t="ob72">🫀 ЖКТ</div>
+        <div class="chip" onclick="obToggleChip(this,'health','thy')" data-t="ob73">🦋 Щитовидная</div>
+        <div class="chip" onclick="obToggleChip(this,'health','kid')" data-t="ob74">🫘 Почки</div>
       </div>
     </div>
 
     <!-- 13: Meals per day -->
     <div class="screen" id="sc13">
       <span class="emoji">🍽️</span>
-      <div class="title">Приёмов пищи в день</div>
-      <div class="sub">Ваш привычный режим</div>
+      <div class="title" data-t="ob75">Приёмов пищи в день</div>
+      <div class="sub" data-t="ob76">Ваш привычный режим</div>
       <div class="meals-row" id="g_meals">
         <div class="meal-n" onclick="obPick('meals','2',this)">2</div>
         <div class="meal-n" onclick="obPick('meals','3',this)">3</div>
@@ -499,31 +529,31 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;color
     <!-- 14: Cuisine -->
     <div class="screen" id="sc14">
       <span class="emoji">👨‍🍳</span>
-      <div class="title">Любимая кухня</div>
-      <div class="sub">Выберите несколько</div>
+      <div class="title" data-t="ob77">Любимая кухня</div>
+      <div class="sub" data-t="ob78">Выберите несколько</div>
       <div class="grid2">
-        <div class="chip sel" onclick="obToggleChip(this,'cuisine','kz')">🇰🇿 Казахская</div>
-        <div class="chip" onclick="obToggleChip(this,'cuisine','eu')">🇪🇺 Европейская</div>
-        <div class="chip" onclick="obToggleChip(this,'cuisine','asia')">🍜 Азиатская</div>
-        <div class="chip" onclick="obToggleChip(this,'cuisine','fast')">🍔 Фастфуд</div>
-        <div class="chip" onclick="obToggleChip(this,'cuisine','home')">🏠 Домашняя</div>
-        <div class="chip" onclick="obToggleChip(this,'cuisine','meat')">🥩 Мясные</div>
+        <div class="chip sel" onclick="obToggleChip(this,'cuisine','kz')" data-t="ob79">🇰🇿 Казахская</div>
+        <div class="chip" onclick="obToggleChip(this,'cuisine','eu')" data-t="ob80">🇪🇺 Европейская</div>
+        <div class="chip" onclick="obToggleChip(this,'cuisine','asia')" data-t="ob81">🍜 Азиатская</div>
+        <div class="chip" onclick="obToggleChip(this,'cuisine','fast')" data-t="ob82">🍔 Фастфуд</div>
+        <div class="chip" onclick="obToggleChip(this,'cuisine','home')" data-t="ob83">🏠 Домашняя</div>
+        <div class="chip" onclick="obToggleChip(this,'cuisine','meat')" data-t="ob84">🥩 Мясные</div>
         <div class="chip" onclick="obToggleChip(this,'cuisine','fish')">🐟 Рыба</div>
-        <div class="chip" onclick="obToggleChip(this,'cuisine','sw')">🍰 Десерты</div>
+        <div class="chip" onclick="obToggleChip(this,'cuisine','sw')" data-t="ob85">🍰 Десерты</div>
       </div>
     </div>
 
     <!-- COMPARE: Без / С Nutrivo -->
     <div class="screen" id="sc_compare">
       <span class="emoji">🚀</span>
-      <div class="title">Постоянная поддержка работает</div>
-      <div class="sub">Nutrivo всегда рядом, чтобы вести тебя к цели</div>
+      <div class="title" data-t="ob86">Постоянная поддержка работает</div>
+      <div class="sub" data-t="ob87">Nutrivo всегда рядом, чтобы вести тебя к цели</div>
       <div style="display:flex;gap:14px;margin:20px 0 16px;align-items:flex-end">
         <!-- Без -->
         <div style="flex:1;text-align:center">
           <div style="font-size:34px;margin-bottom:8px">😕</div>
           <div style="background:var(--surface2);border:1px solid var(--line);border-radius:18px;padding:14px 10px;height:170px;display:flex;flex-direction:column;justify-content:flex-end;position:relative;overflow:hidden">
-            <div style="position:absolute;top:12px;left:0;right:0;font-size:13px;font-weight:800;color:var(--ink2)">Без Nutrivo</div>
+            <div style="position:absolute;top:12px;left:0;right:0;font-size:13px;font-weight:800;color:var(--ink2)" data-t="ob88">Без Nutrivo</div>
             <div id="cmp-bar-without" style="background:var(--line2);border-radius:12px;height:28%;display:flex;align-items:center;justify-content:center;transition:height 1s cubic-bezier(.4,0,.2,1)">
               <span style="font-size:18px;font-weight:900;color:var(--ink3)">1x</span>
             </div>
@@ -533,7 +563,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;color
         <div style="flex:1;text-align:center">
           <div style="font-size:34px;margin-bottom:8px">🤩</div>
           <div style="background:var(--green-soft);border:1.5px solid var(--green-mid);border-radius:18px;padding:14px 10px;height:170px;display:flex;flex-direction:column;justify-content:flex-end;position:relative;overflow:hidden">
-            <div style="position:absolute;top:12px;left:0;right:0;font-size:13px;font-weight:800;color:var(--green-text)">С Nutrivo</div>
+            <div style="position:absolute;top:12px;left:0;right:0;font-size:13px;font-weight:800;color:var(--green-text)" data-t="ob89">С Nutrivo</div>
             <div id="cmp-bar-with" style="background:linear-gradient(180deg,#66bb6a,#4CAF50);border-radius:12px;height:8%;display:flex;align-items:center;justify-content:center;transition:height 1.2s cubic-bezier(.4,0,.2,1);box-shadow:0 4px 16px rgba(76,175,80,.3)">
               <span style="font-size:20px;font-weight:900;color:#fff">2x</span>
             </div>
@@ -541,7 +571,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;color
         </div>
       </div>
       <div style="background:var(--green-soft);border:1px solid var(--green-mid);border-radius:16px;padding:14px 16px;margin-bottom:20px">
-        <div style="font-size:13px;color:var(--ink2);line-height:1.55;text-align:center">Люди, которые следят за питанием с поддержкой AI-тренера, достигают цели заметно стабильнее 💪</div>
+        <div style="font-size:13px;color:var(--ink2);line-height:1.55;text-align:center" data-t="ob90">Люди, которые следят за питанием с поддержкой AI-тренера, достигают цели заметно стабильнее 💪</div>
       </div>
     </div>
 
@@ -549,20 +579,20 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;color
     <div class="screen" id="sc15">
       <div class="result-wrap" id="loading_wrap">
         <div style="font-size:48px;margin-bottom:16px">🤖</div>
-        <div style="font-size:20px;font-weight:700;margin-bottom:8px">AI рассчитывает рекомендации…</div>
-        <div style="font-size:14px;color:#888;margin-bottom:32px">Анализируем ваши данные</div>
+        <div style="font-size:20px;font-weight:700;margin-bottom:8px" data-t="ob91">AI рассчитывает рекомендации…</div>
+        <div style="font-size:14px;color:#888;margin-bottom:32px" data-t="ob92">Анализируем ваши данные</div>
         <div class="spin"></div>
       </div>
       <div id="result_wrap" style="display:none" class="result-wrap">
         <div style="font-size:48px;margin-bottom:12px">🎉</div>
-        <div style="font-size:22px;font-weight:800;margin-bottom:4px">Готово!</div>
-        <div style="font-size:14px;color:#888;margin-bottom:12px">Ваша дневная норма</div>
+        <div style="font-size:22px;font-weight:800;margin-bottom:4px" data-t="ob93">Готово!</div>
+        <div style="font-size:14px;color:#888;margin-bottom:12px" data-t="ob94">Ваша дневная норма</div>
         <div class="res-cal" id="r_cal">2100</div>
-        <div style="font-size:15px;color:#888;margin-bottom:4px">ккал в день</div>
+        <div style="font-size:15px;color:#888;margin-bottom:4px" data-t="ob95">ккал в день</div>
         <div class="res-grid">
-          <div class="res-card"><div class="res-val" id="r_p">-</div><div class="res-lbl">Белки</div></div>
-          <div class="res-card"><div class="res-val" id="r_f">-</div><div class="res-lbl">Жиры</div></div>
-          <div class="res-card"><div class="res-val" id="r_c">-</div><div class="res-lbl">Углеводы</div></div>
+          <div class="res-card"><div class="res-val" id="r_p">-</div><div class="res-lbl" data-t="ob96">"+t("ui37")+"</div></div>
+          <div class="res-card"><div class="res-val" id="r_f">-</div><div class="res-lbl" data-t="ob97">"+t("ui38")+"</div></div>
+          <div class="res-card"><div class="res-val" id="r_c">-</div><div class="res-lbl" data-t="ob98">"+t("ui39")+"</div></div>
         </div>
         <div class="res-msg" id="r_msg"></div>
       </div>
@@ -571,7 +601,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;color
   </div>
 
   <div id="ob_bottom" class="bottom" style="display:none">
-    <button class="btn" id="ob_btn" onclick="obNext()">Далее</button>
+    <button class="btn" id="ob_btn" onclick="obNext()" data-t="ob99">Далее</button>
   </div>
 </div>
   </div>
@@ -581,8 +611,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;color
     <!-- Header (emotional) -->
     <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:18px;animation:cardRise .5s cubic-bezier(.22,1,.36,1) both">
       <div style="flex:1;min-width:0">
-        <div style="font-size:22px;font-weight:800;color:var(--ink);line-height:1.15;letter-spacing:-.02em;margin-bottom:4px" id="greeting">Привет!</div>
-        <div style="font-size:13px;color:var(--ink3);font-weight:500" id="greeting-sub">Сегодня отличный день</div>
+        <div style="font-size:22px;font-weight:800;color:var(--ink);line-height:1.15;letter-spacing:-.02em;margin-bottom:4px" id="greeting" data-t="ob100">Привет!</div>
+        <div style="font-size:13px;color:var(--ink3);font-weight:500" id="greeting-sub" data-t="ob101">Сегодня отличный день</div>
       </div>
       <div id="streak-badge" style="display:flex;align-items:center;gap:8px;background:linear-gradient(135deg,#fff5e9,#fef0db);border:1.5px solid #fde3c0;border-radius:99px;padding:8px 14px 8px 11px;box-shadow:0 3px 14px rgba(245,166,35,.18);flex-shrink:0;margin-left:12px;position:relative;overflow:hidden">
         <span style="font-size:16px">🔥</span>
@@ -625,7 +655,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;color
           </svg>
           <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center">
             <div class="stat-num" style="font-size:30px;font-weight:900;color:var(--ink);line-height:1;letter-spacing:-.02em" id="cal-ring-val">0</div>
-            <div style="font-size:9px;color:var(--ink3);margin-top:4px;font-weight:700;letter-spacing:.1em">ККАЛ</div>
+            <div style="font-size:9px;color:var(--ink3);margin-top:4px;font-weight:700;letter-spacing:.1em" data-t="ob102">ККАЛ</div>
           </div>
         </div>
         <div style="flex:1;min-width:0">
@@ -637,7 +667,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;color
     <!-- PREMIUM MEAL RINGS -->
     <div class="card" id="meal-rings-card" style="padding:20px 18px">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px">
-        <div style="font-size:15px;font-weight:800;color:var(--ink);letter-spacing:-.01em">Приёмы пищи</div>
+        <div style="font-size:15px;font-weight:800;color:var(--ink);letter-spacing:-.01em" data-t="ob103">Приёмы пищи</div>
         <div style="font-size:12px;color:var(--ink3);font-weight:600" id="meals-progress">0 из 4</div>
       </div>
       <div id="meal-rings-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:14px"></div>
@@ -649,15 +679,15 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;color
   </div>
     <!-- FOOD -->
   <div id="scr-food" class="screen hidden" style="padding:56px 18px 120px">
-    <div style="font-size:27px;font-weight:800;color:var(--ink);letter-spacing:-.02em;margin-bottom:5px">Анализ питания</div>
-    <div style="font-size:15px;color:var(--ink3);margin-bottom:20px">Фото, штрихкод или текст — AI посчитает КБЖУ</div>
+    <div style="font-size:27px;font-weight:800;color:var(--ink);letter-spacing:-.02em;margin-bottom:5px" data-t="ob104">Анализ питания</div>
+    <div style="font-size:15px;color:var(--ink3);margin-bottom:20px" data-t="ob105">Фото, штрихкод или текст — AI посчитает КБЖУ</div>
     <div id="food-content"></div>
   </div>
 
   <!-- HISTORY -->
   <div id="scr-history" class="screen hidden" style="padding:56px 18px 120px">
     <div style="font-size:27px;font-weight:800;color:var(--ink);letter-spacing:-.02em;margin-bottom:5px">История</div>
-    <div style="font-size:15px;color:var(--ink3);margin-bottom:22px">Твоё питание за неделю</div>
+    <div style="font-size:15px;color:var(--ink3);margin-bottom:22px" data-t="ob106">Твоё питание за неделю</div>
     <div id="history-content"></div>
   </div>
 
@@ -669,7 +699,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;color
       <button onclick="switchTab('main')" style="width:38px;height:38px;border-radius:12px;border:none;background:var(--surface2);cursor:pointer;font-size:22px;color:var(--ink2);display:flex;align-items:center;justify-content:center" ontouchstart="">‹</button>
       <div style="width:42px;height:42px;border-radius:13px;background:linear-gradient(135deg,#4CAF50,#43a047);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;box-shadow:0 3px 12px rgba(76,175,80,.3)">🤖</div>
       <div style="flex:1">
-        <div style="font-size:16px;font-weight:800;color:var(--ink);letter-spacing:-.01em">Коуч</div>
+        <div style="font-size:16px;font-weight:800;color:var(--ink);letter-spacing:-.01em" data-t="ob107">Коуч</div>
         <div style="font-size:12px;color:var(--green-text);font-weight:600;display:flex;align-items:center;gap:5px"><span style="width:7px;height:7px;border-radius:50%;background:var(--green)"></span>AI-тренер · всегда онлайн</div>
       </div>
     </div>
@@ -679,7 +709,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;color
     <div style="flex-shrink:0;background:var(--surface);border-top:1px solid var(--line);padding:12px 14px 28px">
       <div id="chat-quick" style="display:flex;gap:8px;overflow-x:auto;padding-bottom:10px;scrollbar-width:none"></div>
       <div style="display:flex;gap:10px;align-items:flex-end">
-        <textarea id="chat-input" rows="1" placeholder="Напиши тренеру..." style="flex:1;padding:13px 16px;border:2px solid var(--line2);border-radius:20px;background:var(--surface2);font-size:15px;font-family:inherit;color:var(--ink);outline:none;resize:none;max-height:100px;transition:border-color .2s" onfocus="this.style.borderColor='var(--green)'" onblur="this.style.borderColor='var(--line2)'" oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,100)+'px'"></textarea>
+        <textarea id="chat-input" rows="1" placeholder="Напиши тренеру..." data-t-ph="ch15" style="flex:1;padding:13px 16px;border:2px solid var(--line2);border-radius:20px;background:var(--surface2);font-size:15px;font-family:inherit;color:var(--ink);outline:none;resize:none;max-height:100px;transition:border-color .2s" onfocus="this.style.borderColor='var(--green)'" onblur="this.style.borderColor='var(--line2)'" oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,100)+'px'"></textarea>
         <button onclick="sendChat()" id="chat-send-btn" style="width:46px;height:46px;border-radius:50%;border:none;background:var(--green);color:#fff;font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 4px 14px rgba(76,175,80,.32);transition:all .15s" ontouchstart="">➤</button>
       </div>
     </div>
@@ -693,8 +723,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;color
           <svg width="96" height="96" viewBox="0 0 96 96"><circle cx="48" cy="48" r="42" fill="none" stroke="var(--green-mid)" stroke-width="6"/><circle id="prep-ring-fill" cx="48" cy="48" r="42" fill="none" stroke="var(--green)" stroke-width="6" stroke-linecap="round" stroke-dasharray="264" stroke-dashoffset="264" transform="rotate(-90 48 48)" style="transition:stroke-dashoffset .4s ease"/></svg>
           <div id="prep-pct" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:900;color:var(--ink)">0%</div>
         </div>
-        <div style="font-size:24px;font-weight:800;color:var(--ink);letter-spacing:-.02em;margin-bottom:6px">Готовим твой план</div>
-        <div style="font-size:14px;color:var(--ink3)">AI рассчитывает персональную программу</div>
+        <div style="font-size:24px;font-weight:800;color:var(--ink);letter-spacing:-.02em;margin-bottom:6px" data-t="ob109">Готовим твой план</div>
+        <div style="font-size:14px;color:var(--ink3)" data-t="ob110">AI рассчитывает персональную программу</div>
       </div>
       <div id="prep-steps"></div>
     </div>
@@ -703,13 +733,13 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;color
   <!-- FLOATING ACTION BUTTON (fan menu) -->
   <div id="fab-overlay" onclick="closeFab()" style="display:none;position:absolute;inset:0;background:rgba(15,26,18,.55);backdrop-filter:blur(3px);z-index:80;opacity:0;transition:opacity .25s"></div>
   <div id="fab-wrap" style="display:none;position:absolute;right:18px;width:180px;bottom:158px;z-index:90;flex-direction:column;align-items:flex-end;gap:12px">
-    <div class="fab-item" data-i="0" onclick="fabAction('food')"><span class="fab-lbl">Скан еды</span><span class="fab-ic" style="background:linear-gradient(135deg,#4CAF50,#43a047)">📸</span></div>
-    <div class="fab-item" data-i="1" onclick="fabAction('fridge')"><span class="fab-lbl">Холодильник</span><span class="fab-ic" style="background:linear-gradient(135deg,#3b9eed,#5bb3f5)">🧊</span></div>
-    <div class="fab-item" data-i="2" onclick="fabAction('cook')"><span class="fab-lbl">Что приготовить</span><span class="fab-ic" style="background:linear-gradient(135deg,#f5a623,#ffb74d)">🍳</span></div>
-    <div class="fab-item" data-i="3" onclick="fabAction('water')"><span class="fab-lbl">Добавить воду</span><span class="fab-ic" style="background:linear-gradient(135deg,#42a5f5,#64b5f6)">💧</span></div>
-    <div class="fab-item" data-i="4" onclick="fabAction('workout')"><span class="fab-lbl">Тренировка</span><span class="fab-ic" style="background:linear-gradient(135deg,#9b59d0,#b074dd)">🏋️</span></div>
-    <div class="fab-item" data-i="5" onclick="fabAction('body')"><span class="fab-lbl">Скан тела</span><span class="fab-ic" style="background:linear-gradient(135deg,#ef5350,#f47570)">🪞</span></div>
-    <div class="fab-item" data-i="6" onclick="fabAction('coach')"><span class="fab-lbl">Спросить Коуча</span><span class="fab-ic" style="background:linear-gradient(135deg,#26a69a,#4db6ac)">🤖</span></div>
+    <div class="fab-item" data-i="0" onclick="fabAction('food')"><span class="fab-lbl" data-t="ob111">Скан еды</span><span class="fab-ic" style="background:linear-gradient(135deg,#4CAF50,#43a047)">📸</span></div>
+    <div class="fab-item" data-i="1" onclick="fabAction('fridge')"><span class="fab-lbl" data-t="ob112">"+t("ui1")+"</span><span class="fab-ic" style="background:linear-gradient(135deg,#3b9eed,#5bb3f5)">🧊</span></div>
+    <div class="fab-item" data-i="2" onclick="fabAction('cook')"><span class="fab-lbl" data-t="ob113">Что приготовить</span><span class="fab-ic" style="background:linear-gradient(135deg,#f5a623,#ffb74d)">🍳</span></div>
+    <div class="fab-item" data-i="3" onclick="fabAction('water')"><span class="fab-lbl" data-t="ob114">Добавить воду</span><span class="fab-ic" style="background:linear-gradient(135deg,#42a5f5,#64b5f6)">💧</span></div>
+    <div class="fab-item" data-i="4" onclick="fabAction('workout')"><span class="fab-lbl" data-t="ob115">Тренировка</span><span class="fab-ic" style="background:linear-gradient(135deg,#9b59d0,#b074dd)">🏋️</span></div>
+    <div class="fab-item" data-i="5" onclick="fabAction('body')"><span class="fab-lbl" data-t="ob116">Скан тела</span><span class="fab-ic" style="background:linear-gradient(135deg,#ef5350,#f47570)">🪞</span></div>
+    <div class="fab-item" data-i="6" onclick="fabAction('coach')"><span class="fab-lbl" data-t="ob117">Спросить Коуча</span><span class="fab-ic" style="background:linear-gradient(135deg,#26a69a,#4db6ac)">🤖</span></div>
   </div>
   
 
@@ -867,7 +897,7 @@ function nextSlide(){
 // ROUTING
 // ═══════════════════════════════════════════════════════════════
 function showScreen(name){
-  ["onboard","goal","data","main","food","history","body","coach","prep"].forEach(function(s){
+  ["lang","onboard","goal","data","main","food","history","body","coach","prep"].forEach(function(s){
     var el=document.getElementById("scr-"+s);
     if(!el) return;
     if(s===name){el.classList.remove("hidden");el.classList.add("fade-in");}
@@ -1122,12 +1152,12 @@ function renderDashboard(){
   var gr=document.getElementById("greeting");
   if(gr){
     var h=new Date().getHours();
-    var greet=h<6?"Доброй ночи":h<12?"Доброе утро":h<18?"Добрый день":"Добрый вечер";
+    var greet=h<6?t("greet_night"):h<12?t("greet_morning"):h<18?t("greet_day"):t("greet_evening");
     gr.textContent=greet+", "+S.name+" 👋";
   }
   var grs=document.getElementById("greeting-sub");
   if(grs){
-    var subs=["Сегодня отличный день","Маленькие шаги — большие результаты","Ты на верном пути","Каждый приём пищи имеет значение","Продолжай в том же духе"];
+    var subs=[t("sub0"),t("sub1"),t("sub2"),t("sub3"),t("sub4")];
     grs.textContent=subs[Math.floor(Math.random()*subs.length)];
   }
   renderXP();renderBodyState();renderCalRing();renderMacroBars();renderWater();renderMission();renderMeals();renderWorkoutCard();renderNotif();renderPremiumBadge();setTimeout(function(){applyTranslations();},30);renderPremiumBanner();
@@ -1236,12 +1266,12 @@ function waterGoal(){
   return S.dg?Math.round((S.dg.calories/2000)*2500):2500;
 }
 function waterMsg(pct){
-  if(pct>=100) return "Цель выполнена! Отличная работа 🎉";
-  if(pct>=75) return "Почти у цели — организм скажет спасибо";
-  if(pct>=50) return "Отличный темп, продолжай";
-  if(pct>=25) return "Хорошее начало дня";
-  if(pct>0) return "Первый глоток сделан 💧";
-  return "Начни день со стакана воды";
+  if(pct>=100) return t("water100");
+  if(pct>=75) return t("water75");
+  if(pct>=50) return t("water50");
+  if(pct>=25) return t("water25");
+  if(pct>0) return t("water1");
+  return t("water0");
 }
 function renderWater(){
   var el=document.getElementById("water-card");
@@ -1554,7 +1584,7 @@ function renderFoodInput(){
         "<div style='font-size:56px;margin-bottom:8px'>📸</div>"+
         "<div style='font-weight:700;font-size:18px;color:var(--ink);margin-bottom:6px'>Загрузить фото еды</div>"+
         "<div style='font-size:13px;color:var(--ink3);line-height:1.6;margin-bottom:18px'>AI определит КБЖУ и даст совет<br/>под цель «"+g.title+"»</div>"+
-        "<div style='display:inline-block;padding:12px 28px;background:var(--green);color:#fff;border-radius:14px;font-size:15px;font-weight:700;box-shadow:0 4px 16px rgba(76,175,80,.28)'>Выбрать фото</div>"+
+        "<div style='display:inline-block;padding:12px 28px;background:var(--green);color:#fff;border-radius:14px;font-size:15px;font-weight:700;box-shadow:0 4px 16px rgba(76,175,80,.28)'>"+t("ui15")+"</div>"+
       "</div>";
   }
 }
@@ -1645,7 +1675,7 @@ function analyzePhoto(){
   S.loadingFood=true;renderFoodInput();
   var mealsList=S.meals.length?S.meals.map(function(m){return m.name;}).join(", "):"ничего";
   var prompt=
-    "Ты профессиональный нутрициолог. Анализируй фото еды с максимальной точностью.\n"+
+    ""+(S.lang==="kz"?"Все текстовые значения на казахском. ":S.lang==="en"?"All text values in English. ":"")+"Ты профессиональный нутрициолог. Анализируй фото еды с максимальной точностью.\n"+
     "ВАЖНО — РАСПОЗНАВАЙ ГОТОВЫЕ БЛЮДА ЦЕЛИКОМ, а не как набор продуктов. Если видишь известное блюдо — называй его правильным именем:\n"+
     "- рис + морковь + мясо в одной тарелке = 'Плов' (не 'рис с курицей')\n"+
     "- мясо в тесте = 'Манты' или 'Пельмени'\n"+
@@ -1675,7 +1705,7 @@ function analyzePhoto(){
   }).catch(function(e){
     S.loadingFood=false;
     S.foodAna={error:true,dishes:[],total:{calories:0,protein:0,fat:0,carbs:0}};
-    S.foodAdv={mainAdvice:"Ошибка анализа. Попробуй снова или опиши текстом."};
+    S.foodAdv={mainAdvice:t("ui4")};
     renderFoodResults(document.getElementById("food-content"),GOALS.filter(function(x){return x.id===S.gl;})[0]);
   });
 }
@@ -1711,7 +1741,7 @@ function analyzeText(){
 
 function finishAnalysis(a1){
   S.foodAna=a1;
-  setLoadMsg("🧠 Составляю рекомендацию...");
+  setLoadMsg(t("ui5"));
   var nc=S.st.calories+a1.total.calories;
   var np=S.st.protein+a1.total.protein;
   var nf=S.st.fat+a1.total.fat;
@@ -1730,7 +1760,7 @@ function finishAnalysis(a1){
         "JSON: {mainAdvice:string,nextMeal:string,warning:null,replacement:null,bodyState:string} bodyState: burning|building|dark|sugar|perfect"
       }]})
   }).then(function(r){return r.json();}).then(function(d){
-    var a2={mainAdvice:"Хороший приём!",nextMeal:"Следующий через 3-4ч",bodyState:"burning"};
+    var a2={mainAdvice:t("ui6"),nextMeal:t("ui7"),bodyState:"burning"};
     try{
       var txt=d.content[0].text.replace(/```json|```/g,"").trim();
       var js=txt.indexOf("{");var je=txt.lastIndexOf("}")+1;
@@ -1747,7 +1777,7 @@ function finishAnalysis(a1){
     renderFoodResults(document.getElementById("food-content"),GOALS.filter(function(x){return x.id===S.gl;})[0]);
   }).catch(function(){
     S.st.calories+=a1.total.calories;S.st.protein+=a1.total.protein;S.st.fat+=a1.total.fat;S.st.carbs+=a1.total.carbs;
-    S.foodAdv={mainAdvice:"Записано. Продолжай следить за рационом.",nextMeal:"Следующий приём через 3-4 часа.",bodyState:"burning"};
+    S.foodAdv={mainAdvice:t("ui8"),nextMeal:t("ui9"),bodyState:"burning"};
     var meal={id:Date.now(),name:a1.dishes.map(function(d){return d.name;}).join(" + "),time:new Date().toLocaleTimeString("ru",{hour:"2-digit",minute:"2-digit"}),calories:a1.total.calories,protein:a1.total.protein,fat:a1.total.fat,carbs:a1.total.carbs};
     meal.type=_pendingMealType||currentMealTypeByTime();_lastCommittedType=meal.type;S.meals.push(meal);saveToHistory(meal);_pendingMealType=null;
     addXP(80);renderCalRing();renderMacroBars();renderMeals();renderBodyState();try{renderMealRings();mealRingImpulse(_lastCommittedType);calRingImpulse();softSuccessGlow();}catch(e){}renderMission();
@@ -1843,7 +1873,7 @@ function showWeeklyPlan(){
   var userCtx=getUserContext();var prompt="Составь план питания на 7 дней. "+userCtx+(S.gender==="female"?"Женщина":"Мужчина")+", "+S.age+" лет, "+S.weight+"кг → "+S.targetWeight+"кг. Цель: "+GP[S.gl]+"."+subInfo+" Норма: "+S.dg.calories+" ккал, белок "+S.dg.protein+"г, жиры "+S.dg.fat+"г, углеводы "+S.dg.carbs+"г. Для КАЖДОГО дня укажи реальные protein/fat/carbs в граммах и поле insight — короткий персональный AI-совет (например: 'Отличный баланс белка' или 'Добавь зелени к ужину'). Приёмов в день: "+meals5+". "+cutTip+"Блюда: конкретный продукт + граммы. Примеры: куриные бёдра тушёные 200г, гречка варёная 150г, омлет из 3 яиц. JSON структура: "+jsonTpl;
   fetch("/api/claude",{method:"POST",headers:{"Content-Type":"application/json"},
     body:JSON.stringify({model:"claude-haiku-4-5",max_tokens:4000,
-      system:"Ты диетолог. Используй только: яйца, куриные бёдра/грудка, гречка, рис, овсянка, творог, кефир, картофель, капуста, морковь, огурец, помидор, яблоко, банан. Без стейков и лосося. Верни ТОЛЬКО валидный JSON без markdown.",
+      system:""+(S.lang==="kz"?"Все текстовые значения на казахском. ":S.lang==="en"?"All text values in English. ":"")+"Ты диетолог. Используй только: яйца, куриные бёдра/грудка, гречка, рис, овсянка, творог, кефир, картофель, капуста, морковь, огурец, помидор, яблоко, банан. Без стейков и лосося. Верни ТОЛЬКО валидный JSON без markdown.",
       messages:[{role:"user",content:prompt}]
     })
   }).then(function(r){return r.json();})
@@ -1851,21 +1881,21 @@ function showWeeklyPlan(){
     if(d.error) throw new Error(d.error.message||JSON.stringify(d.error));
     var raw=d.content[0].text.replace(/```json/g,"").replace(/```/g,"").trim();
     var js=raw.indexOf("{"); var je=raw.lastIndexOf("}")+1;
-    if(js<0||je<=js) throw new Error("Неверный формат ответа");
+    if(js<0||je<=js) throw new Error(t("ui40"));
     var plan=JSON.parse(raw.slice(js,je));
-    if(!plan.days||!plan.days.length) throw new Error("Дни не найдены");
+    if(!plan.days||!plan.days.length) throw new Error(t("ui41"));
     S.lastPlan=plan;
     var html="<div style='display:flex;justify-content:space-between;align-items:center;margin-bottom:12px'><div style='font-family:-apple-system,sans-serif;font-size:16px;font-weight:700;color:var(--ink)'>Твой план на 7 дней</div><button onclick='closePlanModal()' style='background:none;border:none;color:var(--ink3);cursor:pointer;font-size:24px'>×</button></div>";
     html+="<div style='font-size:12px;color:var(--ink3);margin-bottom:12px;padding:8px 12px;background:#ffffff;border-radius:8px'>"+(S.gender==="female"?"👩":"👨")+" "+S.weight+"кг → "+S.targetWeight+"кг · "+S.dg.calories+" ккал"+(S.subGlData?" · "+S.subGlData.label:"")+". </div>";
     plan.days.forEach(function(day){
       html+="<div class='card' style='margin-bottom:10px'><div style='font-weight:700;font-size:14px;color:"+g.color+";margin-bottom:10px'>"+day.day+" · "+(day.cal||"")+" ккал</div>";
       var rows=[];
-      if(day.breakfast) rows.push(["🌅 Завтрак",day.breakfast]);
-      if(day.snack1) rows.push(["🥚 Перекус",day.snack1]);
-      if(day.lunch) rows.push(["🍽 Обед",day.lunch]);
-      if(day.snack2) rows.push(["🥛 Полдник",day.snack2]);
-      else if(day.snack&&!day.snack1) rows.push(["🍎 Перекус",day.snack]);
-      if(day.dinner) rows.push(["🌙 Ужин",day.dinner]);
+      if(day.breakfast) rows.push([t("ui26"),day.breakfast]);
+      if(day.snack1) rows.push([t("ui27"),day.snack1]);
+      if(day.lunch) rows.push([t("ui28"),day.lunch]);
+      if(day.snack2) rows.push([t("ui29"),day.snack2]);
+      else if(day.snack&&!day.snack1) rows.push([t("ui30"),day.snack]);
+      if(day.dinner) rows.push([t("ui31"),day.dinner]);
       rows.forEach(function(m,mi){
         html+="<div style='padding:7px 0;"+(mi<rows.length-1?"border-bottom:1px solid #f1f5f9":"")+"'><div style='font-size:11px;color:var(--ink3);font-weight:600;margin-bottom:2px'>"+m[0]+"</div><div style='font-size:13px;color:var(--ink)'>"+m[1]+"</div></div>";
       });
@@ -1924,7 +1954,7 @@ function renderBodyScreen(){
   html+="<div style='font-size:11px;color:var(--ink3);margin-bottom:4px'>Цель: "+tw+"кг при соблюдении плана</div>";
   html+="<div style='font-weight:700;font-size:16px;margin-bottom:4px'>через ~"+daysLeft+" дней ("+months+" мес)</div>";
   html+="<div style='display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-top:6px'>";
-  [["В день",Math.abs(optDiff)+" ккал","var(--blue)"],["В неделю",kgPerWeek+" кг","var(--c)"],["В месяц",kgPerMonth+" кг","var(--green-text)"]].forEach(function(s){
+  [[t("ui12"),Math.abs(optDiff)+" ккал","var(--blue)"],[t("ui13"),kgPerWeek+" кг","var(--c)"],[t("ui14"),kgPerMonth+" кг","var(--green-text)"]].forEach(function(s){
     html+="<div style='background:var(--surface2);border-radius:10px;padding:6px;text-align:center'>" +
       "<div style='font-size:10px;color:var(--ink3);margin-bottom:2px'>"+s[0]+"</div>" +
       "<div style='font-weight:700;font-size:12px;color:"+s[2]+"'>"+s[1]+"</div>" +
@@ -1945,7 +1975,7 @@ function renderBodyScreen(){
     html+="<div style='font-size:56px'>🪞</div>";
     html+="<div style='font-weight:700;font-size:18px;color:var(--ink)'>Загрузи фото тела</div>";
     html+="<div style='font-size:13px;color:var(--ink3);line-height:1.6'>AI определит % жира · уровень мышц 1-100<br/>тип телосложения · проблемные зоны · план</div>";
-    html+="<div style='padding:13px 28px;background:var(--green);color:#fff;border-radius:14px;font-size:15px;font-weight:700;box-shadow:0 4px 16px rgba(76,175,80,.28)'>"+(S_PREMIUM?"Выбрать фото":"🔒 Premium — 990₸/мес")+"</div>";
+    html+="<div style='padding:13px 28px;background:var(--green);color:#fff;border-radius:14px;font-size:15px;font-weight:700;box-shadow:0 4px 16px rgba(76,175,80,.28)'>"+(S_PREMIUM?t("ui15"):"🔒 Только в Nutrivo Pro")+"</div>";
     html+="</div>";
   } else {
     // Body Timeline fat trend chart (2+ photos)
@@ -2029,11 +2059,11 @@ function renderBodyScreen(){
         var f3=extractFat(an.projections.month3,Math.max(8,curFat-3));
         var f6=extractFat(an.projections.month6,Math.max(7,curFat-5));
         var f12=extractFat(an.projections.month12,Math.max(6,curFat-7));
-        var stages=[{lbl:"Сейчас",fat:curFat,txt:"Твоя точка старта",emoji:"📍",now:true},
-                    {lbl:"Через 1 мес",fat:f1,txt:an.projections.month1||"",emoji:"💪"},
-                    {lbl:"Через 3 мес",fat:f3,txt:an.projections.month3||"",emoji:"🔥"},
-                    {lbl:"Через 6 мес",fat:f6,txt:an.projections.month6||"",emoji:"⭐"},
-                    {lbl:"Через год",fat:f12,txt:an.projections.month12||"",emoji:"🏆"}];
+        var stages=[{lbl:t("ui19"),fat:curFat,txt:t("ui20"),emoji:"📍",now:true},
+                    {lbl:t("ui21"),fat:f1,txt:an.projections.month1||"",emoji:"💪"},
+                    {lbl:t("ui22"),fat:f3,txt:an.projections.month3||"",emoji:"🔥"},
+                    {lbl:t("ui23"),fat:f6,txt:an.projections.month6||"",emoji:"⭐"},
+                    {lbl:t("ui24"),fat:f12,txt:an.projections.month12||"",emoji:"🏆"}];
         html+="<div class='card' style='margin-bottom:12px;background:linear-gradient(135deg,#0f1a12,#1a2e1f);border:none;position:relative;overflow:hidden'>";
         html+="<div style='position:absolute;top:-40px;right:-40px;width:140px;height:140px;background:rgba(76,175,80,.15);border-radius:50%'></div>";
         html+="<div style='position:relative'>";
@@ -2065,7 +2095,7 @@ function renderBodyScreen(){
       // Confidence
       if(an.confidence){
         html+="<div style='font-size:11px;color:var(--ink3);text-align:center;margin-bottom:12px'>";
-        html+="Уверенность анализа: "+an.confidence+"% · Не является медицинским диагнозом</div>";
+        html+=""+t("ui25")+" "+an.confidence+"% · Не является медицинским диагнозом</div>";
       }
     }
 
@@ -2114,7 +2144,7 @@ function onBodyFile(e){
     var b=ev.target.result.split(",")[1];
     fetch("/api/claude",{method:"POST",headers:{"Content-Type":"application/json"},
       body:JSON.stringify({model:"claude-haiku-4-5",max_tokens:1500,
-        system:"Ты опытный фитнес-тренер и нутрициолог. Верни ТОЛЬКО валидный JSON без markdown.",
+        system:""+(S.lang==="kz"?"Все текстовые значения на казахском. ":S.lang==="en"?"All text values in English. ":"")+"Ты опытный фитнес-тренер и нутрициолог. Верни ТОЛЬКО валидный JSON без markdown.",
         messages:[{role:"user",content:[
           {type:"image",source:{type:"base64",media_type:f.type,data:b}},
           {type:"text",text:
@@ -2608,7 +2638,7 @@ function renderPlanDayCard(day,di,g){
   // Macro mini-bars
   if(p||f||c){
     html+="<div style='display:flex;gap:10px'>";
-    [["Белки",p,"var(--blue)","var(--blue-bg)"],["Жиры",f,"var(--amber)","var(--amber-bg)"],["Углеводы",c,"var(--purple)","var(--purple-bg)"]].forEach(function(m){
+    [[t("ui37"),p,"var(--blue)","var(--blue-bg)"],[t("ui38"),f,"var(--amber)","var(--amber-bg)"],[t("ui39"),c,"var(--purple)","var(--purple-bg)"]].forEach(function(m){
       html+="<div style='flex:1;background:"+m[3]+";border-radius:12px;padding:10px;text-align:center'>"+
         "<div class='stat-num' style='font-size:18px;font-weight:900;color:"+m[2]+"'>"+m[1]+"</div>"+
         "<div style='font-size:10px;color:var(--ink3);font-weight:600;margin-top:2px'>"+m[0]+" (г)</div></div>";
@@ -2625,12 +2655,12 @@ function renderPlanDayCard(day,di,g){
   }
   // Meals
   var rows=[];
-  if(day.breakfast) rows.push(["🌅","Завтрак",day.breakfast]);
-  if(day.snack1) rows.push(["🥚","Перекус",day.snack1]);
-  if(day.lunch) rows.push(["🍽","Обед",day.lunch]);
-  if(day.snack2) rows.push(["🥛","Полдник",day.snack2]);
-  else if(day.snack&&!day.snack1) rows.push(["🍎","Перекус",day.snack]);
-  if(day.dinner) rows.push(["🌙","Ужин",day.dinner]);
+  if(day.breakfast) rows.push(["🌅",t("ui32"),day.breakfast]);
+  if(day.snack1) rows.push(["🥚",t("ui33"),day.snack1]);
+  if(day.lunch) rows.push(["🍽",t("ui34"),day.lunch]);
+  if(day.snack2) rows.push(["🥛",t("ui35"),day.snack2]);
+  else if(day.snack&&!day.snack1) rows.push(["🍎",t("ui33"),day.snack]);
+  if(day.dinner) rows.push(["🌙",t("ui36"),day.dinner]);
   html+="<div style='font-size:11px;font-weight:700;letter-spacing:.06em;color:var(--ink3);text-transform:uppercase;margin-bottom:10px'>Приёмы пищи</div>";
   rows.forEach(function(m,mi){
     html+="<div class='card' style='margin-bottom:9px;padding:14px 16px;display:flex;gap:13px;align-items:center;animation:resultRise .35s "+(mi*0.05)+"s both'>";
@@ -2710,7 +2740,7 @@ var S_PREMIUM=(function(){
 // ═══════════════════════════════════════════════
 // ACCESS CONTROL — 3-day trial (photo only) → Pro
 // ═══════════════════════════════════════════════
-var TRIAL_DAYS=3;
+var TRIAL_DAYS=2;
 function trialStartDate(){
   try{
     var d=localStorage.getItem("nc_trial_start");
@@ -2829,9 +2859,9 @@ function activatePromo(code){
 // ═══════════════════════════════════════════════
 var _selectedPlan="year"; // year selected by default
 var PAYWALL_PLANS={
-  week:  {name:"Неделя",  price:990,   per:"неделя", display:"990 ₸",    sub:"Для знакомства"},
-  month: {name:"Месяц",   price:2490,  per:"месяц",  display:"2 490 ₸",  sub:"", badge:"⭐ Популярный"},
-  year:  {name:"Год",     price:15990, per:"год",    display:"15 990 ₸", sub:"≈1 332 ₸/мес"}
+  week:  {nameKey:"week",  price:990,   perKey:"pw_perweek", display:"990 ₸",    subKey:"pw_for"},
+  month: {nameKey:"month", price:2490,  perKey:"pw_permonth",display:"2 490 ₸",  subKey:"", badgeKey:"pw_popular"},
+  year:  {nameKey:"year",  price:15990, perKey:"pw_peryear", display:"15 990 ₸", subKey:"pw_permonth_price"}
 };
 function openPremiumPaywall(){
   var modal=document.getElementById("premium-paywall");
@@ -2876,11 +2906,11 @@ function renderPremiumPaywall(){
   var sav=paywallYearSavings();
   // features list
   var features=[
-    {ic:"📷",t:"Считай калории по фото за 5 секунд"},
-    {ic:"💪",t:"Анализ тела и прогноз твоей формы"},
-    {ic:"📅",t:"Персональный план питания под твою цель"},
-    {ic:"💬",t:"Личный коуч Nutrivo на связи 24/7"},
-    {ic:"♾️",t:"Без ограничений каждый день"}
+    {ic:"📷",t:t("pw_feat1")},
+    {ic:"💪",t:t("pw_feat2")},
+    {ic:"📅",t:t("pw_feat3")},
+    {ic:"💬",t:t("pw_feat4")},
+    {ic:"♾️",t:t("pw_feat5")}
   ];
   var featHtml="";
   features.forEach(function(f){
@@ -2895,8 +2925,8 @@ function renderPremiumPaywall(){
     var selected=_selectedPlan===id;
     var isYear=id==="year";
     var badge="";
-    if(isYear) badge="<div style='position:absolute;top:-11px;right:16px;background:linear-gradient(135deg,#43a047,#2e9e54);color:#fff;font-size:11px;font-weight:800;padding:4px 12px;border-radius:99px;letter-spacing:.02em;box-shadow:0 4px 12px rgba(76,175,80,.4)'>Экономия "+sav.pct+"%</div>";
-    else if(p.badge) badge="<div style='position:absolute;top:-11px;right:16px;background:linear-gradient(135deg,#f5a623,#f0930a);color:#fff;font-size:11px;font-weight:800;padding:4px 12px;border-radius:99px;letter-spacing:.02em;box-shadow:0 4px 12px rgba(245,166,35,.35)'>"+p.badge+"</div>";
+    if(isYear) badge="<div style='position:absolute;top:-11px;right:16px;background:linear-gradient(135deg,#43a047,#2e9e54);color:#fff;font-size:11px;font-weight:800;padding:4px 12px;border-radius:99px;letter-spacing:.02em;box-shadow:0 4px 12px rgba(76,175,80,.4)'>"+t("pw_save")+" "+sav.pct+"%</div>";
+    else if((p.badgeKey?t(p.badgeKey):"")) badge="<div style='position:absolute;top:-11px;right:16px;background:linear-gradient(135deg,#f5a623,#f0930a);color:#fff;font-size:11px;font-weight:800;padding:4px 12px;border-radius:99px;letter-spacing:.02em;box-shadow:0 4px 12px rgba(245,166,35,.35)'>"+(p.badgeKey?t(p.badgeKey):"")+"</div>";
     return "<div onclick='selectPlan(\""+id+"\")' style='position:relative;border:2px solid "+(selected?"var(--green)":"var(--line2)")+";border-radius:20px;padding:18px 20px;cursor:pointer;background:"+(selected?"var(--green-soft)":"var(--surface)")+";transition:all .25s cubic-bezier(.34,1.4,.5,1);transform:scale("+(selected?"1.02":"1")+");box-shadow:"+(selected?"0 8px 24px rgba(76,175,80,.18)":"var(--shadow)")+"' ontouchstart=''>"+
       badge+
       "<div style='display:flex;justify-content:space-between;align-items:center'>"+
@@ -2906,13 +2936,13 @@ function renderPremiumPaywall(){
             (selected?"<div style='width:13px;height:13px;border-radius:50%;background:var(--green)'></div>":"")+
           "</div>"+
           "<div>"+
-            "<div style='font-size:17px;font-weight:800;color:var(--ink)'>"+p.name+"</div>"+
-            (p.sub?"<div style='font-size:12px;color:"+(selected?"var(--green-text)":"var(--ink3)")+";font-weight:600'>"+p.sub+"</div>":"")+
+            "<div style='font-size:17px;font-weight:800;color:var(--ink)'>"+t(p.nameKey)+"</div>"+
+            ((p.subKey?t(p.subKey):"")?"<div style='font-size:12px;color:"+(selected?"var(--green-text)":"var(--ink3)")+";font-weight:600'>"+(p.subKey?t(p.subKey):"")+"</div>":"")+
           "</div>"+
         "</div>"+
         "<div style='text-align:right'>"+
           "<div style='font-size:19px;font-weight:800;color:var(--ink)'>"+p.display+"</div>"+
-          "<div style='font-size:11px;color:var(--ink3)'>/ "+p.per+"</div>"+
+          "<div style='font-size:11px;color:var(--ink3)'>/ "+t(p.perKey)+"</div>"+
         "</div>"+
       "</div>"+
     "</div>";
@@ -2929,9 +2959,9 @@ function renderPremiumPaywall(){
       "</div>"+
       // headline
       "<div style='text-align:center;margin-bottom:8px'>"+
-        "<div style='font-size:27px;font-weight:900;color:var(--ink);letter-spacing:-.03em;line-height:1.15'>Откройте весь<br/>потенциал Nutrivo</div>"+
+        "<div style='font-size:27px;font-weight:900;color:var(--ink);letter-spacing:-.03em;line-height:1.15'>"+t("pw_title1")+"<br/>"+t("pw_title2")+"</div>"+
       "</div>"+
-      "<div style='text-align:center;font-size:14px;color:var(--ink3);margin-bottom:28px;font-weight:500'>Всё для твоей цели — в одном приложении</div>"+
+      "<div style='text-align:center;font-size:14px;color:var(--ink3);margin-bottom:28px;font-weight:500'>"+t("pw_subtitle")+"</div>"+
       // features
       "<div style='margin-bottom:28px'>"+featHtml+"</div>"+
       // plans
@@ -2941,27 +2971,27 @@ function renderPremiumPaywall(){
         planCard("week")+
       "</div>"+
       // savings note (year only)
-      (_selectedPlan==="year"?"<div style='text-align:center;font-size:12px;color:var(--green-text);font-weight:700;margin-bottom:16px'>Вместо "+sav.full.toLocaleString('ru')+" \u20b8 \u00b7 \u044d\u043a\u043e\u043d\u043e\u043c\u0438\u044f "+sav.saved.toLocaleString('ru')+" \u20b8</div>":"")+
+      (_selectedPlan==="year"?"<div style='text-align:center;font-size:12px;color:var(--green-text);font-weight:700;margin-bottom:16px'>"+t("pw_instead")+" "+sav.full.toLocaleString('ru')+" \u20b8 \u00b7 "+t("pw_economy")+" "+sav.saved.toLocaleString('ru')+" \u20b8</div>":"")+
       // CTA primary (trial)
-      "<button onclick='paywallStartTrial()' style='width:100%;padding:19px;border-radius:20px;border:none;background:linear-gradient(135deg,#4CAF50,#2e9e54);color:#fff;font-size:18px;font-weight:800;cursor:pointer;font-family:inherit;box-shadow:0 10px 30px rgba(76,175,80,.4);margin-bottom:10px;letter-spacing:-.01em' ontouchstart=''>Попробовать бесплатно 3 дня</button>"+
+      "<button onclick='paywallStartTrial()' style='width:100%;padding:19px;border-radius:20px;border:none;background:linear-gradient(135deg,#4CAF50,#2e9e54);color:#fff;font-size:18px;font-weight:800;cursor:pointer;font-family:inherit;box-shadow:0 10px 30px rgba(76,175,80,.4);margin-bottom:10px;letter-spacing:-.01em' ontouchstart=''>"+t("pw_trial_btn")+"</button>"+
       // what happens after trial (auto-renew transparency)
-      "<div style='text-align:center;font-size:12px;color:var(--ink3);margin-bottom:14px;line-height:1.5'>Далее "+PAYWALL_PLANS[_selectedPlan].display+" / "+PAYWALL_PLANS[_selectedPlan].per+". Спишется автоматически после 3 дней</div>"+
+      "<div style='text-align:center;font-size:12px;color:var(--ink3);margin-bottom:14px;line-height:1.5'>"+t("pw_next")+" "+PAYWALL_PLANS[_selectedPlan].display+" / "+t(PAYWALL_PLANS[_selectedPlan].perKey)+". "+t("pw_autocharge")+"</div>"+
       // secondary: buy now without trial
-      "<button onclick='paywallBuyNow()' style='width:100%;padding:15px;border-radius:16px;border:1.5px solid var(--green-mid);background:var(--surface);color:var(--green-text);font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;margin-bottom:20px' ontouchstart=''>Оформить сразу без пробного периода</button>"+
+      "<button onclick='paywallBuyNow()' style='width:100%;padding:15px;border-radius:16px;border:1.5px solid var(--green-mid);background:var(--surface);color:var(--green-text);font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;margin-bottom:20px' ontouchstart=''>"+t("pw_buynow")+"</button>"+
       // reassurance
       "<div style='text-align:center;margin-bottom:24px'>"+
         "<div style='font-size:12px;color:var(--ink2);line-height:1.8;font-weight:500'>"+
-          "✓ Сегодня списаний не будет<br/>"+
-          "✓ Отмена в любой момент до конца пробного периода"+
+          "✓ "+t("pw_reassure1")+"<br/>"+
+          "✓ "+t("pw_reassure2")+
         "</div>"+
       "</div>"+
       // footer links
       "<div style='margin-top:auto;text-align:center;line-height:2.2'>"+
-        "<span onclick='paywallRestore()' style='font-size:12px;color:var(--ink3);font-weight:600;cursor:pointer;text-decoration:underline'>Восстановить покупки</span>"+
+        "<span onclick='paywallRestore()' style='font-size:12px;color:var(--ink3);font-weight:600;cursor:pointer;text-decoration:underline'>"+t("pw_restore")+"</span>"+
         "<div style='font-size:11px;color:var(--ink4);margin-top:6px'>"+
-          "<span onclick='paywallLink(\"privacy\")' style='cursor:pointer'>Конфиденциальность</span> · "+
-          "<span onclick='paywallLink(\"terms\")' style='cursor:pointer'>Условия</span> · "+
-          "<span onclick='paywallLink(\"support\")' style='cursor:pointer'>Поддержка</span>"+
+          "<span onclick='paywallLink(\"privacy\")' style='cursor:pointer'>"+t("pw_privacy")+"</span> · "+
+          "<span onclick='paywallLink(\"terms\")' style='cursor:pointer'>"+t("pw_terms")+"</span> · "+
+          "<span onclick='paywallLink(\"support\")' style='cursor:pointer'>"+t("pw_support")+"</span>"+
         "</div>"+
       "</div>"+
     "</div>";
@@ -2971,14 +3001,14 @@ function paywallStartTrial(){
   // In App Store build, this triggers StoreKit purchase sheet.
   // For now: activate trial + show confirmation, then enter app.
   var p=PAYWALL_PLANS[_selectedPlan];
-  try{showToast("✨ Пробный период активирован! 3 дня бесплатно");}catch(e){}
+  try{showToast("✨ "+t("pw_trialon"));}catch(e){}
   closePremiumPaywall();
 }
 function paywallBuyNow(){
   // Buy immediately without trial. In App Store build → StoreKit purchase (no intro offer).
   try{if(navigator.vibrate)navigator.vibrate([10,30,15]);}catch(e){}
   var p=PAYWALL_PLANS[_selectedPlan];
-  try{showToast("Открываю оплату "+p.name+"...");}catch(e){}
+  try{showToast(t(p.nameKey)+"...");}catch(e){}
   closePremiumPaywall();
 }
 function paywallMaybeLater(){
@@ -2986,7 +3016,7 @@ function paywallMaybeLater(){
   closePremiumPaywall();
 }
 function paywallRestore(){
-  try{showToast("Восстановление покупок...");}catch(e){}
+  try{showToast(t("pw_restore")+"...");}catch(e){}
   // App Store: SKPaymentQueue.restoreCompletedTransactions()
 }
 function paywallLink(type){
@@ -2999,61 +3029,10 @@ function paywallLink(type){
 }
 
 function showPaywall(feature){
-  var modal=document.getElementById("paywall-modal");
-  if(!modal) return;
-  modal.style.display="flex";
-  var level=accessLevel();
-  var daysLeft=trialDaysLeft();
-  // feature display names
-  var fnames={photo:"Анализ еды",fridge:"AI Холодильник",body:"Анализ тела",plan:"План питания",cook:"Идеи блюд",chat:"AI Коуч"};
-  var fname=fnames[feature]||"Эта функция";
-  // dynamic subtitle
-  var subtitle;
-  if(level==="trial"){
-    subtitle="«"+fname+"» доступна в Pro · Пробный период ещё "+daysLeft+" "+(daysLeft===1?"день":"дн.");
-  } else {
-    subtitle="Пробный период закончился · Оформи Pro чтобы продолжить";
-  }
-  document.getElementById("paywall-sheet").innerHTML=
-    "<div style='width:40px;height:5px;background:var(--line2);border-radius:99px;margin:0 auto 20px'></div>"+
-    "<div style='text-align:center;margin-bottom:22px'>"+
-      "<div style='width:72px;height:72px;margin:0 auto 14px;background:linear-gradient(135deg,#ffd76a,#f5a623);border-radius:22px;display:flex;align-items:center;justify-content:center;font-size:38px;box-shadow:0 8px 24px rgba(245,166,35,.35)'>👑</div>"+
-      "<div style='font-size:23px;font-weight:800;color:var(--ink);letter-spacing:-.02em;margin-bottom:7px'>Nutrivo Pro</div>"+
-      "<div style='font-size:13px;color:var(--ink3);padding:0 10px;line-height:1.5'>"+subtitle+"</div>"+
-    "</div>"+
-    // Benefits
-    "<div style='background:var(--surface2);border:1px solid var(--line);border-radius:18px;padding:18px;margin-bottom:18px'>"+
-      "<div style='font-size:11px;color:var(--green-text);font-weight:700;margin-bottom:14px;letter-spacing:.04em'>ЧТО ВХОДИТ В PRO</div>"+
-      "<div style='font-size:13px;color:var(--ink);line-height:2.3;font-weight:500'>"+
-        "📷 Анализ еды — 30 в день<br/>"+
-        "🧊 AI Холодильник — что приготовить из продуктов<br/>"+
-        "📅 Персональный план питания<br/>"+
-        "💪 Анализ тела и прогноз формы<br/>"+
-        "🤖 AI Коуч 24/7<br/>"+
-        "🍳 Безлимит идей блюд"+
-      "</div>"+
-    "</div>"+
-    // Three plans
-    "<div style='display:flex;flex-direction:column;gap:10px;margin-bottom:16px'>"+
-      planRow("week","Неделя","990₸","","")+
-      planRow("year","Год","11990₸","999₸/мес","-60% · Популярный")+
-      planRow("month","Месяц","2490₸","","")+
-    "</div>"+
-    "<div style='font-size:11px;color:var(--ink4);text-align:center;line-height:1.5;margin-bottom:14px'>Подписка продлевается автоматически. Отменить можно в настройках App Store в любой момент.</div>"+
-    // Promo code (keep for manual Kaspi flow)
-    "<input id='promo-input' style='width:100%;padding:14px 18px;border:2px solid var(--line2);border-radius:14px;background:var(--surface2);font-size:14px;font-family:inherit;color:var(--ink);outline:none;text-align:center;text-transform:uppercase;letter-spacing:2px' placeholder='Есть промокод?'/>"+
-    "<div id='promo-msg' style='text-align:center;font-size:12px;margin-top:8px;min-height:18px'></div>"+
-    "<button onclick='submitPromo()' style='display:block;width:100%;padding:15px;border-radius:16px;border:none;background:var(--green);color:#fff;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;margin-top:8px;box-shadow:0 4px 16px rgba(76,175,80,.28)' ontouchstart=''>Активировать промокод</button>"+
-    "<button onclick='closeModal(\"paywall-modal\")' style='display:block;width:100%;padding:13px;border:none;background:none;color:var(--ink3);font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;margin-top:4px' ontouchstart=''>"+(level==="expired"?"Закрыть":"Может позже")+"</button>";
+  // Redirect to the new premium full-screen paywall (single source of truth)
+  try{openPremiumPaywall();}catch(e){}
 }
-function planRow(id,name,price,permonth,badge){
-  var isHot=!!badge;
-  return "<div style='position:relative;border:"+(isHot?"2px solid var(--green)":"1.5px solid var(--line2)")+";border-radius:16px;padding:16px 18px;display:flex;justify-content:space-between;align-items:center;background:"+(isHot?"var(--green-soft)":"var(--surface)")+"'>"+
-    (badge?"<div style='position:absolute;top:-10px;left:18px;background:var(--green);color:#fff;font-size:10px;font-weight:800;padding:3px 10px;border-radius:99px;letter-spacing:.03em'>"+badge+"</div>":"")+
-    "<div><div style='font-size:16px;font-weight:800;color:var(--ink)'>"+name+"</div>"+(permonth?"<div style='font-size:12px;color:var(--green-text);font-weight:600'>"+permonth+"</div>":"")+"</div>"+
-    "<div style='font-size:18px;font-weight:800;color:var(--ink)'>"+price+"</div>"+
-  "</div>";
-}
+
 
 function submitPromo(){
   var inp=document.getElementById("promo-input");
@@ -3134,7 +3113,7 @@ function renderPremiumBanner(){
       "<div style='flex:1'>"+
         "<div style='font-size:13px;font-weight:700;color:var(--green-text);margin-bottom:5px'>🎁 Бесплатный доступ</div>"+
         "<div style='display:flex;align-items:center;gap:5px;margin-bottom:4px'>"+dots+"<span style='font-size:11px;color:var(--ink3);margin-left:4px'>"+(left>0?left+" из 3 анализов":"анализы закончились")+"</span></div>"+
-        "<div style='font-size:11px;color:var(--ink3)'>Безлимит — 990₸/мес</div>"+
+        "<div style='font-size:11px;color:var(--ink3)'>Входит в Nutrivo Pro</div>"+
       "</div>"+
       "<button onclick='showPaywall&&showPaywall()' style='padding:10px 16px;font-size:13px;font-weight:700;border-radius:12px;background:var(--green);color:#fff;border:none;cursor:pointer;font-family:inherit;white-space:nowrap;flex-shrink:0'>Открыть</button>"+
     "</div></div>";
@@ -3145,61 +3124,139 @@ function renderPremiumBanner(){
 // ═══════════════════════════════════════════════════════════════
 var LANG={
   ru:{
+    ch_hi:"Привет, ",
+    
+    ch0:"Я голоден 🍽",ch1:"Я сыт ✅",ch2:"Что съесть на ужин?",ch3:"Хочу перекус",ch4:"Сколько мне осталось?",ch5:"Что съесть?",ch6:"Мой остаток?",ch7:"друг",ch8:"! 👋 Я твой личный тренер. Напиши как ты себя чувствуешь или что ел сегодня. Или выбери «",ch9:"». Спрашивай что угодно про питание!",ch10:"Напиши мне — подскажу что съесть 💬",ch11:"Понял тебя! Расскажи подробнее?",ch12:"Извини, не смог ответить сейчас 😅 Попробуй ещё раз через секунду.",ch13:"Коуч",ch14:"AI-тренер · всегда онлайн",ch15:"Напиши тренеру...",ch16:"Я AI-тренер Nutrivo и помогаю только с питанием 🥗",
+    
+    ui0:"Фото",ui1:"Холодильник",ui2:"Штрихкод",ui3:"Текст",ui4:"Ошибка анализа. Попробуй снова или опиши текстом.",ui5:"🧠 Составляю рекомендацию...",ui6:"Хороший приём!",ui7:"Следующий через 3-4ч",ui8:"Записано. Продолжай следить за рационом.",ui9:"Следующий приём через 3-4 часа.",ui10:"15 мин",ui11:"Осталось на сегодня:",ui12:"В день",ui13:"В неделю",ui14:"В месяц",ui15:"Выбрать фото",ui16:"Мышцы",ui17:"Тип",ui18:"Рейтинг",ui19:"Сейчас",ui20:"Твоя точка старта",ui21:"Через 1 мес",ui22:"Через 3 мес",ui23:"Через 6 мес",ui24:"Через год",ui25:"Уверенность анализа:",ui26:"🌅 Завтрак",ui27:"🥚 Перекус",ui28:"🍽 Обед",ui29:"🥛 Полдник",ui30:"🍎 Перекус",ui31:"🌙 Ужин",ui32:"Завтрак",ui33:"Перекус",ui34:"Обед",ui35:"Полдник",ui36:"Ужин",ui37:"Белки",ui38:"Жиры",ui39:"Углеводы",ui40:"Неверный формат ответа",ui41:"Дни не найдены",ui42:"Сфотографировать",ui43:"Распознаю по фото",ui44:"Выбрать из истории",ui45:"Частые блюда",ui46:"Ввести текстом",ui47:"Опиши что съел",ui48:"Сканировать штрихкод",ui49:"Готовый продукт",ui50:"Спросить AI",ui51:"Совет по приёму",
+    
+    week:"Неделя",month:"Месяц",year:"Год",pw_permonth_price:"≈1 332 ₸/мес",
+    
+    pw_feat1:"Считай калории по фото за 5 секунд",pw_feat2:"Анализ тела и прогноз твоей формы",pw_feat3:"Персональный план питания под твою цель",pw_feat4:"Личный коуч Nutrivo на связи 24/7",pw_feat5:"Без ограничений каждый день",pw_save:"Экономия",pw_title1:"Откройте весь",pw_title2:"потенциал Nutrivo",pw_subtitle:"Всё для твоей цели — в одном приложении",pw_instead:"Вместо",pw_economy:"экономия",pw_trial_btn:"Попробовать бесплатно 2 дня",pw_next:"Далее",pw_autocharge:"Спишется автоматически после 2 дней",pw_buynow:"Оформить сразу без пробного периода",pw_reassure1:"Сегодня списаний не будет",pw_reassure2:"Отмена в любой момент до конца пробного периода",pw_restore:"Восстановить покупки",pw_privacy:"Конфиденциальность",pw_terms:"Условия",pw_support:"Поддержка",pw_maybe:"Может позже",pw_for:"Для знакомства",pw_popular:"Популярный",pw_perweek:"неделя",pw_permonth:"месяц",pw_peryear:"год",pw_whatin:"ЧТО ВХОДИТ В PRO",pw_trialon:"Пробный период активирован! 2 дня бесплатно",
+    
+    greet_night:"Доброй ночи",greet_morning:"Доброе утро",greet_day:"Добрый день",greet_evening:"Добрый вечер",sub0:"Сегодня отличный день",sub1:"Маленькие шаги — большие результаты",sub2:"Ты на верном пути",sub3:"Каждый приём пищи имеет значение",sub4:"Продолжай в том же духе",m_breakfast:"Завтрак",m_lunch:"Обед",m_snack:"Перекус",m_dinner:"Ужин",water100:"Цель выполнена! Отличная работа 🎉",water75:"Почти у цели — организм скажет спасибо",water50:"Отличный темп, продолжай",water25:"Хорошее начало дня",water1:"Первый глоток сделан 💧",water0:"Начни день со стакана воды",xp_today:"XP сегодня",xp_to_lvl:"до ур.",days1:"день",days2:"дня",days5:"дней",goal_label:"Цель",left_label:"Остаток",of:"из",tapPlus:"Нажми +",
+    
+    ob100:"Привет!",ob101:"Сегодня отличный день",ob102:"ККАЛ",ob103:"Приёмы пищи",ob104:"Анализ питания",ob105:"Фото, штрихкод или текст — AI посчитает КБЖУ",ob106:"Твоё питание за неделю",ob107:"Коуч",ob108:"AI-тренер · всегда онлайн",ob109:"Готовим твой план",ob110:"AI рассчитывает персональную программу",ob111:"Скан еды",ob112:"Холодильник",ob113:"Что приготовить",ob114:"Добавить воду",ob115:"Тренировка",ob116:"Скан тела",ob117:"Спросить Коуча",
+    
+    ob0:"Добро пожаловать в Nutrivo",ob1:"AI поможет считать калории, анализировать питание и отслеживать прогресс",ob2:"Анализ еды по фото за 5 секунд",ob3:"Персональный план питания",ob4:"Body Twin — AI оценка тела",ob5:"Начать",ob6:"Как вас зовут?",ob7:"Мы будем обращаться к вам по имени",ob8:"Ваш пол",ob9:"Влияет на расчёт нормы",ob10:"Мужской",ob11:"Женский",ob12:"Предпочитаю не указывать",ob13:"Ваш возраст",ob14:"Введите или выберите ползунком",ob15:"лет",ob16:"Ваш рост",ob17:"Сдвиньте ползунок",ob18:"см",ob19:"Текущий вес",ob20:"Ваш вес прямо сейчас",ob21:"кг",ob22:"Желаемый вес",ob23:"К какому весу хотите прийти?",ob24:"Ваша цель",ob25:"Выберите главную задачу",ob26:"Похудеть",ob27:"Снизить вес, улучшить форму",ob28:"Сушка",ob29:"Сжечь жир, сохранить мышцы",ob30:"Поддерживать вес",ob31:"Держать текущую форму",ob32:"Набрать массу",ob33:"Рост мышц и силы",ob34:"Улучшить здоровье",ob35:"Правильное питание",ob36:"Больше белка",ob37:"Для роста и восстановления",ob38:"Интенсивность",ob39:"Выберите темп",ob40:"Уровень активности",ob41:"Сколько вы двигаетесь?",ob42:"Практически нет активности",ob43:"Лёгкая (1–2 тренировки)",ob44:"Средняя (3–4)",ob45:"Высокая (5+)",ob46:"Профессиональный спорт",ob47:"Сколько воды пьёте?",ob48:"В среднем за день",ob49:"литра в день",ob50:"Особенности питания",ob51:"Можно выбрать несколько",ob52:"🙅 Нет ограничений",ob53:"🥦 Вегетарианство",ob54:"🌱 Веганство",ob55:"🌙 Халяль",ob56:"🥛 Безлактозное",ob57:"🌾 Безглютеновое",ob58:"🥩 Низкоуглеводное",ob59:"Аллергии",ob60:"Отметьте если есть",ob61:"✅ Нет",ob62:"🥜 Орехи",ob63:"🧀 Молочные",ob64:"🥚 Яйца",ob65:"🐟 Рыба",ob66:"🦐 Морепродукты",ob67:"🫘 Соя",ob68:"Состояние здоровья",ob69:"Учтём в рекомендациях",ob70:"🩸 Диабет",ob71:"💊 Давление",ob72:"🫀 ЖКТ",ob73:"🦋 Щитовидная",ob74:"🫘 Почки",ob75:"Приёмов пищи в день",ob76:"Ваш привычный режим",ob77:"Любимая кухня",ob78:"Выберите несколько",ob79:"🇰🇿 Казахская",ob80:"🇪🇺 Европейская",ob81:"🍜 Азиатская",ob82:"🍔 Фастфуд",ob83:"🏠 Домашняя",ob84:"🥩 Мясные",ob85:"🍰 Десерты",ob86:"Постоянная поддержка работает",ob87:"Nutrivo всегда рядом, чтобы вести тебя к цели",ob88:"Без Nutrivo",ob89:"С Nutrivo",ob90:"Люди, которые следят за питанием с поддержкой AI-тренера, достигают цели заметно стабильнее 💪",ob91:"AI рассчитывает рекомендации…",ob92:"Анализируем ваши данные",ob93:"Готово!",ob94:"Ваша дневная норма",ob95:"ккал в день",ob96:"Белки",ob97:"Жиры",ob98:"Углеводы",ob99:"Далее",
+    
     main:"Главная",history:"История",food:"Еда",plan:"План",body:"Тело",
     calories:"ккал",protein:"Белок",fat:"Жиры",carbs:"Углеводы",water:"Вода",
     goal:"Цель",remaining:"Остаток",today:"Сегодня",meals:"приёмов",
     mission:"МИССИЯ ДНЯ",done:"Выполнил",level:"Level",streak:"Streak",
     analyze:"Анализировать",photo:"Фото",text:"Текст",barcode:"Штрихкод",favs:"Избранное",
-    bodyTwin:"BODY TWIN — AI АНАЛИЗ ТЕЛА",scenarios:"ДВА СЦЕНАРИЯ — 30 ДНЕЙ",
-    noPlan:"БЕЗ ПЛАНА",withPlan:"ПО ПЛАНУ",
-    save:"Сохранить",add:"Добавить",back:"↩ Назад",
+    save:"Сохранить",add:"Добавить",back:"↩ Назад",close:"Закрыть",
     premium:"Премиум",free:"Бесплатно",activate:"Активировать",
-    hello:"Привет",drink:"Пей больше воды"
+    mealsTitle:"Приёмы пищи",breakfast:"Завтрак",lunch:"Обед",snack:"Перекус",dinner:"Ужин",
+    tapAdd:"Нажми +",water_unit:"мл",
+    langSub:"Тілді таңдаңыз · Выберите язык · Choose language"
   },
   kz:{
+    ch_hi:"Сәлем, ",
+    
+    ch0:"Қарным аш 🍽",ch1:"Тойдым ✅",ch2:"Кешкі асқа не жесем?",ch3:"Жеңіл ас қалаймын",ch4:"Маған қанша қалды?",ch5:"Не жесем?",ch6:"Менің қалдығым?",ch7:"дос",ch8:"! 👋 Мен сенің жеке жаттықтырушыңмын. Өзіңді қалай сезінетініңді немесе бүгін не жегеніңді жаз. Немесе «",ch9:"». Тамақтану туралы кез келген нәрсені сұра!",ch10:"Маған жаз — не жейтініңді айтамын 💬",ch11:"Түсіндім! Толығырақ айтшы?",ch12:"Кешір, қазір жауап бере алмадым 😅 Бір секундтан кейін қайталап көр.",ch13:"Коуч",ch14:"Жаттықтырушы · әрқашан онлайн",ch15:"Жаттықтырушыға жаз...",ch16:"Мен Nutrivo жаттықтырушысымын және тек тамақтануға көмектесемін 🥗",
+    
+    ui0:"Фото",ui1:"Тоңазытқыш",ui2:"Штрихкод",ui3:"Мәтін",ui4:"Талдау қатесі. Қайталап көріңіз немесе мәтінмен сипаттаңыз.",ui5:"🧠 Ұсыныс дайындалуда...",ui6:"Жақсы тамақ!",ui7:"Келесісі 3-4 сағаттан кейін",ui8:"Жазылды. Рационды бақылауды жалғастыр.",ui9:"Келесі тамақ 3-4 сағаттан кейін.",ui10:"15 мин",ui11:"Бүгінге қалды:",ui12:"Күніне",ui13:"Аптасына",ui14:"Айына",ui15:"Фото таңдау",ui16:"Бұлшықет",ui17:"Түрі",ui18:"Рейтинг",ui19:"Қазір",ui20:"Бастау нүктең",ui21:"1 айдан кейін",ui22:"3 айдан кейін",ui23:"6 айдан кейін",ui24:"Жылдан кейін",ui25:"Талдау сенімділігі:",ui26:"🌅 Таңғы ас",ui27:"🥚 Жеңіл ас",ui28:"🍽 Түскі ас",ui29:"🥛 Бесін ас",ui30:"🍎 Жеңіл ас",ui31:"🌙 Кешкі ас",ui32:"Таңғы ас",ui33:"Жеңіл ас",ui34:"Түскі ас",ui35:"Бесін ас",ui36:"Кешкі ас",ui37:"Ақуыз",ui38:"Майлар",ui39:"Көмірсулар",ui40:"Жауап форматы қате",ui41:"Күндер табылмады",ui42:"Суретке түсіру",ui43:"Фото бойынша танимын",ui44:"Тарихтан таңдау",ui45:"Жиі тағамдар",ui46:"Мәтінмен енгізу",ui47:"Не жегеніңді сипатта",ui48:"Штрихкод сканерлеу",ui49:"Дайын өнім",ui50:"Коучтан сұрау",ui51:"Тамақ бойынша кеңес",
+    
+    week:"Апта",month:"Ай",year:"Жыл",pw_permonth_price:"≈1 332 ₸/ай",
+    
+    pw_feat1:"Тамақты фото бойынша 5 секундта сана",pw_feat2:"Дене талдауы және форма болжамы",pw_feat3:"Мақсатыңа сай жеке тамақтану жоспары",pw_feat4:"Жеке коуч Nutrivo 24/7 байланыста",pw_feat5:"Күн сайын шектеусіз",pw_save:"Үнем",pw_title1:"Nutrivo-ның толық",pw_title2:"мүмкіндігін аш",pw_subtitle:"Мақсатың үшін бәрі — бір қолданбада",pw_instead:"Орнына",pw_economy:"үнем",pw_trial_btn:"2 күн тегін көру",pw_next:"Әрі қарай",pw_autocharge:"2 күннен кейін автоматты түрде есептеледі",pw_buynow:"Сынақ кезеңінсіз бірден рәсімдеу",pw_reassure1:"Бүгін ақша алынбайды",pw_reassure2:"Сынақ кезеңі біткенше кез келген уақытта бас тарту",pw_restore:"Сатып алуларды қалпына келтіру",pw_privacy:"Құпиялылық",pw_terms:"Шарттар",pw_support:"Қолдау",pw_maybe:"Кейінірек",pw_for:"Танысу үшін",pw_popular:"Танымал",pw_perweek:"апта",pw_permonth:"ай",pw_peryear:"жыл",pw_whatin:"PRO-ҒА НЕ КІРЕДІ",pw_trialon:"Сынақ кезеңі белсендірілді! 2 күн тегін",
+    
+    greet_night:"Қайырлы түн",greet_morning:"Қайырлы таң",greet_day:"Қайырлы күн",greet_evening:"Қайырлы кеш",sub0:"Бүгін тамаша күн",sub1:"Кішкентай қадамдар — үлкен нәтиже",sub2:"Дұрыс жолдасың",sub3:"Әр тамақтың мәні бар",sub4:"Осылай жалғастыр",m_breakfast:"Таңғы ас",m_lunch:"Түскі ас",m_snack:"Жеңіл ас",m_dinner:"Кешкі ас",water100:"Мақсат орындалды! Тамаша 🎉",water75:"Мақсатқа жақын — ағзаң алғыс айтады",water50:"Тамаша қарқын, жалғастыр",water25:"Күннің жақсы басталуы",water1:"Алғашқы жұтым жасалды 💧",water0:"Күнді бір стақан судан баста",xp_today:"XP бүгін",xp_to_lvl:"дейін",days1:"күн",days2:"күн",days5:"күн",goal_label:"Мақсат",left_label:"Қалдық",of:"/",tapPlus:"Бас +",
+    
+    ob100:"Сәлем!",ob101:"Бүгін тамаша күн",ob102:"ККАЛ",ob103:"Тамақтану",ob104:"Тамақтануды талдау",ob105:"Фото, штрихкод немесе мәтін — КБЖУ есептеледі",ob106:"Аптадағы тамақтануың",ob107:"Коуч",ob108:"Жаттықтырушы · әрқашан онлайн",ob109:"Жоспарың дайындалуда",ob110:"Жеке бағдарлама есептелуде",ob111:"Тамақ сканері",ob112:"Тоңазытқыш",ob113:"Не дайындау",ob114:"Су қосу",ob115:"Жаттығу",ob116:"Дене сканері",ob117:"Коучтан сұрау",
+    
+    ob0:"Nutrivo-ге қош келдіңіз",ob1:"Калория санауға, тамақтануды талдауға және прогресті бақылауға көмектеседі",ob2:"Тамақты фото бойынша 5 секундта талдау",ob3:"Жеке тамақтану жоспары",ob4:"Дене талдауы",ob5:"Бастау",ob6:"Атыңыз кім?",ob7:"Сізге атыңызбен жүгінеміз",ob8:"Жынысыңыз",ob9:"Норманы есептеуге әсер етеді",ob10:"Ер",ob11:"Әйел",ob12:"Көрсеткім келмейді",ob13:"Жасыңыз",ob14:"Енгізіңіз немесе жүгірткімен таңдаңыз",ob15:"жас",ob16:"Бойыңыз",ob17:"Жүгірткіні жылжытыңыз",ob18:"см",ob19:"Қазіргі салмақ",ob20:"Дәл қазіргі салмағыңыз",ob21:"кг",ob22:"Қалаған салмақ",ob23:"Қандай салмаққа жеткіңіз келеді?",ob24:"Мақсатыңыз",ob25:"Негізгі мақсатты таңдаңыз",ob26:"Арықтау",ob27:"Салмақ азайту, форманы жақсарту",ob28:"Кептіру",ob29:"Майды жағу, бұлшықетті сақтау",ob30:"Салмақты сақтау",ob31:"Қазіргі форманы ұстау",ob32:"Салмақ қосу",ob33:"Бұлшықет пен күш өсімі",ob34:"Денсаулықты жақсарту",ob35:"Дұрыс тамақтану",ob36:"Көбірек ақуыз",ob37:"Өсу мен қалпына келу үшін",ob38:"Қарқындылық",ob39:"Қарқынды таңдаңыз",ob40:"Белсенділік деңгейі",ob41:"Қаншалықты қозғаласыз?",ob42:"Белсенділік жоқтың қасы",ob43:"Жеңіл (1–2 жаттығу)",ob44:"Орташа (3–4)",ob45:"Жоғары (5+)",ob46:"Кәсіби спорт",ob47:"Қанша су ішесіз?",ob48:"Орташа күніне",ob49:"литр күніне",ob50:"Тамақтану ерекшеліктері",ob51:"Бірнешеуін таңдауға болады",ob52:"🙅 Шектеу жоқ",ob53:"🥦 Вегетариандық",ob54:"🌱 Вегандық",ob55:"🌙 Халал",ob56:"🥛 Лактозасыз",ob57:"🌾 Глютенсіз",ob58:"🥩 Көмірсуы аз",ob59:"Аллергиялар",ob60:"Болса белгілеңіз",ob61:"✅ Жоқ",ob62:"🥜 Жаңғақтар",ob63:"🧀 Сүт өнімдері",ob64:"🥚 Жұмыртқа",ob65:"🐟 Балық",ob66:"🦐 Теңіз өнімдері",ob67:"🫘 Соя",ob68:"Денсаулық жағдайы",ob69:"Ұсыныстарда ескереміз",ob70:"🩸 Қант диабеті",ob71:"💊 Қан қысымы",ob72:"🫀 Ас қорыту",ob73:"🦋 Қалқанша без",ob74:"🫘 Бүйрек",ob75:"Күніне тамақтану саны",ob76:"Әдеттегі режиміңіз",ob77:"Сүйікті асхана",ob78:"Бірнешеуін таңдаңыз",ob79:"🇰🇿 Қазақ",ob80:"🇪🇺 Еуропалық",ob81:"🍜 Азиялық",ob82:"🍔 Фастфуд",ob83:"🏠 Үй тағамы",ob84:"🥩 Ет тағамдары",ob85:"🍰 Десерттер",ob86:"Тұрақты қолдау жұмыс істейді",ob87:"Nutrivo мақсатыңа жетелеу үшін әрқашан қасыңда",ob88:"Nutrivo-сыз",ob89:"Nutrivo-мен",ob90:"Тамақтануын қолдаумен бақылайтын адамдар мақсатына әлдеқайда тұрақты жетеді 💪",ob91:"Ұсыныстар есептелуде…",ob92:"Деректеріңізді талдап жатырмыз",ob93:"Дайын!",ob94:"Күндік нормаңыз",ob95:"ккал күніне",ob96:"Ақуыз",ob97:"Майлар",ob98:"Көмірсулар",ob99:"Әрі қарай",
+    
     main:"Басты",history:"Тарих",food:"Тамақ",plan:"Жоспар",body:"Дене",
     calories:"ккал",protein:"Белок",fat:"Майлар",carbs:"Көмірсулар",water:"Су",
     goal:"Мақсат",remaining:"Қалдық",today:"Бүгін",meals:"тамақ",
-    mission:"КҮНДІК ТАПСЫРМА",done:"Орындадым",level:"Деңгей",streak:"Жолақ",
+    mission:"КҮНДІК ТАПСЫРМА",done:"Орындадым",level:"Деңгей",streak:"Серия",
     analyze:"Талдау",photo:"Фото",text:"Мәтін",barcode:"Штрихкод",favs:"Таңдаулы",
-    bodyTwin:"ДЕНЕ ТАЛДАУЫ — AI",scenarios:"ЕКІ СЦЕНАРИЙ — 30 КҮН",
-    noPlan:"ЖОСПАРСЫЗ",withPlan:"ЖОСПАР БОЙЫНША",
-    save:"Сақтау",add:"Қосу",back:"↩ Артқа",
+    save:"Сақтау",add:"Қосу",back:"↩ Артқа",close:"Жабу",
     premium:"Премиум",free:"Тегін",activate:"Белсендіру",
-    hello:"Сәлем",drink:"Көбірек су іш"
+    mealsTitle:"Тамақтану",breakfast:"Таңғы ас",lunch:"Түскі ас",snack:"Жеңіл ас",dinner:"Кешкі ас",
+    tapAdd:"Бас +",water_unit:"мл",
+    langSub:"Тілді таңдаңыз · Выберите язык · Choose language"
+  },
+  en:{
+    ch_hi:"Hi, ",
+    
+    ch0:"I'm hungry 🍽",ch1:"I'm full ✅",ch2:"What to eat for dinner?",ch3:"I want a snack",ch4:"How much do I have left?",ch5:"What to eat?",ch6:"My remaining?",ch7:"friend",ch8:"! 👋 I'm your personal coach. Tell me how you feel or what you ate today. Or pick «",ch9:"». Ask me anything about nutrition!",ch10:"Message me — I'll suggest what to eat 💬",ch11:"Got it! Tell me more?",ch12:"Sorry, couldn't respond now 😅 Try again in a second.",ch13:"Coach",ch14:"Coach · always online",ch15:"Message your coach...",ch16:"I'm the Nutrivo coach and I only help with nutrition 🥗",
+    
+    ui0:"Photo",ui1:"Fridge",ui2:"Barcode",ui3:"Text",ui4:"Analysis error. Try again or describe with text.",ui5:"🧠 Preparing recommendation...",ui6:"Good meal!",ui7:"Next in 3-4h",ui8:"Logged. Keep tracking your diet.",ui9:"Next meal in 3-4 hours.",ui10:"15 min",ui11:"Left for today:",ui12:"Per day",ui13:"Per week",ui14:"Per month",ui15:"Choose photo",ui16:"Muscle",ui17:"Type",ui18:"Rating",ui19:"Now",ui20:"Your starting point",ui21:"In 1 month",ui22:"In 3 months",ui23:"In 6 months",ui24:"In a year",ui25:"Analysis confidence:",ui26:"🌅 Breakfast",ui27:"🥚 Snack",ui28:"🍽 Lunch",ui29:"🥛 Afternoon snack",ui30:"🍎 Snack",ui31:"🌙 Dinner",ui32:"Breakfast",ui33:"Snack",ui34:"Lunch",ui35:"Afternoon snack",ui36:"Dinner",ui37:"Protein",ui38:"Fats",ui39:"Carbs",ui40:"Invalid response format",ui41:"No days found",ui42:"Take a photo",ui43:"Recognize by photo",ui44:"Choose from history",ui45:"Frequent dishes",ui46:"Enter as text",ui47:"Describe what you ate",ui48:"Scan barcode",ui49:"Packaged product",ui50:"Ask Coach",ui51:"Meal advice",
+    
+    week:"Week",month:"Month",year:"Year",pw_permonth_price:"≈1,332 ₸/mo",
+    
+    pw_feat1:"Count calories by photo in 5 seconds",pw_feat2:"Body analysis and shape forecast",pw_feat3:"Personal nutrition plan for your goal",pw_feat4:"Personal Nutrivo coach 24/7",pw_feat5:"No limits every day",pw_save:"Save",pw_title1:"Unlock the full",pw_title2:"power of Nutrivo",pw_subtitle:"Everything for your goal — in one app",pw_instead:"Instead of",pw_economy:"save",pw_trial_btn:"Try free for 2 days",pw_next:"Then",pw_autocharge:"Charged automatically after 2 days",pw_buynow:"Subscribe now without trial",pw_reassure1:"No charge today",pw_reassure2:"Cancel anytime before trial ends",pw_restore:"Restore purchases",pw_privacy:"Privacy",pw_terms:"Terms",pw_support:"Support",pw_maybe:"Maybe later",pw_for:"To get started",pw_popular:"Popular",pw_perweek:"week",pw_permonth:"month",pw_peryear:"year",pw_whatin:"WHAT'S IN PRO",pw_trialon:"Trial activated! 2 days free",
+    
+    greet_night:"Good night",greet_morning:"Good morning",greet_day:"Good afternoon",greet_evening:"Good evening",sub0:"Today is a great day",sub1:"Small steps — big results",sub2:"You're on the right track",sub3:"Every meal matters",sub4:"Keep it up",m_breakfast:"Breakfast",m_lunch:"Lunch",m_snack:"Snack",m_dinner:"Dinner",water100:"Goal reached! Great job 🎉",water75:"Almost there — your body thanks you",water50:"Great pace, keep going",water25:"Good start to the day",water1:"First sip done 💧",water0:"Start your day with a glass of water",xp_today:"XP today",xp_to_lvl:"to lvl",days1:"day",days2:"days",days5:"days",goal_label:"Goal",left_label:"Left",of:"of",tapPlus:"Tap +",
+    
+    ob100:"Hi!",ob101:"Today is a great day",ob102:"KCAL",ob103:"Meals",ob104:"Nutrition analysis",ob105:"Photo, barcode or text — we'll count macros",ob106:"Your nutrition this week",ob107:"Coach",ob108:"Coach · always online",ob109:"Preparing your plan",ob110:"Building your personal program",ob111:"Scan food",ob112:"Fridge",ob113:"What to cook",ob114:"Add water",ob115:"Workout",ob116:"Scan body",ob117:"Ask Coach",
+    
+    ob0:"Welcome to Nutrivo",ob1:"We'll help you count calories, analyze nutrition and track progress",ob2:"Analyze food by photo in 5 seconds",ob3:"Personal nutrition plan",ob4:"Body analysis",ob5:"Start",ob6:"What's your name?",ob7:"We'll address you by name",ob8:"Your gender",ob9:"Affects your daily target",ob10:"Male",ob11:"Female",ob12:"Prefer not to say",ob13:"Your age",ob14:"Enter or use the slider",ob15:"years",ob16:"Your height",ob17:"Move the slider",ob18:"cm",ob19:"Current weight",ob20:"Your weight right now",ob21:"kg",ob22:"Target weight",ob23:"What weight do you want to reach?",ob24:"Your goal",ob25:"Choose your main goal",ob26:"Lose weight",ob27:"Lose weight, improve shape",ob28:"Cutting",ob29:"Burn fat, keep muscle",ob30:"Maintain weight",ob31:"Keep current shape",ob32:"Gain mass",ob33:"Muscle and strength growth",ob34:"Improve health",ob35:"Healthy eating",ob36:"More protein",ob37:"For growth and recovery",ob38:"Intensity",ob39:"Choose the pace",ob40:"Activity level",ob41:"How much do you move?",ob42:"Almost no activity",ob43:"Light (1–2 workouts)",ob44:"Medium (3–4)",ob45:"High (5+)",ob46:"Professional sport",ob47:"How much water do you drink?",ob48:"On average per day",ob49:"liters per day",ob50:"Dietary preferences",ob51:"You can pick several",ob52:"🙅 No restrictions",ob53:"🥦 Vegetarian",ob54:"🌱 Vegan",ob55:"🌙 Halal",ob56:"🥛 Lactose-free",ob57:"🌾 Gluten-free",ob58:"🥩 Low-carb",ob59:"Allergies",ob60:"Mark if any",ob61:"✅ None",ob62:"🥜 Nuts",ob63:"🧀 Dairy",ob64:"🥚 Eggs",ob65:"🐟 Fish",ob66:"🦐 Seafood",ob67:"🫘 Soy",ob68:"Health conditions",ob69:"We'll factor this in",ob70:"🩸 Diabetes",ob71:"💊 Blood pressure",ob72:"🫀 Digestion",ob73:"🦋 Thyroid",ob74:"🫘 Kidneys",ob75:"Meals per day",ob76:"Your usual routine",ob77:"Favorite cuisine",ob78:"Pick several",ob79:"🇰🇿 Kazakh",ob80:"🇪🇺 European",ob81:"🍜 Asian",ob82:"🍔 Fast food",ob83:"🏠 Home-style",ob84:"🥩 Meat dishes",ob85:"🍰 Desserts",ob86:"Consistent support works",ob87:"Nutrivo is always here to guide you to your goal",ob88:"Without Nutrivo",ob89:"With Nutrivo",ob90:"People who track nutrition with support reach their goals far more consistently 💪",ob91:"Calculating recommendations…",ob92:"Analyzing your data",ob93:"Done!",ob94:"Your daily target",ob95:"kcal per day",ob96:"Protein",ob97:"Fats",ob98:"Carbs",ob99:"Next",
+    
+    main:"Home",history:"History",food:"Food",plan:"Plan",body:"Body",
+    calories:"kcal",protein:"Protein",fat:"Fat",carbs:"Carbs",water:"Water",
+    goal:"Goal",remaining:"Left",today:"Today",meals:"meals",
+    mission:"DAILY MISSION",done:"Done",level:"Level",streak:"Streak",
+    analyze:"Analyze",photo:"Photo",text:"Text",barcode:"Barcode",favs:"Favorites",
+    save:"Save",add:"Add",back:"↩ Back",close:"Close",
+    premium:"Premium",free:"Free",activate:"Activate",
+    mealsTitle:"Meals",breakfast:"Breakfast",lunch:"Lunch",snack:"Snack",dinner:"Dinner",
+    tapAdd:"Tap +",water_unit:"ml",
+    langSub:"Тілді таңдаңыз · Выберите язык · Choose language"
   }
 };
+
+
+
+function applyLangToStaticUI(){
+  // Nav labels (static HTML with classes nav-lbl-*)
+  var navMap={"nav-lbl-main":"main","nav-lbl-history":"history","nav-lbl-plan":"plan","nav-lbl-body":"body"};
+  for(var cls in navMap){
+    var els=document.getElementsByClassName(cls);
+    for(var i=0;i<els.length;i++){ els[i].textContent=t(navMap[cls]); }
+  }
+  var fl=document.getElementById("nav-food-label");
+  if(fl) fl.textContent=t("food");
+  // Translate ALL [data-t] elements (onboarding + tagged static text)
+  try{
+    var dt=document.querySelectorAll("[data-t]");
+    for(var j=0;j<dt.length;j++){
+      var key=dt[j].getAttribute("data-t");
+      if(key) dt[j].textContent=t(key);
+    }
+    // placeholders
+    var dp=document.querySelectorAll("[data-t-ph]");
+    for(var p=0;p<dp.length;p++){
+      var pk=dp[p].getAttribute("data-t-ph");
+      if(pk) dp[p].setAttribute("placeholder",t(pk));
+    }
+  }catch(e){}
+}
+
+function pickLang(lang){
+  S.lang=lang;
+  try{localStorage.setItem("nc_lang",lang);}catch(e){}
+  try{if(navigator.vibrate)navigator.vibrate(12);}catch(e){}
+  // proceed to onboarding
+  try{applyLangToStaticUI();}catch(e){}
+  try{obShow(0);}catch(e){}
+  showScreen("onboard");
+}
+function getSavedLang(){
+  try{return localStorage.getItem("nc_lang");}catch(e){return null;}
+}
 
 function t(key){
   var lang=S.lang||"ru";
   return (LANG[lang]&&LANG[lang][key])||LANG.ru[key]||key;
 }
 
-function switchLang(){
-  S.lang=S.lang==="ru"?"kz":"ru";
-  try{localStorage.setItem("nc_lang",S.lang);}catch(e){}
-  renderLangBtn();
-  if(S.currentTab==="main") renderDashboard();
-  else if(S.currentTab==="body") renderBodyScreen();
-  else if(S.currentTab==="history") renderHistoryScreen();
-  else if(S.currentTab==="food") renderFoodScreen();
-  setTimeout(function(){applyTranslations();},50);
-}
 
-function renderLangBtn(){
-  var btn=document.getElementById("lang-btn");
-  if(!btn) return;
-  btn.textContent=S.lang==="ru"?"🇰🇿 ҚАЗ":"🇷🇺 РУС";
-  // Update nav labels
-  var labels={
-    "nav-lbl-main":t("main"),"nav-lbl-hist":t("history"),
-    "nav-lbl-plan":t("plan"),"nav-lbl-body":t("body")
-  };
-  for(var id in labels){
-    var el=document.getElementById(id);
-    if(el) el.textContent=labels[id];
-  }
-}
+
+
 
 function applyTranslations(){
   if(S.lang==="ru") return; // Russian is default, no changes needed
@@ -3348,6 +3405,7 @@ function obShow(idx){
   }
   var _ct=document.getElementById('ob_content');if(_ct)_ct.scrollTop=0;
   obCheckBtn();
+  try{applyLangToStaticUI();}catch(e){}
 }
 
 function obNext(){
@@ -3530,7 +3588,7 @@ function coachFallback(tod){
 function renderCoachCard(msg){
   var el=document.getElementById("coach-card");
   if(!el) return;
-  var preview="Напиши мне — подскажу что съесть 💬";
+  var preview=t("ch10");
   if(S.chatLog&&S.chatLog.length>0){
     var last=S.chatLog[S.chatLog.length-1];
     preview=last.text.length>68?last.text.slice(0,68)+"...":last.text;
@@ -3573,7 +3631,7 @@ function openCoachChat(){
   // First-time greeting
   if(S.chatLog.length===0){
     var g=GOALS.filter(function(x){return x.id===S.gl;})[0]||GOALS[0];
-    S.chatLog.push({role:"assistant",text:"Привет, "+(S.name||"друг")+"! 👋 Я твой личный тренер. Напиши как ты себя чувствуешь — голодный, сытый, что хочешь поесть, и я подскажу что лучше съесть под твою цель «"+g.title+"». Спрашивай что угодно про питание!"});
+    S.chatLog.push({role:"assistant",text:t("ch_hi")+(S.name||t("ch7"))+t("ch8")+g.title+t("ch9")});
     saveChatLog();
   }
   renderChat();
@@ -3591,9 +3649,9 @@ function renderChat(){
   if(!box) return;
   // Quick reply chips
   if(quick){
-    var chips=["Я голodен 🍽","Я сыт ✅","Что съесть на ужин?","Хочу перекус","Сколько мне осталось?"];
+    var chips=[t("ch0"),t("ch1"),t("ch2"),t("ch3"),t("ch4")];
     // fix typo
-    chips=["Я голоден 🍽","Я сыт ✅","Что съесть?","Хочу перекус","Мой остаток?"];
+    chips=[t("ch0"),t("ch1"),t("ch5"),t("ch3"),t("ch6")];
     quick.innerHTML=chips.map(function(c){
       return "<button onclick='quickChat(this)' data-t='"+c.replace(/'/g,"&#39;")+"' style='flex-shrink:0;padding:9px 15px;border-radius:99px;border:1.5px solid var(--green-mid);background:var(--green-soft);color:var(--green-text);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;white-space:nowrap' ontouchstart=''>"+c+"</button>";
     }).join("");
@@ -3660,7 +3718,8 @@ function sendChat(){
   // Recent chat history for context (last 6)
   var history=S.chatLog.slice(-7,-1).map(function(m){return {role:m.role==="user"?"user":"assistant",content:m.text};});
   var messages=history.concat([{role:"user",content:ctx}]);
-  var sys="Ты — Коуч, AI-тренер приложения Nutrivo. Отвечаешь ТЁПЛО, дружелюбно, КОРОТКО (2-4 предложения), на ты, по-русски. "+
+  var _langName=S.lang==="kz"?"КАЗАХСКОМ":S.lang==="en"?"АНГЛИЙСКОМ":"РУССКОМ";
+  var sys="ВАЖНО: отвечай ТОЛЬКО на "+_langName+" языке. Ты — Коуч, AI-тренер приложения Nutrivo. Отвечаешь ТЁПЛО, дружелюбно, КОРОТКО (2-4 предложения), на ты, по-русски. "+
     "\n\nТВОЯ СПЕЦИАЛИЗАЦИЯ — ТОЛЬКО эти темы: питание, калории, КБЖУ, похудение, набор массы, поддержание веса, продукты, рецепты, план питания, анализ еды, тренировки, вода, здоровые привычки, мотивация, цели пользователя, функции Nutrivo. "+
     "\n\nКРИТИЧЕСКИ ВАЖНО: если вопрос НЕ относится к питанию/фитнесу/здоровью (например: политика, новости, история, математика, физика, закон Ома, программирование, код, криптовалюта, инвестиции, фильмы, игры, кто президент, общие факты, любые посторонние темы) — ВЕЖЛИВО ОТКАЖИСЬ и НЕ ПЫТАЙСЯ связать это с питанием через метафоры. "+
     "Просто ответь: 'Я AI-тренер Nutrivo и помогаю только с питанием, калориями, КБЖУ, тренировками и здоровыми привычками. По другим темам не подскажу 🙂 Но могу помочь с твоим рационом!' и предложи 2-3 варианта чем помочь по питанию. "+
@@ -3669,11 +3728,11 @@ function sendChat(){
     "Верни ТОЛЬКО JSON: {\"reply\":\"твой ответ\",\"offtopic\":true/false}";
   callClaude(messages,sys,{model:"claude-haiku-4-5",max_tokens:400}).then(function(res){
     S.chatSending=false;
-    S.chatLog.push({role:"assistant",text:res.reply||"Понял тебя! Расскажи подробнее?"});
+    S.chatLog.push({role:"assistant",text:res.reply||t("ch11")});
     saveChatLog();renderChat();
   }).catch(function(e){
     S.chatSending=false;
-    S.chatLog.push({role:"assistant",text:"Извини, не смог ответить сейчас 😅 Попробуй ещё раз через секунду."});
+    S.chatLog.push({role:"assistant",text:t("ch12")});
     saveChatLog();renderChat();
   });
 }
@@ -3714,7 +3773,7 @@ function analyzeFridge(){
   var g=GOALS.filter(function(x){return x.id===S.gl;})[0]||GOALS[0];
   var calLeft=Math.max(0,S.dg.calories-S.st.calories);
   var prompt=
-    "Ты повар-нутрициолог. На фото — холодильник/продукты. ОПРЕДЕЛИ какие продукты видишь. "+
+    ""+(S.lang==="kz"?"Все текстовые значения на казахском. ":S.lang==="en"?"All text values in English. ":"")+"Ты повар-нутрициолог. На фото — холодильник/продукты. ОПРЕДЕЛИ какие продукты видишь. "+
     "Затем предложи 3 блюда которые можно приготовить ИЗ ЭТИХ продуктов под цель «"+g.title+"». "+
     "Осталось на сегодня: "+calLeft+" ккал, "+Math.max(0,S.dg.protein-S.st.protein)+"г белка. "+
     getUserContext()+
@@ -3722,7 +3781,7 @@ function analyzeFridge(){
     "Верни ТОЛЬКО JSON: {products:[\"продукт1\",\"продукт2\"],dishes:[{name:string,ingredients:string,calories:number,protein:number,fat:number,carbs:number,time:string,why:string}]}";
   fetch("/api/claude",{method:"POST",headers:{"Content-Type":"application/json","X-User-Name":encodeURIComponent(S.name||"unknown")},
     body:JSON.stringify({model:"claude-haiku-4-5",max_tokens:1200,
-      system:"Ты AI повар-нутрициолог. Верни ТОЛЬКО JSON без markdown.",
+      system:""+(S.lang==="kz"?"Все текстовые значения на казахском. ":S.lang==="en"?"All text values in English. ":"")+"Ты AI повар-нутрициолог. Верни ТОЛЬКО JSON без markdown.",
       messages:[{role:"user",content:[
         {type:"image",source:{type:"base64",media_type:S.fridgeMime||"image/jpeg",data:S.fridgeB64}},
         {type:"text",text:prompt}
@@ -4420,10 +4479,10 @@ function flyFireToStreak(){
 // PREMIUM MEAL RINGS — breathing, glass, glow + meal-type system
 // ═══════════════════════════════════════════════
 var MEAL_TYPES=[
-  {id:"breakfast",emoji:"🍳",label:"Завтрак",color:"#f5a623",soft:"#fff4e0",share:0.30},
-  {id:"lunch",    emoji:"🥗",label:"Обед",   color:"#4CAF50",soft:"#e6f4e6",share:0.35},
-  {id:"snack",    emoji:"🍎",label:"Перекус",color:"#42a5f5",soft:"#e3f0fc",share:0.10},
-  {id:"dinner",   emoji:"🌙",label:"Ужин",   color:"#9b59d0",soft:"#f0e6fa",share:0.25}
+  {id:"breakfast",emoji:"🍳",label:"Завтрак",lkey:"m_breakfast",color:"#f5a623",soft:"#fff4e0",share:0.30},
+  {id:"lunch",    emoji:"🥗",label:"Обед",   lkey:"m_lunch",color:"#4CAF50",soft:"#e6f4e6",share:0.35},
+  {id:"snack",    emoji:"🍎",label:"Перекус",lkey:"m_snack",color:"#42a5f5",soft:"#e3f0fc",share:0.10},
+  {id:"dinner",   emoji:"🌙",label:"Ужин",   lkey:"m_dinner",color:"#9b59d0",soft:"#f0e6fa",share:0.25}
 ];
 function mealTypeTarget(typeId){
   var mt=MEAL_TYPES.filter(function(x){return x.id===typeId;})[0];
@@ -4465,7 +4524,7 @@ function renderMealRings(){
     html+="</div>";
     html+="</div>";
     // label
-    html+="<div style='font-size:13px;font-weight:700;color:var(--ink);margin-bottom:2px'>"+mt.label+"</div>";
+    html+="<div style='font-size:13px;font-weight:700;color:var(--ink);margin-bottom:2px'>"+t(mt.lkey)+"</div>";
     html+="<div style='font-size:11px;color:"+(hasFood?mt.color:"var(--ink3)")+";font-weight:"+(hasFood?"700":"500")+"'>"+(hasFood?cal+" / "+target+" ккал":"Нажми +")+"</div>";
     html+="</div></div>";
   });
@@ -4515,17 +4574,17 @@ function openMealSheet(typeId){
       "<div style='width:40px;height:5px;background:var(--line2);border-radius:99px;margin:0 auto 20px'></div>"+
       "<div style='display:flex;align-items:center;gap:14px;margin-bottom:20px'>"+
         "<div style='width:54px;height:54px;border-radius:16px;background:"+mt.soft+";display:flex;align-items:center;justify-content:center;font-size:28px'>"+mt.emoji+"</div>"+
-        "<div><div style='font-size:20px;font-weight:800;color:var(--ink)'>"+mt.label+"</div>"+
+        "<div><div style='font-size:20px;font-weight:800;color:var(--ink)'>"+t(mt.lkey)+"</div>"+
         "<div style='font-size:13px;color:var(--ink3)'>Цель ~"+mealTypeTarget(typeId)+" ккал</div></div>"+
       "</div>"+
       existHtml+
       "<div style='font-size:11px;font-weight:700;color:var(--ink3);text-transform:uppercase;letter-spacing:.04em;margin-bottom:10px'>Добавить еду</div>"+
       "<div style='display:flex;flex-direction:column;gap:9px'>"+
-        mealSheetBtn("📷","Сфотографировать","Распознаю по фото","food")+
-        mealSheetBtn("🍽️","Выбрать из истории","Частые блюда","history")+
-        mealSheetBtn("✍️","Ввести текстом","Опиши что съел","text")+
-        mealSheetBtn("📦","Сканировать штрихкод","Готовый продукт","barcode")+
-        mealSheetBtn("🤖","Спросить AI","Совет по приёму","coach")+
+        mealSheetBtn("📷",t("ui42"),t("ui43"),"food")+
+        mealSheetBtn("🍽️",t("ui44"),t("ui45"),"history")+
+        mealSheetBtn("✍️",t("ui46"),t("ui47"),"text")+
+        mealSheetBtn("📦",t("ui48"),t("ui49"),"barcode")+
+        mealSheetBtn("🤖",t("ui50"),t("ui51"),"coach")+
       "</div>"+
       "<button onclick='closeMealSheet()' style='display:block;width:100%;padding:13px;border:none;background:none;color:var(--ink3);font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;margin-top:8px' ontouchstart=''>Закрыть</button>"+
     "</div>";
@@ -4898,7 +4957,7 @@ function checkUsage(feature){
 window.addEventListener("DOMContentLoaded",function(){
   try{initFabScroll();}catch(e){}
   try{renderGoals();}catch(e){}
-  try{renderLangBtn();}catch(e){}
+  try{}catch(e){}
   // URL ?new or ?reset clears everything and forces onboarding
   try{if(location.search&&(location.search.indexOf("new")>=0||location.search.indexOf("reset")>=0)){localStorage.clear();}}catch(e){}
   // Restore saved profile only if COMPLETE
@@ -4920,8 +4979,16 @@ window.addEventListener("DOMContentLoaded",function(){
     }
   }catch(e){}
   // Show onboarding
-  try{obShow(0);}catch(e){console.warn("OB:",e);}
-  showScreen("onboard");
+  // First launch: show language picker. If already chosen, skip it.
+  var savedLang=getSavedLang();
+  if(savedLang){
+    S.lang=savedLang;
+    try{applyLangToStaticUI();}catch(e){}
+    try{obShow(0);}catch(e){console.warn("OB:",e);}
+    showScreen("onboard");
+  } else {
+    showScreen("lang");
+  }
 });
 </script>
 <script>
