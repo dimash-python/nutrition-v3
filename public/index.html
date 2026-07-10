@@ -6,7 +6,10 @@
 <meta name="apple-mobile-web-app-capable" content="yes"/>
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
 <meta name="apple-mobile-web-app-title" content="AI Nutrition"/>
-<meta name="theme-color" content="#4CAF50"/>
+<script>
+(function(){try{var th=localStorage.getItem("nc_theme")||"light";if(th==="dark"){document.documentElement.setAttribute("data-theme","dark");}var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("content",th==="dark"?"#0d1410":"#f4f7f3");}catch(e){}})();
+</script>
+  <meta name="theme-color" content="#4CAF50"/>
 <link rel="manifest" href="/manifest.json"/>
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"/>
 <!-- v2-button-fix -->
@@ -31,9 +34,39 @@
   --shadow-md:0 10px 34px rgba(15,40,20,.09), 0 2px 6px rgba(15,40,20,.05);
   --shadow-lg:0 20px 56px rgba(15,40,20,.14), 0 4px 12px rgba(15,40,20,.06);
   --c:#4CAF50; --cb:rgba(76,175,80,.12);
+  --nav-bg:rgba(255,255,255,.92); --nav-border:rgba(15,40,20,.06);
+  --overlay-bg:rgba(15,25,18,.5); --sheet-bg:#fffef9;
+  --card-white:#ffffff; --input-bg:#f7f9f5; --input-border:#e3eae4;
+  --on-accent:#ffffff; --frost:rgba(255,255,255,.7); --frost-strong:rgba(255,255,255,.92);
+  --skeleton:rgba(15,40,20,.06); --divider:rgba(15,40,20,.08);
+  --status-bar:#f4f7f3; --toast-bg:#0f1a12; --toast-ink:#ffffff;
 }
+
+html[data-theme="dark"]{
+  --green:#5cba60; --green-d:#4caf50; --green-light:#1a2e1c; --green-mid:#1f3a22;
+  --green-text:#7dd382; --green-soft:#16241a;
+  --bg:#0d1410; --surface:#161e18; --surface2:#1a241c;
+  --ink:#f0f5f1; --ink2:#a8b8ac; --ink3:#7a8a7e; --ink4:#4a5a4d;
+  --line:#222e24; --line2:#2a382c;
+  --blue:#4fa9f0; --blue-bg:#14222e; --blue-text:#7cc0f5;
+  --amber:#f5b443; --amber-bg:#2a2114; --amber-text:#f0c674;
+  --purple:#a96ad8; --purple-bg:#221630; --purple-text:#c79ae0;
+  --red:#f06360; --red-bg:#2a1414;
+  --shadow:0 4px 20px rgba(0,0,0,.3), 0 1px 3px rgba(0,0,0,.2);
+  --shadow-md:0 10px 34px rgba(0,0,0,.4), 0 2px 6px rgba(0,0,0,.25);
+  --shadow-lg:0 20px 56px rgba(0,0,0,.5), 0 4px 12px rgba(0,0,0,.3);
+  --cb:rgba(92,186,96,.15);
+  --nav-bg:rgba(20,28,22,.92); --nav-border:rgba(255,255,255,.07);
+  --overlay-bg:rgba(0,0,0,.65); --sheet-bg:#161e18;
+  --card-white:#1a241c; --input-bg:#1a241c; --input-border:#2a382c;
+  --on-accent:#ffffff; --frost:rgba(20,28,22,.7); --frost-strong:rgba(20,28,22,.92);
+  --skeleton:rgba(255,255,255,.06); --divider:rgba(255,255,255,.08);
+  --status-bar:#0d1410; --toast-bg:#2a382c; --toast-ink:#f0f5f1;
+}
+html[data-theme="dark"] body{background:#0d1410}
+
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-html{height:100%}
+html{height:100%;background:var(--bg)}
 body{height:100%;background:var(--bg);overflow:hidden;position:fixed;width:100%;top:0;left:0;right:0;bottom:0}
 body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;color:var(--ink);display:flex;justify-content:center}
 #app{width:100%;max-width:390px;height:100%;position:relative;background:var(--bg);overflow:hidden}
@@ -66,11 +99,11 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;color
 .sel-card:active{transform:scale(.98)}
 .sel-card.sel{border-color:var(--green);background:var(--green-light)}
 /* overlay + sheet */
-.overlay{display:none;position:fixed;inset:0;background:rgba(20,40,20,.4);z-index:100;align-items:flex-end;justify-content:center;backdrop-filter:blur(4px)}
+.overlay{display:none;position:fixed;inset:0;background:var(--overlay-bg);z-index:100;align-items:flex-end;justify-content:center;backdrop-filter:blur(4px)}
 .sheet{background:var(--surface);border-radius:28px 28px 0 0;padding:24px 20px 36px;width:100%;max-width:390px;box-shadow:0 -8px 40px rgba(0,0,0,.12);animation:sheetUp .3s cubic-bezier(.22,1,.36,1);max-height:90vh;overflow-y:auto;-webkit-overflow-scrolling:touch}
 @keyframes sheetUp{from{transform:translateY(100%)}to{transform:none}}
 /* bottom nav */
-#main-nav{position:absolute;bottom:0;left:0;width:100%;max-width:390px;background:rgba(255,255,255,.92);backdrop-filter:blur(20px);border-top:1px solid var(--line);display:none;justify-content:space-around;align-items:center;padding:10px 0 28px;z-index:50}
+#main-nav{position:absolute;bottom:0;left:0;width:100%;max-width:390px;background:var(--nav-bg);backdrop-filter:blur(20px);border-top:1px solid var(--nav-border);display:none;justify-content:space-around;align-items:center;padding:10px 0 28px;z-index:50}
 .nav-btn{background:none;border:none;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px;padding:0 12px;font-family:inherit}
 .nav-icon{font-size:22px;line-height:1;opacity:.45;transition:opacity .2s}
 .nav-btn.active .nav-icon{opacity:1}
@@ -138,12 +171,32 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;color
 @keyframes cardSuccessBounce{0%{transform:scale(1)}35%{transform:scale(1.015)}100%{transform:scale(1)}}
 .card{will-change:transform}
 
-.water-chip{flex:1;padding:12px 4px;border-radius:13px;border:1.5px solid #cbe6fb;background:rgba(255,255,255,.7);color:var(--blue-text);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;transition:transform .12s}
+.water-chip{flex:1;padding:12px 4px;border-radius:13px;border:1.5px solid var(--blue-bg);background:var(--card-white);color:var(--blue-text);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;transition:transform .12s}
 .water-chip:active{transform:scale(.94);background:#dcefff}
 
 .lang-opt{display:flex;align-items:center;gap:16px;width:100%;padding:18px 20px;border:2px solid var(--line2);border-radius:18px;background:var(--surface);font-size:17px;font-weight:700;color:var(--ink);cursor:pointer;font-family:inherit;transition:all .2s cubic-bezier(.34,1.4,.5,1);box-shadow:var(--shadow)}
 .lang-opt:active{transform:scale(.97);border-color:var(--green);background:var(--green-soft)}
 .lang-check{color:var(--ink3);font-size:20px}
+@keyframes streakFlamePulse{0%,100%{transform:scale(1)}50%{transform:scale(1.08)}}
+
+/* Dark theme comprehensive overrides */
+html[data-theme="dark"] .water-chip{background:var(--input-bg);border-color:var(--input-border)}
+html[data-theme="dark"] #main-nav{background:var(--nav-bg);border-top-color:var(--nav-border)}
+html[data-theme="dark"] input,html[data-theme="dark"] textarea{background:var(--input-bg)!important;color:var(--ink)!important;border-color:var(--input-border)!important}
+html[data-theme="dark"] input::placeholder,html[data-theme="dark"] textarea::placeholder{color:var(--ink3)!important}
+html[data-theme="dark"] .toast{background:var(--sheet-bg);color:var(--ink);border:1px solid var(--line2)}
+html[data-theme="dark"] .chip{background:var(--input-bg);color:var(--ink2);border-color:var(--input-border)}
+html[data-theme="dark"] .fab-ic{box-shadow:0 4px 14px rgba(0,0,0,.4)}
+html[data-theme="dark"] .skeleton{background:var(--skeleton)}
+html[data-theme="dark"] ::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1)}
+
+/* Smooth theme transitions */
+body,.card,#main-nav,.sheet,.overlay,input,textarea,.water-chip,.chip,.nav-btn{transition:background-color .35s ease,border-color .35s ease,color .35s ease,box-shadow .35s ease}
+
+/* Pastel accent cards in dark mode */
+html[data-theme="dark"] #mission-card{background:linear-gradient(135deg,#2a2114,#231b10)!important;border-color:#3a2f1a!important}
+html[data-theme="dark"] #referral-card>div{background:linear-gradient(135deg,#16241a,#14201a)!important;border-color:#1f3a22!important}
+html[data-theme="dark"] #streak-badge{background:linear-gradient(135deg,#2a2114,#231b10)!important;border-color:#3a2f1a!important}
 </style>
 </head>
 <body>
@@ -151,7 +204,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;color
 <div id="app">
 
   <!-- LANGUAGE PICKER (first screen) -->
-  <div id="scr-lang" class="screen hidden" style="padding:0;overflow:hidden;background:linear-gradient(180deg,#fffef9,#f4f9f4)">
+  <div id="scr-lang" class="screen hidden" style="padding:0;overflow:hidden;background:linear-gradient(180deg,var(--bg),var(--surface2))">
     <div style="height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 28px">
       <div style="width:80px;height:80px;background:linear-gradient(135deg,#4CAF50,#2e9e54);border-radius:24px;display:flex;align-items:center;justify-content:center;font-size:42px;box-shadow:0 12px 36px rgba(76,175,80,.35);margin-bottom:28px">🔥</div>
       <div style="font-size:26px;font-weight:900;color:var(--ink);letter-spacing:-.02em;margin-bottom:8px;text-align:center">Nutrivo</div>
@@ -177,7 +230,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;color
   </div>
 
   <!-- ONBOARDING -->
-  <div id="scr-onboard" class="screen fade-in" style="padding:0;overflow:hidden;background:#f5f7f5">
+  <div id="scr-onboard" class="screen fade-in" style="padding:0;overflow:hidden;background:var(--bg)">
     <style>
 /* CRITICAL: override main app .screen properties that break onboarding layout */
 #scr-onboard.screen{padding-bottom:0 !important;overflow:hidden !important;position:absolute !important;inset:0 !important}
@@ -192,7 +245,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;color
 
 #scr-onboard {box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 
-#scr-onboard {font-family:-apple-system,BlinkMacSystemFont,sans-serif;background:#f0f9f0;color:#1a1a1a;height:100vh;overflow:hidden}
+#scr-onboard {font-family:-apple-system,BlinkMacSystemFont,sans-serif;background:var(--input-bg);color:var(--ink);height:100vh;overflow:hidden}
 
 #scr-onboard .app {max-width:390px;height:100%;margin:0 auto;background:#fff;display:flex;flex-direction:column;position:relative;overflow:hidden}
 
@@ -219,7 +272,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;color
 
 #scr-onboard .sub {font-size:16px;color:#666;line-height:1.5;margin-bottom:24px}
 
-#scr-onboard input[type=text] {width:100%;padding:16px 18px;border:2px solid #e0e0e0;border-radius:16px;font-size:18px;font-family:inherit;outline:none;background:#fafafa;color:#1a1a1a;transition:border-color .2s}
+#scr-onboard input[type=text] {width:100%;padding:16px 18px;border:2px solid #e0e0e0;border-radius:16px;font-size:18px;font-family:inherit;outline:none;background:var(--input-bg);color:var(--ink);transition:border-color .2s}
 
 #scr-onboard input[type=text]:focus {border-color:#4CAF50;background:#fff}
 
@@ -279,7 +332,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;color
 
 #scr-onboard .wheel-item {height:50px;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:500;color:#ccc;transition:color .1s,font-size .1s,font-weight .1s;flex-shrink:0}
 
-#scr-onboard .wheel-item.sel-item {color:#1a1a1a;font-size:26px;font-weight:800}
+#scr-onboard .wheel-item.sel-item {color:var(--ink);font-size:26px;font-weight:800}
 
 #scr-onboard .wheel-unit {font-size:13px;color:#888;text-align:center;margin-top:6px}
 
@@ -590,9 +643,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;color
         <div class="res-cal" id="r_cal">2100</div>
         <div style="font-size:15px;color:#888;margin-bottom:4px" data-t="ob95">ккал в день</div>
         <div class="res-grid">
-          <div class="res-card"><div class="res-val" id="r_p">-</div><div class="res-lbl" data-t="ob96">"+t("ui37")+"</div></div>
-          <div class="res-card"><div class="res-val" id="r_f">-</div><div class="res-lbl" data-t="ob97">"+t("ui38")+"</div></div>
-          <div class="res-card"><div class="res-val" id="r_c">-</div><div class="res-lbl" data-t="ob98">"+t("ui39")+"</div></div>
+          <div class="res-card"><div class="res-val" id="r_p">-</div><div class="res-lbl" data-t="ob96">Белки</div></div>
+          <div class="res-card"><div class="res-val" id="r_f">-</div><div class="res-lbl" data-t="ob97">Жиры</div></div>
+          <div class="res-card"><div class="res-val" id="r_c">-</div><div class="res-lbl" data-t="ob98">Углеводы</div></div>
         </div>
         <div class="res-msg" id="r_msg"></div>
       </div>
@@ -614,7 +667,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;color
         <div style="font-size:22px;font-weight:800;color:var(--ink);line-height:1.15;letter-spacing:-.02em;margin-bottom:4px" id="greeting" data-t="ob100">Привет!</div>
         <div style="font-size:13px;color:var(--ink3);font-weight:500" id="greeting-sub" data-t="ob101">Сегодня отличный день</div>
       </div>
-      <div id="streak-badge" style="display:flex;align-items:center;gap:8px;background:linear-gradient(135deg,#fff5e9,#fef0db);border:1.5px solid #fde3c0;border-radius:99px;padding:8px 14px 8px 11px;box-shadow:0 3px 14px rgba(245,166,35,.18);flex-shrink:0;margin-left:12px;position:relative;overflow:hidden">
+      <button id="theme-toggle-btn" onclick="toggleTheme()" style="width:38px;height:38px;border-radius:50%;border:1.5px solid var(--line2);background:var(--surface);font-size:17px;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;padding:0;margin-left:8px" ontouchstart="">🌙</button>
+      <div id="streak-badge" onclick="openStreakModal()" style="display:flex;align-items:center;gap:8px;background:linear-gradient(135deg,#fff5e9,#fef0db);border:1.5px solid #fde3c0;border-radius:99px;padding:8px 14px 8px 11px;box-shadow:0 3px 14px rgba(245,166,35,.18);flex-shrink:0;margin-left:12px;position:relative;overflow:hidden;cursor:pointer" ontouchstart="">
         <span style="font-size:16px">🔥</span>
         <span style="font-size:14px;font-weight:800;color:var(--amber-text)" id="streak-tag">0 дней</span>
       </div>
@@ -676,6 +730,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;color
     <div class="card" id="water-card"></div>
     <!-- Mission -->
     <div class="card" id="mission-card" style="background:linear-gradient(135deg,#fef6e9,#fdf0db);border-color:#fde3c0"></div>
+    <!-- Referral card (Pro only) -->
+    <div id="referral-card" style="margin-bottom:18px"></div>
   </div>
     <!-- FOOD -->
   <div id="scr-food" class="screen hidden" style="padding:56px 18px 120px">
@@ -734,12 +790,13 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;color
   <div id="fab-overlay" onclick="closeFab()" style="display:none;position:absolute;inset:0;background:rgba(15,26,18,.55);backdrop-filter:blur(3px);z-index:80;opacity:0;transition:opacity .25s"></div>
   <div id="fab-wrap" style="display:none;position:absolute;right:18px;width:180px;bottom:158px;z-index:90;flex-direction:column;align-items:flex-end;gap:12px">
     <div class="fab-item" data-i="0" onclick="fabAction('food')"><span class="fab-lbl" data-t="ob111">Скан еды</span><span class="fab-ic" style="background:linear-gradient(135deg,#4CAF50,#43a047)">📸</span></div>
-    <div class="fab-item" data-i="1" onclick="fabAction('fridge')"><span class="fab-lbl" data-t="ob112">"+t("ui1")+"</span><span class="fab-ic" style="background:linear-gradient(135deg,#3b9eed,#5bb3f5)">🧊</span></div>
+    <div class="fab-item" data-i="1" onclick="fabAction('fridge')"><span class="fab-lbl" data-t="ob112">Холодильник</span><span class="fab-ic" style="background:linear-gradient(135deg,#3b9eed,#5bb3f5)">🧊</span></div>
     <div class="fab-item" data-i="2" onclick="fabAction('cook')"><span class="fab-lbl" data-t="ob113">Что приготовить</span><span class="fab-ic" style="background:linear-gradient(135deg,#f5a623,#ffb74d)">🍳</span></div>
     <div class="fab-item" data-i="3" onclick="fabAction('water')"><span class="fab-lbl" data-t="ob114">Добавить воду</span><span class="fab-ic" style="background:linear-gradient(135deg,#42a5f5,#64b5f6)">💧</span></div>
     <div class="fab-item" data-i="4" onclick="fabAction('workout')"><span class="fab-lbl" data-t="ob115">Тренировка</span><span class="fab-ic" style="background:linear-gradient(135deg,#9b59d0,#b074dd)">🏋️</span></div>
     <div class="fab-item" data-i="5" onclick="fabAction('body')"><span class="fab-lbl" data-t="ob116">Скан тела</span><span class="fab-ic" style="background:linear-gradient(135deg,#ef5350,#f47570)">🪞</span></div>
-    <div class="fab-item" data-i="6" onclick="fabAction('coach')"><span class="fab-lbl" data-t="ob117">Спросить Коуча</span><span class="fab-ic" style="background:linear-gradient(135deg,#26a69a,#4db6ac)">🤖</span></div>
+    <div class="fab-item" data-i="7" onclick="fabAction('share')"><span class="fab-lbl" data-t="share_btn">Поделиться</span><span class="fab-ic" style="background:linear-gradient(135deg,#ec4899,#f472b6)">📤</span></div>
+  <div class="fab-item" data-i="6" onclick="fabAction('coach')"><span class="fab-lbl" data-t="ob117">Спросить Коуча</span><span class="fab-ic" style="background:linear-gradient(135deg,#26a69a,#4db6ac)">🤖</span></div>
   </div>
   
 
@@ -957,7 +1014,7 @@ function renderGoals(){
             "<div class='text-muted' style='font-size:12px;margin-top:2px'>"+g.desc+"</div>" +
           "</div>" +
           "<div id='gc-chk-"+g.id+"' style='display:none;width:20px;height:20px;border-radius:50%;background:"+g.color+";flex-shrink:0;align-items:center;justify-content:center'>" +
-            "<span style='color:#000;font-size:13px;font-weight:900'>✓</span>" +
+            "<span style='color:var(--ink);font-size:13px;font-weight:900'>✓</span>" +
           "</div>" +
         "</div>" +
       "</div>" +
@@ -1146,6 +1203,22 @@ function startMain(){
 // ═══════════════════════════════════════════════════════════════
 // DASHBOARD
 // ═══════════════════════════════════════════════════════════════
+
+function renderReferralCard(){
+  var el=document.getElementById("referral-card");
+  if(!el) return;
+  // Only show for Pro users (referral is a Pro perk)
+  if(typeof isPro!=="function" || !isPro()){ el.innerHTML=""; return; }
+  el.innerHTML="<div onclick='openReferral()' class='card' style='background:linear-gradient(135deg,#e8f5e9,#e0f2e1);border-color:#c8e6c9;cursor:pointer;display:flex;align-items:center;gap:14px' ontouchstart=''>"+
+    "<div style='font-size:34px'>🎁</div>"+
+    "<div style='flex:1'>"+
+      "<div style='font-size:15px;font-weight:800;color:var(--ink);margin-bottom:2px'>"+t("ref_title")+"</div>"+
+      "<div style='font-size:12px;color:var(--ink3);line-height:1.4'>"+t("ref_menu")+"</div>"+
+    "</div>"+
+    "<div style='font-size:20px;color:var(--green)'>›</div>"+
+  "</div>";
+}
+
 function renderDashboard(){
   var g=GOALS.filter(function(x){return x.id===S.gl;})[0];
   setCSSVars(g);
@@ -1164,6 +1237,8 @@ function renderDashboard(){
   try{loadCoach();}catch(e){}
   try{renderMealRings();}catch(e){}
   try{applyDynamicBg();}catch(e){}
+  try{renderReferralCard();}catch(e){}
+  try{updateThemeToggle();}catch(e){}
 }
 function renderXP(){
   var ll=document.getElementById("level-label");
@@ -2288,7 +2363,7 @@ function renderSubGoals(goalId){
     h+="<span style='font-size:22px'>"+s.icon+"</span>";
     h+="<div style='flex:1'><div style='font-weight:700;font-size:13px;color:var(--ink)' id='sub-lbl-"+s.id+"'>"+s.label+"</div>";
     h+="<div style='font-size:11px;color:var(--ink3);margin-top:2px'>"+s.desc+"</div></div>";
-    h+="<div id='sub-chk-"+s.id+"' style='display:none;width:18px;height:18px;border-radius:50%;background:"+s.color+";flex-shrink:0;align-items:center;justify-content:center;font-size:10px;font-weight:900;color:#000'>v</div>";
+    h+="<div id='sub-chk-"+s.id+"' style='display:none;width:18px;height:18px;border-radius:50%;background:"+s.color+";flex-shrink:0;align-items:center;justify-content:center;font-size:10px;font-weight:900;color:#fff'>v</div>";
     h+="</div></div>";
   }
   h+="</div>";
@@ -2868,7 +2943,7 @@ function openPremiumPaywall(){
   if(!modal){
     modal=document.createElement("div");
     modal.id="premium-paywall";
-    modal.style.cssText="position:absolute;inset:0;z-index:300;background:linear-gradient(180deg,#fffef9 0%,#f4f9f4 100%);overflow-y:auto;opacity:0;transition:opacity .5s;-webkit-overflow-scrolling:touch";
+    modal.style.cssText="position:absolute;inset:0;z-index:300;background:linear-gradient(180deg,var(--bg) 0%,var(--surface2) 100%);overflow-y:auto;opacity:0;transition:opacity .5s;-webkit-overflow-scrolling:touch";
     document.body.appendChild(modal);
   }
   _selectedPlan="year";
@@ -3124,6 +3199,12 @@ function renderPremiumBanner(){
 // ═══════════════════════════════════════════════════════════════
 var LANG={
   ru:{
+    ref_title:"Приведи друга",ref_sub:"Друг получит неделю бесплатно, а ты +7 дней Pro за каждого",ref_yourcode:"Твой код",ref_copy:"Копировать код",ref_copied:"Скопировано! ✓",ref_share:"Поделиться приглашением",ref_invited:"Приглашено друзей",ref_earned:"Заработано дней Pro",ref_how:"Как это работает",ref_step1:"Поделись своим кодом с другом",ref_step2:"Друг вводит код при оформлении",ref_step3:"Вы оба получаете бонусные дни",ref_msg:"Привет! Попробуй Nutrivo — приложение для подсчёта калорий по фото. По моему коду ",ref_msg2:" получишь неделю бесплатно:",ref_locked:"Реферальная программа доступна с Nutrivo Pro",ref_close:"Закрыть",ref_menu:"Пригласить друга",
+    
+    st_title:"Серия дней",st_keep:"Не теряй серию!",st_days:"дней подряд",st_msg_new:"Отличное начало! Заходи каждый день",st_msg_good:"Так держать! Ты в ударе",st_msg_fire:"Невероятно! Ты неудержим 🔥",st_week:"Неделя",st_record:"Рекорд",st_today_done:"Сегодня выполнено ✓",st_today_todo:"Запиши еду чтобы продолжить серию",st_close:"Закрыть",
+    
+    share_title:"Поделиться прогрессом",share_cal:"ккал сегодня",share_streak:"дней подряд",share_water:"воды",share_tag:"Мой прогресс в Nutrivo",share_btn:"Поделиться",share_save:"Сохранить картинку",share_made:"Создано в Nutrivo",share_err:"Не удалось поделиться, картинка сохранена",
+    
     ch_hi:"Привет, ",
     
     ch0:"Я голоден 🍽",ch1:"Я сыт ✅",ch2:"Что съесть на ужин?",ch3:"Хочу перекус",ch4:"Сколько мне осталось?",ch5:"Что съесть?",ch6:"Мой остаток?",ch7:"друг",ch8:"! 👋 Я твой личный тренер. Напиши как ты себя чувствуешь или что ел сегодня. Или выбери «",ch9:"». Спрашивай что угодно про питание!",ch10:"Напиши мне — подскажу что съесть 💬",ch11:"Понял тебя! Расскажи подробнее?",ch12:"Извини, не смог ответить сейчас 😅 Попробуй ещё раз через секунду.",ch13:"Коуч",ch14:"AI-тренер · всегда онлайн",ch15:"Напиши тренеру...",ch16:"Я AI-тренер Nutrivo и помогаю только с питанием 🥗",
@@ -3152,6 +3233,12 @@ var LANG={
     langSub:"Тілді таңдаңыз · Выберите язык · Choose language"
   },
   kz:{
+    ref_title:"Досыңды шақыр",ref_sub:"Досың бір апта тегін алады, ал сен әрқайсысы үшін +7 күн Pro",ref_yourcode:"Сенің кодың",ref_copy:"Кодты көшіру",ref_copied:"Көшірілді! ✓",ref_share:"Шақырумен бөлісу",ref_invited:"Шақырылған достар",ref_earned:"Жиналған Pro күндері",ref_how:"Бұл қалай жұмыс істейді",ref_step1:"Кодыңды досыңмен бөліс",ref_step2:"Досың рәсімдеу кезінде кодты енгізеді",ref_step3:"Екеуің де бонустық күндер аласыңдар",ref_msg:"Сәлем! Nutrivo қолданбасын көр — фото бойынша калория санайды. Менің кодыммен ",ref_msg2:" бір апта тегін аласың:",ref_locked:"Реферал бағдарламасы Nutrivo Pro-мен қолжетімді",ref_close:"Жабу",ref_menu:"Досты шақыру",
+    
+    st_title:"Күндер сериясы",st_keep:"Серияңды жоғалтпа!",st_days:"күн қатарынан",st_msg_new:"Тамаша бастама! Күн сайын кір",st_msg_good:"Осылай ұста! Сен жақсы жолдасың",st_msg_fire:"Керемет! Сені тоқтату мүмкін емес 🔥",st_week:"Апта",st_record:"Рекорд",st_today_done:"Бүгін орындалды ✓",st_today_todo:"Серияны жалғастыру үшін тамақ жаз",st_close:"Жабу",
+    
+    share_title:"Прогреспен бөлісу",share_cal:"ккал бүгін",share_streak:"күн қатарынан",share_water:"су",share_tag:"Nutrivo-дағы прогресім",share_btn:"Бөлісу",share_save:"Суретті сақтау",share_made:"Nutrivo-да жасалған",share_err:"Бөлісу мүмкін болмады, сурет сақталды",
+    
     ch_hi:"Сәлем, ",
     
     ch0:"Қарным аш 🍽",ch1:"Тойдым ✅",ch2:"Кешкі асқа не жесем?",ch3:"Жеңіл ас қалаймын",ch4:"Маған қанша қалды?",ch5:"Не жесем?",ch6:"Менің қалдығым?",ch7:"дос",ch8:"! 👋 Мен сенің жеке жаттықтырушыңмын. Өзіңді қалай сезінетініңді немесе бүгін не жегеніңді жаз. Немесе «",ch9:"». Тамақтану туралы кез келген нәрсені сұра!",ch10:"Маған жаз — не жейтініңді айтамын 💬",ch11:"Түсіндім! Толығырақ айтшы?",ch12:"Кешір, қазір жауап бере алмадым 😅 Бір секундтан кейін қайталап көр.",ch13:"Коуч",ch14:"Жаттықтырушы · әрқашан онлайн",ch15:"Жаттықтырушыға жаз...",ch16:"Мен Nutrivo жаттықтырушысымын және тек тамақтануға көмектесемін 🥗",
@@ -3180,6 +3267,12 @@ var LANG={
     langSub:"Тілді таңдаңыз · Выберите язык · Choose language"
   },
   en:{
+    ref_title:"Invite a friend",ref_sub:"Your friend gets a free week, you get +7 days Pro for each",ref_yourcode:"Your code",ref_copy:"Copy code",ref_copied:"Copied! ✓",ref_share:"Share invitation",ref_invited:"Friends invited",ref_earned:"Pro days earned",ref_how:"How it works",ref_step1:"Share your code with a friend",ref_step2:"Friend enters code at checkout",ref_step3:"You both get bonus days",ref_msg:"Hi! Try Nutrivo — count calories by photo. With my code ",ref_msg2:" you get a free week:",ref_locked:"Referral program available with Nutrivo Pro",ref_close:"Close",ref_menu:"Invite a friend",
+    
+    st_title:"Day streak",st_keep:"Don't lose your streak!",st_days:"days in a row",st_msg_new:"Great start! Come back every day",st_msg_good:"Keep it up! You're on fire",st_msg_fire:"Incredible! Unstoppable 🔥",st_week:"Week",st_record:"Record",st_today_done:"Done today ✓",st_today_todo:"Log a meal to keep your streak",st_close:"Close",
+    
+    share_title:"Share progress",share_cal:"kcal today",share_streak:"day streak",share_water:"water",share_tag:"My progress in Nutrivo",share_btn:"Share",share_save:"Save image",share_made:"Made in Nutrivo",share_err:"Couldn't share, image saved",
+    
     ch_hi:"Hi, ",
     
     ch0:"I'm hungry 🍽",ch1:"I'm full ✅",ch2:"What to eat for dinner?",ch3:"I want a snack",ch4:"How much do I have left?",ch5:"What to eat?",ch6:"My remaining?",ch7:"friend",ch8:"! 👋 I'm your personal coach. Tell me how you feel or what you ate today. Or pick «",ch9:"». Ask me anything about nutrition!",ch10:"Message me — I'll suggest what to eat 💬",ch11:"Got it! Tell me more?",ch12:"Sorry, couldn't respond now 😅 Try again in a second.",ch13:"Coach",ch14:"Coach · always online",ch15:"Message your coach...",ch16:"I'm the Nutrivo coach and I only help with nutrition 🥗",
@@ -3429,12 +3522,12 @@ function obNext(){
 }
 
 function obBack(){
-  if(cur<=1) return;
+  if(OB_CUR<=1) return;
   var id=OB_STEPS[OB_CUR];
-  if(id==='sc8'&&OB_STEPS[cur-1]==='sc7b'&&!OB_SUBGOALS[OB_D.goal]){
-    cur-=2;
+  if(id==='sc8'&&OB_STEPS[OB_CUR-1]==='sc7b'&&!OB_SUBGOALS[OB_D.goal]){
+    OB_CUR-=2;
   } else {
-    cur--;
+    OB_CUR--;
   }
   obShow(OB_CUR);
 }
@@ -4099,6 +4192,7 @@ function fabAction(act){
     else if(act==="workout") showWorkoutModal();
     else if(act==="body"){ switchTab("body"); }
     else if(act==="coach") openCoachChat();
+    else if(act==="share") shareProgress();
   },180);
 }
 function fabAddWater(){
@@ -4114,7 +4208,7 @@ function showToast(msg){
   if(!t){
     t=document.createElement("div");
     t.id="nc-toast";
-    t.style.cssText="position:fixed;bottom:170px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--ink);color:#fff;padding:12px 22px;border-radius:14px;font-size:14px;font-weight:600;z-index:200;opacity:0;transition:all .3s;box-shadow:var(--shadow-lg);pointer-events:none";
+    t.style.cssText="position:fixed;bottom:170px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--toast-bg);color:var(--toast-ink);padding:12px 22px;border-radius:14px;font-size:14px;font-weight:600;z-index:200;opacity:0;transition:all .3s;box-shadow:var(--shadow-lg);pointer-events:none";
     document.body.appendChild(t);
   }
   t.textContent=msg;
@@ -4954,7 +5048,320 @@ function checkUsage(feature){
   return true;
 }
 
+
+// ═══════════════════════════════════════════════
+// SHARE PROGRESS — beautiful story image
+// ═══════════════════════════════════════════════
+function shareProgress(){
+  try{if(navigator.vibrate)navigator.vibrate(12);}catch(e){}
+  var canvas=document.createElement("canvas");
+  var W=540,H=960;
+  canvas.width=W;canvas.height=H;
+  var ctx=canvas.getContext("2d");
+  // gradient background
+  var grad=ctx.createLinearGradient(0,0,0,H);
+  grad.addColorStop(0,"#4CAF50");grad.addColorStop(0.5,"#2e9e54");grad.addColorStop(1,"#1b7a3e");
+  ctx.fillStyle=grad;ctx.fillRect(0,0,W,H);
+  // subtle circles decoration
+  ctx.globalAlpha=0.08;ctx.fillStyle="#fff";
+  ctx.beginPath();ctx.arc(W-60,120,160,0,7);ctx.fill();
+  ctx.beginPath();ctx.arc(40,H-100,200,0,7);ctx.fill();
+  ctx.globalAlpha=1;
+  // logo flame
+  ctx.font="64px serif";ctx.textAlign="center";
+  ctx.fillText("🔥",W/2,130);
+  // Nutrivo title
+  ctx.fillStyle="#fff";ctx.font="bold 38px -apple-system,system-ui,sans-serif";
+  ctx.fillText("Nutrivo",W/2,185);
+  // main stat - calories
+  var used=S.st.calories||0;
+  var goal=(S.dg&&S.dg.calories)||2000;
+  ctx.font="bold 130px -apple-system,system-ui,sans-serif";
+  ctx.fillText(String(used),W/2,400);
+  ctx.font="500 28px -apple-system,system-ui,sans-serif";
+  ctx.globalAlpha=0.9;
+  ctx.fillText("/ "+goal+" "+t("share_cal"),W/2,445);
+  ctx.globalAlpha=1;
+  // divider
+  ctx.strokeStyle="rgba(255,255,255,.25)";ctx.lineWidth=2;
+  ctx.beginPath();ctx.moveTo(80,510);ctx.lineTo(W-80,510);ctx.stroke();
+  // streak + water row
+  var streak=S.str||0;
+  var water=S.water||0;
+  // streak block
+  ctx.font="56px serif";ctx.fillText("🔥",W/2-110,600);
+  ctx.fillStyle="#fff";ctx.font="bold 46px -apple-system,system-ui,sans-serif";
+  ctx.fillText(String(streak),W/2-110,660);
+  ctx.font="500 20px -apple-system,system-ui,sans-serif";ctx.globalAlpha=0.85;
+  ctx.fillText(t("share_streak"),W/2-110,690);ctx.globalAlpha=1;
+  // water block
+  ctx.font="56px serif";ctx.fillText("💧",W/2+110,600);
+  ctx.fillStyle="#fff";ctx.font="bold 46px -apple-system,system-ui,sans-serif";
+  ctx.fillText((water>=1000?(water/1000).toFixed(1)+"л":water+""),W/2+110,660);
+  ctx.font="500 20px -apple-system,system-ui,sans-serif";ctx.globalAlpha=0.85;
+  ctx.fillText(t("share_water"),W/2+110,690);ctx.globalAlpha=1;
+  // macros mini
+  var p=S.st.protein||0,f=S.st.fat||0,c=S.st.carbs||0;
+  ctx.font="500 24px -apple-system,system-ui,sans-serif";ctx.globalAlpha=0.95;
+  ctx.fillText("🥩 "+p+"г   🥑 "+f+"г   🌾 "+c+"г",W/2,790);
+  ctx.globalAlpha=1;
+  // footer tag
+  ctx.font="600 22px -apple-system,system-ui,sans-serif";ctx.globalAlpha=0.8;
+  ctx.fillText(t("share_made"),W/2,H-60);
+  ctx.globalAlpha=1;
+  // Convert to blob and share
+  canvas.toBlob(function(blob){
+    if(!blob){try{showToast(t("share_err"));}catch(e){}return;}
+    var file=new File([blob],"nutrivo-progress.png",{type:"image/png"});
+    // Try Web Share API with file
+    if(navigator.canShare&&navigator.canShare({files:[file]})){
+      navigator.share({files:[file],title:t("share_tag"),text:t("share_tag")}).catch(function(){
+        downloadShareImage(blob);
+      });
+    } else {
+      downloadShareImage(blob);
+    }
+  },"image/png");
+}
+function downloadShareImage(blob){
+  try{
+    var url=URL.createObjectURL(blob);
+    var a=document.createElement("a");
+    a.href=url;a.download="nutrivo-progress.png";
+    document.body.appendChild(a);a.click();
+    setTimeout(function(){document.body.removeChild(a);URL.revokeObjectURL(url);},100);
+    try{showToast(t("share_save"));}catch(e){}
+  }catch(e){
+    try{showToast(t("share_err"));}catch(e2){}
+  }
+}
+
+
+// ═══════════════════════════════════════════════
+// STREAK MODAL — Duolingo-style, keeps users coming back
+// ═══════════════════════════════════════════════
+function getStreakRecord(){
+  try{return parseInt(localStorage.getItem("nc_streak_record")||"0")||0;}catch(e){return 0;}
+}
+function updateStreakRecord(){
+  try{
+    var rec=getStreakRecord();
+    if((S.str||0)>rec){localStorage.setItem("nc_streak_record",String(S.str));return S.str;}
+    return rec;
+  }catch(e){return S.str||0;}
+}
+function openStreakModal(){
+  try{if(navigator.vibrate)navigator.vibrate(12);}catch(e){}
+  var modal=document.getElementById("streak-modal");
+  if(!modal){
+    modal=document.createElement("div");
+    modal.id="streak-modal";
+    modal.className="overlay";
+    modal.onclick=function(e){if(e.target===modal)modal.style.display="none";};
+    document.body.appendChild(modal);
+  }
+  var streak=S.str||0;
+  var record=updateStreakRecord();
+  // message by streak length
+  var msg=streak<3?t("st_msg_new"):streak<7?t("st_msg_good"):t("st_msg_fire");
+  // week view - which of last 7 days were active (we only know today + streak)
+  var todayIdx=new Date().getDay(); // 0=Sun
+  var weekDays=["Вс","Пн","Вт","Ср","Чт","Пт","Сб"];
+  if(S.lang==="en") weekDays=["Su","Mo","Tu","We","Th","Fr","Sa"];
+  if(S.lang==="kz") weekDays=["Жс","Дс","Сс","Ср","Бс","Жм","Сб"];
+  var todayDone=S.missionDone||S.meals&&S.meals.length>0;
+  var weekHtml="";
+  for(var i=0;i<7;i++){
+    // mark days within streak as done (rough: last `streak` days up to today)
+    var dayOffset=(todayIdx-i+7)%7;
+    var isToday=i===todayIdx;
+    var inStreak=dayOffset<streak;
+    var active=isToday?todayDone:inStreak;
+    weekHtml+="<div style='display:flex;flex-direction:column;align-items:center;gap:6px;flex:1'>"+
+      "<div style='font-size:11px;color:var(--ink3);font-weight:600'>"+weekDays[i]+"</div>"+
+      "<div style='width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;"+
+        (active?"background:linear-gradient(135deg,#f5a623,#f0930a);box-shadow:0 2px 8px rgba(245,166,35,.4)":"background:var(--surface2);border:1.5px solid var(--line)")+
+        (isToday?";outline:2.5px solid var(--green);outline-offset:2px":"")+"'>"+
+        (active?"🔥":"")+"</div>"+
+    "</div>";
+  }
+  modal.innerHTML="<div class='sheet' style='text-align:center'>"+
+    "<div style='width:40px;height:5px;background:var(--line2);border-radius:99px;margin:0 auto 24px'></div>"+
+    // big flame + number
+    "<div style='font-size:80px;line-height:1;margin-bottom:8px;animation:streakFlamePulse 2s ease-in-out infinite'>🔥</div>"+
+    "<div class='stat-num' style='font-size:64px;font-weight:900;color:#f5a623;line-height:1;letter-spacing:-.02em'>"+streak+"</div>"+
+    "<div style='font-size:16px;color:var(--ink2);font-weight:600;margin-bottom:6px'>"+t("st_days")+"</div>"+
+    "<div style='font-size:14px;color:var(--ink3);margin-bottom:24px'>"+msg+"</div>"+
+    // week view
+    "<div style='background:var(--surface2);border-radius:18px;padding:18px 14px;margin-bottom:18px'>"+
+      "<div style='display:flex;gap:4px;margin-bottom:14px'>"+weekHtml+"</div>"+
+      "<div style='font-size:13px;font-weight:600;color:"+(todayDone?"var(--green-text)":"var(--ink3)")+"'>"+
+        (todayDone?t("st_today_done"):t("st_today_todo"))+"</div>"+
+    "</div>"+
+    // record
+    "<div style='display:flex;justify-content:center;gap:8px;align-items:center;margin-bottom:22px'>"+
+      "<span style='font-size:18px'>🏆</span>"+
+      "<span style='font-size:14px;color:var(--ink2);font-weight:600'>"+t("st_record")+": "+record+" "+t("st_days")+"</span>"+
+    "</div>"+
+    "<button onclick='document.getElementById(\"streak-modal\").style.display=\"none\"' style='width:100%;padding:16px;border-radius:16px;border:none;background:linear-gradient(135deg,#f5a623,#f0930a);color:#fff;font-size:16px;font-weight:800;cursor:pointer;font-family:inherit;box-shadow:0 6px 20px rgba(245,166,35,.35)' ontouchstart=''>"+t("st_keep")+"</button>"+
+  "</div>";
+  modal.style.display="flex";
+}
+
+
+// ═══════════════════════════════════════════════
+// REFERRAL SYSTEM — invite friends, earn Pro days
+// ═══════════════════════════════════════════════
+function getReferralCode(){
+  try{
+    var c=localStorage.getItem("nc_ref_code");
+    if(!c){
+      // generate a short code from name + random
+      var base=(S.name||"NUT").slice(0,3).toUpperCase().replace(/[^A-ZА-Я]/g,"");
+      if(base.length<3) base="NUT";
+      c=base+Math.floor(1000+Math.random()*9000);
+      localStorage.setItem("nc_ref_code",c);
+    }
+    return c;
+  }catch(e){return "NUT"+Math.floor(1000+Math.random()*9000);}
+}
+function getReferralStats(){
+  try{
+    var d=JSON.parse(localStorage.getItem("nc_ref_stats")||'{"invited":0,"earned":0}');
+    return d;
+  }catch(e){return {invited:0,earned:0};}
+}
+function openReferral(){
+  try{if(navigator.vibrate)navigator.vibrate(10);}catch(e){}
+  // Pro only
+  if(typeof isPro==="function" && !isPro()){
+    try{showToast(t("ref_locked"));}catch(e){}
+    setTimeout(function(){try{openPremiumPaywall();}catch(e){}},800);
+    return;
+  }
+  var modal=document.getElementById("referral-modal");
+  if(!modal){
+    modal=document.createElement("div");
+    modal.id="referral-modal";
+    modal.className="overlay";
+    modal.onclick=function(e){if(e.target===modal)modal.style.display="none";};
+    document.body.appendChild(modal);
+  }
+  var code=getReferralCode();
+  var stats=getReferralStats();
+  modal.innerHTML="<div class='sheet' style='max-height:90vh;overflow-y:auto'>"+
+    "<div style='width:40px;height:5px;background:var(--line2);border-radius:99px;margin:0 auto 22px'></div>"+
+    "<div style='text-align:center;margin-bottom:24px'>"+
+      "<div style='font-size:56px;margin-bottom:10px'>🎁</div>"+
+      "<div style='font-size:23px;font-weight:800;color:var(--ink);margin-bottom:8px'>"+t("ref_title")+"</div>"+
+      "<div style='font-size:14px;color:var(--ink3);padding:0 10px;line-height:1.5'>"+t("ref_sub")+"</div>"+
+    "</div>"+
+    // stats
+    "<div style='display:flex;gap:12px;margin-bottom:22px'>"+
+      "<div style='flex:1;background:var(--green-soft);border-radius:16px;padding:16px;text-align:center'>"+
+        "<div class='stat-num' style='font-size:28px;font-weight:900;color:var(--green-text)'>"+stats.invited+"</div>"+
+        "<div style='font-size:11px;color:var(--ink3);font-weight:600;margin-top:2px'>"+t("ref_invited")+"</div>"+
+      "</div>"+
+      "<div style='flex:1;background:#fff5e9;border-radius:16px;padding:16px;text-align:center'>"+
+        "<div class='stat-num' style='font-size:28px;font-weight:900;color:var(--amber-text)'>"+stats.earned+"</div>"+
+        "<div style='font-size:11px;color:var(--ink3);font-weight:600;margin-top:2px'>"+t("ref_earned")+"</div>"+
+      "</div>"+
+    "</div>"+
+    // code box
+    "<div style='font-size:11px;font-weight:700;color:var(--ink3);text-transform:uppercase;letter-spacing:.04em;margin-bottom:8px'>"+t("ref_yourcode")+"</div>"+
+    "<div style='display:flex;gap:10px;margin-bottom:14px'>"+
+      "<div style='flex:1;background:var(--surface2);border:2px dashed var(--green-mid);border-radius:14px;padding:16px;text-align:center;font-size:24px;font-weight:900;color:var(--ink);letter-spacing:3px'>"+code+"</div>"+
+      "<button onclick='copyReferralCode()' style='width:56px;border-radius:14px;border:none;background:var(--green-soft);color:var(--green-text);font-size:22px;cursor:pointer' ontouchstart=''>📋</button>"+
+    "</div>"+
+    // share button
+    "<button onclick='shareReferral()' style='width:100%;padding:16px;border-radius:16px;border:none;background:linear-gradient(135deg,#4CAF50,#2e9e54);color:#fff;font-size:16px;font-weight:800;cursor:pointer;font-family:inherit;box-shadow:0 6px 20px rgba(76,175,80,.35);margin-bottom:24px' ontouchstart=''>"+t("ref_share")+"</button>"+
+    // how it works
+    "<div style='font-size:11px;font-weight:700;color:var(--ink3);text-transform:uppercase;letter-spacing:.04em;margin-bottom:14px'>"+t("ref_how")+"</div>"+
+    refStep("1",t("ref_step1"))+
+    refStep("2",t("ref_step2"))+
+    refStep("3",t("ref_step3"))+
+    "<button onclick='document.getElementById(\"referral-modal\").style.display=\"none\"' style='display:block;width:100%;padding:13px;border:none;background:none;color:var(--ink3);font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;margin-top:10px' ontouchstart=''>"+t("ref_close")+"</button>"+
+  "</div>";
+  modal.style.display="flex";
+}
+function refStep(num,text){
+  return "<div style='display:flex;align-items:center;gap:13px;margin-bottom:12px'>"+
+    "<div style='width:30px;height:30px;border-radius:50%;background:var(--green);color:#fff;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;flex-shrink:0'>"+num+"</div>"+
+    "<div style='font-size:14px;color:var(--ink);font-weight:500;flex:1'>"+text+"</div>"+
+  "</div>";
+}
+function copyReferralCode(){
+  var code=getReferralCode();
+  try{
+    if(navigator.clipboard){
+      navigator.clipboard.writeText(code);
+    } else {
+      var ta=document.createElement("textarea");ta.value=code;document.body.appendChild(ta);ta.select();document.execCommand("copy");document.body.removeChild(ta);
+    }
+    try{if(navigator.vibrate)navigator.vibrate(12);}catch(e){}
+    try{showToast(t("ref_copied"));}catch(e){}
+  }catch(e){}
+}
+function shareReferral(){
+  var code=getReferralCode();
+  var text=t("ref_msg")+code+t("ref_msg2")+" https://nutrivo.kz";
+  try{if(navigator.vibrate)navigator.vibrate(12);}catch(e){}
+  if(navigator.share){
+    navigator.share({title:"Nutrivo",text:text}).catch(function(){copyReferralCode();});
+  } else {
+    copyReferralCode();
+  }
+}
+
+
+// ═══════════════════════════════════════════════
+// DARK THEME — toggle + persistence
+// ═══════════════════════════════════════════════
+function getTheme(){
+  try{return localStorage.getItem("nc_theme")||"light";}catch(e){return "light";}
+}
+function applyTheme(theme){
+  try{
+    if(theme==="dark"){
+      document.documentElement.setAttribute("data-theme","dark");
+    } else {
+      document.documentElement.removeAttribute("data-theme");
+    }
+    localStorage.setItem("nc_theme",theme);
+    // update status bar color (iOS/Android chrome) to match theme
+    var meta=document.querySelector('meta[name="theme-color"]');
+    if(!meta){meta=document.createElement("meta");meta.name="theme-color";document.head.appendChild(meta);}
+    meta.setAttribute("content",theme==="dark"?"#0d1410":"#f4f7f3");
+    // iOS status bar style
+    var sbMeta=document.querySelector('meta[name="apple-mobile-web-app-status-bar-style"]');
+    if(sbMeta) sbMeta.setAttribute("content",theme==="dark"?"black-translucent":"default");
+  }catch(e){}
+}
+function toggleTheme(){
+  try{if(navigator.vibrate)navigator.vibrate(10);}catch(e){}
+  var cur=getTheme();
+  var next=cur==="dark"?"light":"dark";
+  applyTheme(next);
+  // re-render current screen so dynamic colors update
+  try{
+    if(S.currentTab==="main") renderDashboard();
+    else if(S.currentTab==="body") renderBodyScreen();
+    else if(S.currentTab==="history") renderHistoryScreen();
+    else if(S.currentTab==="food") renderFoodScreen();
+  }catch(e){}
+  // update toggle button label if visible
+  try{updateThemeToggle();}catch(e){}
+}
+function updateThemeToggle(){
+  var btn=document.getElementById("theme-toggle-btn");
+  if(btn){
+    var dark=getTheme()==="dark";
+    btn.innerHTML=dark?"☀️":"🌙";
+  }
+}
+
 window.addEventListener("DOMContentLoaded",function(){
+  try{applyTheme(getTheme());}catch(e){}
   try{initFabScroll();}catch(e){}
   try{renderGoals();}catch(e){}
   try{}catch(e){}
